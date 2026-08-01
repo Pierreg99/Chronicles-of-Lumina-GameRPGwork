@@ -7,13 +7,24 @@ Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Chan
 Siehe [`PLAN.md`](./PLAN.md) für detaillierte Aufgaben-Schätzungen.
 
 ### Geplant
-- **Phase 12 — Code-Hygiene**: `ui-system.js` Dead-Code weg, CI-Workflows SHA-pinnen, REFACTOR-Doku fixen
 - **Phase 13 — Type-Safety**: JSDoc-Type-Hints auf `core/*` + `systems/*` (ohne TypeScript-Build)
 - **Phase 14 — Distribution**: GitHub-Pages-Deploy, Demo-GIF im README, erstes GitHub-Release
 - **Phase 15 — Security**: SECURITY.md, Dependabot-Config, optional CodeQL-Analyse
 - **Phase 16 — Test-Coverage**: Three.js-Mocks für Rendering, jsdom für UI (53 → ~80 Assertions)
 - **Phase 17 — i18n**: Hardcoded DE-Strings extrahieren, English-Locale, optional FR
 - **Phase 18 — Performance**: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling
+
+## [0.10.1] – 2026-08-01
+
+### Removed (Phase 12: Code-Hygiene)
+- Entfernt: `src/systems/ui-system.js` — 38 Zeilen, 1438 Bytes, 0 Importe, 0 Instanziierungen (echter Dead-Code seit R5)
+
+### Changed
+- Geändert: 3 GitHub-Actions-Workflows SHA-pinned (Org-Policy-Konformität):
+  - `actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2`
+  - `actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0`
+  - `slsa-framework/slsa-github-generator/...@68bad40844440577b33778c9f29077a3388838e9 # v1.4.0`
+- Geändert: `REFACTOR.md` R5-Tabelle: ehrliche Korrektur, "UiSystem komplett raus" wird spezifiziert als "Import + Instanziierung in main.js" — die Datei selbst war noch da, jetzt entfernt
 
 
 

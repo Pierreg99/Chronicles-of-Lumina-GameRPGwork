@@ -117,6 +117,7 @@ FPS-Counter, Adaptive-Music-Toggle und Minimap-Draw sind Teil von `updateLoop`, 
 | `applyShake()`, `_activeShakes[]` | `main.js` | in CameraRig verschoben (R3) | ✅ |
 | Monkey-Patches `_origKill` / `_origBossDamage` | `main.js` | in Systeme (R2) | ✅ |
 | Alte `core/game.js` Klassen-Implementierung mit `sceneMgr`, `mobileInput`, `collision`, `loop.setPaused` | `core/game.js` | komplett ersetzt mit der neuen Game-Klasse | ✅ |
+| **Nachtrag Phase 12** | `src/systems/ui-system.js` | **Datei selbst** gelöscht (war nach R5 noch vorhanden, 0 Importe, 38 Zeilen Dead-Code) | ✅ |
 
 ---
 
