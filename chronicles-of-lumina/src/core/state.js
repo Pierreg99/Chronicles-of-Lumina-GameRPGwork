@@ -1,7 +1,8 @@
 // core/state.js — global game state. Plain object, mutations via small setters.
 
 export const state = {
-  phase: 'menu',                  // menu | playing | paused | endscreen
+  screen: 'start',                 // see core/screen-state.js for valid values
+  phase:  'start',                 // legacy alias of screen, kept for back-compat
   time: 0,
   crystals: 0,
   bossActive: false,
@@ -17,9 +18,10 @@ export const state = {
   flags: new Set(),
 };
 
-export const isPlaying = () => state.phase === 'playing';
-export const isPaused = () => state.phase === 'paused';
+export const isPlaying = () => state.screen === 'playing';
+export const isPaused  = () => state.screen === 'paused';
 
 export function setPhase(p) {
   state.phase = p;
+  state.screen = p;
 }

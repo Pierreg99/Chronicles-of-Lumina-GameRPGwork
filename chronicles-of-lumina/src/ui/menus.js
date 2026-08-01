@@ -1,28 +1,37 @@
-// ui/menus.js — start / pause / end screens + their buttons.
+// ui/menus.js — start / pause / end screens. Listens to screen-state
+// changes and shows/hides overlays declaratively. The DOM is no longer
+// poked from main.js for these panels.
 
 import { EVENTS } from '../core/constants.js';
+import { screenBus, SCREEN, transition } from '../core/screen-state.js';
+
+const PANELS = {
+  [SCREEN.START]:     'start-screen',
+  [SCREEN.PAUSED]:    'pause-screen',
+  [SCREEN.ENDScreen]: 'end-screen',
+};
 
 export class Menus {
-  constructor(bus, onStart, onRestart, onResume) {
+  constructor(bus, callbacks = {}) {
     this.bus = bus;
-    this.onStart = onStart;
-    this.onRestart = onRestart;
-    this.onResume = onResume;
-    this._wire();
+    this.cb = callbacks;
+    this._wireButtons();
+    screenBus.on('change', ({ to }) => this._apply(to));
+    this._apply(SCREEN.START);
   }
 
-  _wire() {
+  _wireButtons() {
     const start = document.getElementById('start-btn');
-    if (start) start.onclick = () => this.onStart && this.onStart();
+    if (start) start.onclick = () => this.cb.onStart && this.cb.onStart();
 
     const resume = document.getElementById('resume-btn');
-    if (resume) resume.onclick = () => this.onResume && this.onResume();
+    if (resume) resume.onclick = () => this.cb.onResume && this.cb.onResume();
 
     const restart = document.getElementById('restart-btn');
-    if (restart) restart.onclick = () => this.onRestart && this.onRestart();
+    if (restart) restart.onclick = () => this.cb.onRestart && this.cb.onRestart();
 
     const endRestart = document.getElementById('end-restart-btn');
-    if (endRestart) endRestart.onclick = () => this.onRestart && this.onRestart();
+    if (endRestart) endRestart.onclick = () => this.cb.onRestart && this.cb.onRestart();
 
     const mute = document.getElementById('mute-btn');
     if (mute) mute.onclick = () => {
@@ -33,14 +42,17 @@ export class Menus {
     };
   }
 
-  show(panel) {
-    const el = document.getElementById(panel + '-screen');
-    if (el) el.style.display = 'flex';
-  }
-
-  hide(panel) {
-    const el = document.getElementById(panel + '-screen');
-    if (el) el.style.display = 'none';
+  _apply(screen) {
+    // Hide all overlay panels first.
+    Object.values(PANELS).forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    const showId = PANELS[screen];
+    if (showId) {
+      const el = document.getElementById(showId);
+      if (el) el.style.display = 'flex';
+    }
   }
 
   showEndscreen({ win, time, kills, crystals }) {

@@ -45,6 +45,8 @@ import { XpPanel } from './ui/xp-panel.js';
 import { BossBar } from './ui/boss-bar.js';
 import { InventoryPanel } from './ui/inventory-panel.js';
 import { MobileControls } from './ui/mobile-controls.js';
+import { InteractionHint } from './ui/interaction-hint.js';
+import { transition, SCREEN } from './core/screen-state.js';
 
 // ── Bootstrap ──────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -78,14 +80,15 @@ const interactionSystem = new InteractionSystem({
 const combatSystem = new CombatSystem({ player, enemySystem, bossSystem, particleSystem: particles, audio: null, feedback });
 
 // UI panels
-new HUD(bus);
-new Menus(bus, onStart, onRestart, onResume);
+new HUD(bus, player);
+new Menus(bus, { onStart, onRestart, onResume });
 new DialogPanel(bus);
 new QuestPanel(bus);
 new XpPanel(bus);
 new BossBar(bus);
 new InventoryPanel(bus, inventorySystem);
 new MobileControls();
+new InteractionHint(bus, { player, interactionSystem });
 
 // ── Global event wiring ───────────────────────────────────
 bus.on(EVENTS.PLAYER_DAMAGE, () => bus.emit(EVENTS.UI_REFRESH));
@@ -168,8 +171,7 @@ bossSystem.damage = (n) => {
 
 // ── Menu actions ──────────────────────────────────────────
 function onStart() {
-  menus.hide('start');
-  setPhase('playing');
+  transition(SCREEN.PLAYING);
   state.startTime = state.time;
   enemySystem.spawnInitial();
   bus.emit(EVENTS.UI_REFRESH);
@@ -177,14 +179,12 @@ function onStart() {
 }
 
 function onResume() {
-  menus.hide('pause');
-  setPhase('playing');
+  transition(SCREEN.PLAYING);
 }
 
 function onRestart() { location.reload(); }
 
 function endGame(win) {
-  setPhase('endscreen');
   state.endTime = state.time;
   menus.showEndscreen({
     win,
@@ -192,6 +192,7 @@ function endGame(win) {
     kills: player.kills,
     crystals: state.crystals,
   });
+  transition(SCREEN.ENDScreen);
 }
 
 // ── Resize ────────────────────────────────────────────────
@@ -249,10 +250,10 @@ function loop(t) {
   // Time scale (Phase 1+ slowmo)
   const dt = rawDt * feedback.timeScale;
 
-  if (state.phase === 'playing' || state.phase === 'paused') {
-    state.time += (state.phase === 'playing') ? rawDt : 0;
+  if (state.screen === 'playing' || state.screen === 'paused') {
+    state.time += (state.screen === 'playing') ? rawDt : 0;
   }
-  if (state.phase !== 'playing') {
+  if (state.screen !== 'playing') {
     renderer.render(scene, cameraRig.camera);
     return;
   }
@@ -270,7 +271,7 @@ function loop(t) {
     if (input.consumeAttack())    combatSystem.tryAttack();
     if (input.consumeDodge())     player.startDodge();
     if (input.consumeInteract())  interactionSystem.interact();
-    if (input.consumePause())     { menus.show('pause'); setPhase('paused'); }
+    if (input.consumePause())     { transition(SCREEN.PAUSED); }
 
     // Player death check
     if (player.hp <= 0) bus.emit(EVENTS.PLAYER_DIED);
@@ -292,15 +293,7 @@ function loop(t) {
   cameraRig.update(dt, player.position, player.velocity);
   applyShake();
   minimap.draw(player, world.shrine, state.crystals, state.bossActive);
-
-  // Interact hint
-  const target = interactionSystem.nearestInteractable();
-  const hint = document.getElementById('hint');
-  if (hint) {
-    if (target === 'shrine')      { hint.style.display = 'block'; hint.textContent = '[E] Schrein reinigen'; }
-    else if (target === 'elder')  { hint.style.display = 'block'; hint.textContent = '[E] Mit der Dorfältesten sprechen'; }
-    else                          { hint.style.display = 'none'; }
-  }
+  bus.emit('tick'); // UI hooks (e.g., interaction-hint) read state every frame
 
   renderer.render(scene, cameraRig.camera);
 }
