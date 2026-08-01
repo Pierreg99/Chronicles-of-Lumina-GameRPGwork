@@ -71,35 +71,20 @@ Verschoben in die jeweiligen Systeme:
 
 ---
 
-## Phase R3 — `applyShake` in `CameraRig` integrieren
+## Phase R3 — `applyShake` in `CameraRig` integrieren  ✅
 
-Aktuell hat `main.js` ein privates `_activeShakes[]`-Array und einen `applyShake()`-Block, der jeden Frame die Kamera-Offset aufaddiert.
+Aktuell hatte `main.js` ein privates `_activeShakes[]`-Array und einen `applyShake()`-Block, der jeden Frame die Kamera-Offset aufaddiert.
 
-**Ziel:** Alles in `engine/camera.js`:
+**Status: ✅ Abgeschlossen.**
 
-```js
-// In createCamera().update():
-applyShake(dt) {
-  let ox = 0, oy = 0, oz = 0;
-  for (let i = this._shakes.length - 1; i >= 0; i--) {
-    const s = this._shakes[i];
-    s.remaining -= dt;
-    const decay = s.remaining / s.total;
-    const k = s.intensity * decay;
-    ox += (Math.random() - 0.5) * k;
-    oy += (Math.random() - 0.5) * k;
-    oz += (Math.random() - 0.5) * k;
-    if (s.remaining <= 0) this._shakes.splice(i, 1);
-  }
-  this._kickOffset.set(ox, oy, oz);
-}
+`engine/camera.js` hat jetzt:
+- `addShake(intensity, duration)` — fügt einen Shake zum internen `_shakes[]`-Array hinzu
+- `update(dt, target, velocity)` summiert und zerlegt die Shakes im selben Schritt wie das normale Follow
 
-addShake(intensity, duration) {
-  this._shakes.push({ intensity, remaining: duration, total: duration });
-}
-```
-
-`Game.update(dt)` ruft am Ende `cameraRig.applyShake(dt)` und `cameraRig.update(dt, ...)`. Damit verschwindet die `bus.on(EVENTS.SHAKE, …)`-Subscription in `main.js` und wird durch `cameraRig.addShake(...)` ersetzt — entweder direkt im Feedback-System oder via Event-Bus-Listener in `Game._wireGlobalEvents()`.
+`main.js`:
+- `game.bus.on(EVENTS.SHAKE, ...)` ruft `game.cameraRig.addShake(...)` auf
+- `applyShake()` Funktion + `_activeShakes[]` Array komplett gelöscht
+- Loop ruft nur noch `game.cameraRig.update(...)`, kein separates Apply
 
 ---
 

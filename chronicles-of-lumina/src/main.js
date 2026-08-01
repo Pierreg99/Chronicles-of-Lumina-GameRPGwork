@@ -260,10 +260,9 @@ function onResize() {
 }
 window.addEventListener('resize', onResize);
 
-// ── Feedback wiring (Phase 1) ──────────────────────────────
-const _activeShakes = [];
+// ── Feedback wiring (Phase 1 / R3) ─────────────────────────
 game.bus.on(EVENTS.SHAKE, ({ intensity, duration }) => {
-  _activeShakes.push({ intensity, remaining: duration, total: duration });
+  game.cameraRig.addShake(intensity, duration);
 });
 game.bus.on(EVENTS.CAMERA_KICK, ({ direction, intensity, duration }) => {
   game.cameraRig.kickToward(direction, intensity, duration);
@@ -276,23 +275,6 @@ game.bus.on(EVENTS.FLASH, ({ color, duration }) => {
     setTimeout(() => { f.style.opacity = '0'; }, Math.max(50, duration * 1000));
   }
 });
-
-function applyShake() {
-  let offX = 0, offY = 0, offZ = 0;
-  for (let i = _activeShakes.length - 1; i >= 0; i--) {
-    const s = _activeShakes[i];
-    s.remaining -= 1 / 60;
-    const decay = s.remaining / s.total;
-    const k = s.intensity * decay;
-    offX += (Math.random() - 0.5) * k;
-    offY += (Math.random() - 0.5) * k;
-    offZ += (Math.random() - 0.5) * k;
-    if (s.remaining <= 0) _activeShakes.splice(i, 1);
-  }
-  game.cameraRig.camera.position.x += offX;
-  game.cameraRig.camera.position.y += offY;
-  game.cameraRig.camera.position.z += offZ;
-}
 
 // ── Main loop ──────────────────────────────────────────────
 let lastT = 0;
@@ -358,7 +340,6 @@ function loop(t) {
   }
 
   game.cameraRig.update(dt, game.player.position, game.player.velocity);
-  applyShake();
   game.minimap.draw(game.player, game.world.shrine, state.crystals, state.bossActive);
   game.bus.emit('tick');
 
