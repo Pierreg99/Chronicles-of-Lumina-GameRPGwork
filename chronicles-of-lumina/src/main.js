@@ -34,6 +34,8 @@ import { InventorySystem } from './systems/inventory-system.js';
 import { DialogueSystem } from './systems/dialogue-system.js';
 import { InteractionSystem } from './systems/interaction-system.js';
 import { UiSystem } from './systems/ui-system.js';
+import { FeedbackSystem } from './systems/feedback-system.js';
+import { HitStop } from './core/hitstop.js';
 
 import { HUD } from './ui/hud.js';
 import { Menus } from './ui/menus.js';
@@ -63,7 +65,9 @@ const player = new Player(scene, materials);
 const projectiles = new ProjectileSystem(scene);
 const loot = new LootSystem(scene, materials);
 const enemySystem = new EnemySystem(scene, materials, projectiles);
-const bossSystem = new BossSystem(scene, materials, projectiles, particles);
+const hitstop = new HitStop();
+const feedback = new FeedbackSystem(bus, hitstop);
+const bossSystem = new BossSystem(scene, materials, projectiles, particles, feedback);
 const xpSystem = new XpSystem(bus, player);
 const inventorySystem = new InventorySystem(bus, player);
 const questSystem = new QuestSystem(bus, bossSystem);
@@ -71,7 +75,7 @@ const dialogueSystem = new DialogueSystem(bus);
 const interactionSystem = new InteractionSystem({
   bus, player, shrine: world.shrine, elder, dialogueSystem, questSystem,
 });
-const combatSystem = new CombatSystem({ player, enemySystem, bossSystem, particleSystem: particles, audio: null });
+const combatSystem = new CombatSystem({ player, enemySystem, bossSystem, particleSystem: particles, audio: null, feedback });
 
 // UI panels
 new HUD(bus);
@@ -197,45 +201,93 @@ function onResize() {
 }
 window.addEventListener('resize', onResize);
 
+// ── Feedback wiring (Phase 1) ─────────────────────────────
+const _activeShakes = [];   // { intensity, remaining, total }
+const _cameraBasePos = new THREE.Vector3();
+bus.on(EVENTS.SHAKE, ({ intensity, duration }) => {
+  _activeShakes.push({ intensity, remaining: duration, total: duration });
+});
+bus.on(EVENTS.FLASH, ({ color, duration }) => {
+  // Minimal full-screen flash via CSS overlay; created lazily in index.html
+  const f = document.getElementById('flash-overlay');
+  if (f) {
+    f.style.background = color;
+    f.style.opacity = '0.5';
+    setTimeout(() => { f.style.opacity = '0'; }, Math.max(50, duration * 1000));
+  }
+});
+
+function applyShake() {
+  // Reduce/clear all active shakes, sum residual offsets.
+  _cameraBasePos.copy(cameraRig.camera.position);
+  let offX = 0, offY = 0, offZ = 0;
+  for (let i = _activeShakes.length - 1; i >= 0; i--) {
+    const s = _activeShakes[i];
+    s.remaining -= 1 / 60; // approx frame-time
+    const decay = s.remaining / s.total;
+    const k = s.intensity * decay;
+    offX += (Math.random() - 0.5) * k;
+    offY += (Math.random() - 0.5) * k;
+    offZ += (Math.random() - 0.5) * k;
+    if (s.remaining <= 0) _activeShakes.splice(i, 1);
+  }
+  cameraRig.camera.position.x += offX;
+  cameraRig.camera.position.y += offY;
+  cameraRig.camera.position.z += offZ;
+}
+
 // ── Main loop ─────────────────────────────────────────────
 let lastT = 0;
 function loop(t) {
   requestAnimationFrame(loop);
-  const dt = Math.min((t - lastT) / 1000, 0.05);
+  const rawDt = Math.min((t - lastT) / 1000, 0.05);
   lastT = t;
 
+  // Time scale (Phase 1+ slowmo)
+  const dt = rawDt * feedback.timeScale;
+
   if (state.phase === 'playing' || state.phase === 'paused') {
-    state.time += (state.phase === 'playing') ? dt : 0;
+    state.time += (state.phase === 'playing') ? rawDt : 0;
   }
   if (state.phase !== 'playing') {
     renderer.render(scene, cameraRig.camera);
     return;
   }
 
+  // Camera yaw input
   const dYaw = input.consumeCameraYaw();
   if (dYaw !== 0) cameraRig.yaw += dYaw;
   state.cameraYaw = cameraRig.yaw;
 
-  if (input.consumeAttack())    combatSystem.tryAttack();
-  if (input.consumeDodge())     player.startDodge();
-  if (input.consumeInteract())  interactionSystem.interact();
-  if (input.consumePause())     { menus.show('pause'); setPhase('paused'); }
+  // Hit-stop: skip game-logic updates but keep rendering.
+  hitstop.update(rawDt);
+  const skipUpdate = hitstop.active;
 
-  // Player death check
-  if (player.hp <= 0) bus.emit(EVENTS.PLAYER_DIED);
+  if (!skipUpdate) {
+    if (input.consumeAttack())    combatSystem.tryAttack();
+    if (input.consumeDodge())     player.startDodge();
+    if (input.consumeInteract())  interactionSystem.interact();
+    if (input.consumePause())     { menus.show('pause'); setPhase('paused'); }
 
-  player.update(dt, t, input);
-  enemySystem.update(dt, player);
-  bossSystem.update(dt, player);
-  projectiles.update(dt, player, () => player.takeDamage(1));
-  loot.update(dt, player,
-    () => bus.emit(EVENTS.LOOT_PICKUP_CRYSTAL),
-    () => bus.emit(EVENTS.LOOT_PICKUP_BERRY)
-  );
-  particles.update(dt);
-  combatSystem.update(dt);
-  dialogueSystem.update();
+    // Player death check
+    if (player.hp <= 0) bus.emit(EVENTS.PLAYER_DIED);
+
+    player.update(dt, t, input);
+    enemySystem.update(dt, player);
+    bossSystem.update(dt, player);
+    projectiles.update(dt, player, () => player.takeDamage(1));
+    loot.update(dt, player,
+      () => bus.emit(EVENTS.LOOT_PICKUP_CRYSTAL),
+      () => bus.emit(EVENTS.LOOT_PICKUP_BERRY)
+    );
+    particles.update(dt);
+    combatSystem.update(dt);
+    dialogueSystem.update();
+    feedback.update(rawDt);
+  }
+
   cameraRig.update(dt, player.position);
+  applyShake();
   minimap.draw(player, world.shrine, state.crystals, state.bossActive);
 
   // Interact hint

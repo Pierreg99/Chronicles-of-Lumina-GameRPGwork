@@ -28,6 +28,16 @@ canvas#game {
   display: block;
 }
 
+#flash-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 50;
+  transition: opacity 0.18s ease-out;
+}
+
 .panel {
   position: fixed;
   background: var(--surface);
