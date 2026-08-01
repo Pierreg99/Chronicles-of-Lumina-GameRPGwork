@@ -35,7 +35,7 @@ jobs:
         run: npm run build-pages 2>/dev/null || true
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@4b9fd3b736529cd83454918e4e16e1da8b4a9d9e # v3.9.3, SHA-pinned
+        uses: peaceiris/actions-gh-pages@4c82c7262fae7c69e985454e2c815482877cc12a # v3.9.3, SHA-pinned
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./chronicles-of-lumina
