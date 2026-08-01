@@ -77,9 +77,9 @@ import { SettingsPanel }   from '../ui/settings-panel.js';
  * @typedef {import('three').WebGLRenderer} TThreeRenderer
  * @typedef {import('../entities/player.js').Player} TPlayer
  * @typedef {import('../entities/npc-elder.js').NpcElder} TNpcElder
- * @typedef {import('../systems/projectile-system.js').ProjectileSystem} TProjectileSystem
- * @typedef {import('../systems/loot-system.js').LootSystem} TLootSystem
- * @typedef {import('../systems/particle-system.js').ParticleSystem} TParticleSystem
+ * @typedef {import('../entities/projectile.js').ProjectileSystem} TProjectileSystem
+ * @typedef {import('../entities/loot.js').LootSystem} TLootSystem
+ * @typedef {import('../world/particles.js').ParticleSystem} TParticleSystem
  * @typedef {import('../ui/settings-panel.js').SettingsPanel} TSettingsPanel
  * @typedef {{village:object, shrine:object}} TWorld
  * @typedef {{update:(dt:number)=>void, render:(alpha:number)=>void}} TLoopHooks
@@ -232,7 +232,9 @@ export class Game {
       orb.material.color.set(0x5ad1ff);
       orb.material.emissive = new THREE.Color(0x2f7bff);
       this.particles.burst(this.world.shrine.position.clone().add(new THREE.Vector3(0, 4, 0)), '#5ad1ff', 40);
+      // @ts-ignore — Three.js Color/Texture union: set() exists on both
       this.scene.fog.color.set(0x9fd8f0);
+      // @ts-ignore
       this.scene.background.set(0x9fd8f0);
       playSfx('shrine');
       this.dialogueSystem.victory();
@@ -246,8 +248,8 @@ export class Game {
   _buildStartInfo() {
     const idx = document.getElementById('daily-index');
     const seed = document.getElementById('daily-seed');
-    if (idx) idx.textContent = state.dailyIndex;
-    if (seed) seed.textContent = state.dailySeed;
+    if (idx) idx.textContent = String(state.dailyIndex);
+    if (seed) seed.textContent = state.dailySeed != null ? String(state.dailySeed) : '—';
   }
 
   // 5. Build the main loop and start it.
@@ -367,18 +369,18 @@ export class Game {
     ));
     state.score = score;
     document.getElementById('end-time').textContent     = Math.round(time) + 's';
-    document.getElementById('end-kills').textContent    = this.player.kills;
-    document.getElementById('end-crystals').textContent = state.crystals;
+    document.getElementById('end-kills').textContent    = String(this.player.kills ?? 0);
+    document.getElementById('end-crystals').textContent = String(state.crystals);
     const seedEl = document.getElementById('end-seed');
-    if (seedEl) seedEl.textContent = state.dailySeed ?? '—';
+    if (seedEl) seedEl.textContent = state.dailySeed != null ? String(state.dailySeed) : '—';
     const scoreEl = document.getElementById('end-score');
-    if (scoreEl) scoreEl.textContent = score;
+    if (scoreEl) scoreEl.textContent = String(score);
     const endScreen = document.getElementById('end-screen');
     if (endScreen) {
       endScreen.style.display = 'flex';
       const h1 = endScreen.querySelector('h1');
       if (h1) h1.innerHTML = win ? 'Demo <span>abgeschlossen</span>' : 'Demo <span>beendet</span>';
     }
-    transition(SCREEN.ENDScreen);
+    transition(SCREEN.ENDSCREEN);
   }
 }

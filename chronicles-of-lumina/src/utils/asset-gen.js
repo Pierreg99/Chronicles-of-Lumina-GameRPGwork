@@ -471,7 +471,7 @@ function minimap() {
   x.fillStyle = '#7a5631';
   x.font = 'bold 10px serif'; x.textAlign = 'center';
   for (const [px, py, ch] of [[20, 18, 'N'], [108, 18, 'O'], [20, 116, 'W'], [108, 116, 'S']]) {
-    x.fillText(ch, px, py + 4);
+    x.fillText(ch, /** @type {number} */ (px), /** @type {number} */ (py) + 4);
   }
   return c;
 }
@@ -1085,4 +1085,4 @@ export const AssetGen = {
 };
 
 // Expose for the dev-tools console in the browser
-if (typeof window !== 'undefined') window.AssetGen = AssetGen;
+if (typeof window !== 'undefined') /** @type {any} */ (window).AssetGen = AssetGen;

@@ -39,11 +39,16 @@ group('Loop', () => {
       update: (dt) => updates.push(dt),
       render: () => {},
     });
+    // Use a realistic first-frame timestamp so frameTime is non-negative.
+    // Passing t=0 here would make frameTime = (0 - this.last)/1000 negative
+    // (since this.last was just set to performance.now() in start()) and
+    // starve the accumulator.
+    const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
     loop.start();
-    raf.tick(0);      // first frame after start: no time has passed yet
-    raf.tick(1000);   // 1s after start → ~60 update steps at DT=1/60
+    raf.tick(now + 16);  // first frame after start: ~16ms after this.last
+    raf.tick(now + 1016); // 1s later
     loop.stop();
-    assert.truthy(updates.length >= 1);
+    assert.truthy(updates.length >= 1, `expected ≥1 update, got ${updates.length}`);
     for (const u of updates) assert.approx(u, 1 / 60, 0.0001);
   });
 

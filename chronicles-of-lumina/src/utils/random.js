@@ -28,7 +28,7 @@ export function seedFromDate(date) {
   const day = d.getUTCDate();
   // Julian day of year
   const start = new Date(Date.UTC(y, 0, 0));
-  const diff = (d - start) / 86400000;
+  const diff = (d.getTime() - start.getTime()) / 86400000;
   return (y * 10000 + Math.floor(diff) * 1000 + m * 13) >>> 0;
 }
 
@@ -39,5 +39,5 @@ export function dailySeed() {
 export function dailyIndex() {
   const d = new Date();
   const start = new Date(Date.UTC(d.getUTCFullYear(), 0, 0));
-  return Math.floor((d - start) / 86400000);
+  return Math.floor((d.getTime() - start.getTime()) / 86400000);
 }

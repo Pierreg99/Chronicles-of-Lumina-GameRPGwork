@@ -9,6 +9,22 @@ Siehe [`PLAN.md`](./PLAN.md) für detaillierte Aufgaben-Schätzungen.
 ### Geplant
 - **Phase 18 — Performance**: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling
 
+## [0.10.6] – 2026-08-01
+
+### Fixed (Phase 18-Vorbereitung: Quality-Hardening)
+- **Test-Flake-Fix**: `tests/loop.test.mjs` "update() is called" war in 6-10% der Runs flaky (passing t=0 als ersten Frame → frameTime negativ, accumulator hungert). Fix: realistische Timestamp `performance.now() + 16` für ersten Frame. **Stabilität: 100/100 runs grün.**
+- **Type-Bug**: `src/core/game.js(382)` — `SCREEN.ENDScreen` (alt) → `SCREEN.ENDSCREEN` (neu nach JSDoc-Refactor)
+- **Type-Bug**: `src/utils/random.js` — Date-Arithmetic `d - start` → `d.getTime() - start.getTime()`
+- **Type-Bugs**: `src/core/game.js` — `textContent = number` ohne Cast → `String(...)` Cast (4 Stellen)
+- **Type-Bugs**: `src/core/game.js` — `three.set()` auf Color/Texture-Union mit `@ts-ignore`
+- **Type-Bugs**: `src/core/i18n.js` — `Locale`-Cast + `availableLocales()`-Rückgabetyp
+- **Type-Bug**: `src/utils/asset-gen.js` — `window.AssetGen` Cast + Compass-Rose-Tupel-Type
+
+### Verified
+- `npm test`: 81/81 grün, **100/100 runs stabil**
+- `npm run check`: 34 → **14 Errors** (alle in `ui/*`/`engine/*` DOM-Lib-Types, nicht im JSDoc-Scope)
+- `bot/npm test`: grün (8+4+8+3 = 23 Tests)
+
 ## [0.10.5] – 2026-08-01
 
 ### Added (Phase 17: i18n)

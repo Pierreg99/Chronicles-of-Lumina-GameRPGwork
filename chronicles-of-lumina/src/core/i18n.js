@@ -13,12 +13,12 @@ const LOCALES = { de, en };
 const DEFAULT_LOCALE = 'de';
 const STORAGE_KEY = 'lumina_locale';
 
-/** @typedef {keyof typeof LOCALES} Locale */
+/** @typedef {'de'|'en'} Locale */
 
 let active = (() => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && stored in LOCALES) return stored;
+    if (stored && stored in LOCALES) return /** @type {Locale} */ (stored);
   } catch { /* ignore */ }
   return DEFAULT_LOCALE;
 })();
@@ -38,14 +38,14 @@ export function setLocale(locale) {
 }
 
 /** @returns {ReadonlyArray<Locale>} list of available locales. */
-export function availableLocales() { return Object.keys(LOCALES); }
+export function availableLocales() { return /** @type {ReadonlyArray<Locale>} */ (Object.keys(LOCALES)); }
 
 /**
  * Look up a translation key. Supports `{name}`-style parameter substitution.
  * Falls back to the default locale, then to the key itself, on miss.
  *
- * @param {string} key — dot-path like "ui.hearts.full" or flat "START_BTN"
- * @param {Record<string,string|number>} [params] — values to interpolate
+ * @param {string} key  dot-path like "ui.hearts.full" or flat "START_BTN"
+ * @param {Record<string, string|number>} [params]  values to interpolate
  * @returns {string}
  */
 export function t(key, params) {
