@@ -1,0 +1,21 @@
+# .pagesignore — files NOT to deploy to GitHub Pages
+# peaceiris/actions-gh-pages reads this file before pushing
+
+node_modules/
+bot/
+desktop/
+tests/
+docs/
+CHANGELOG.md
+DEPLOY.md
+PLAN.md
+REFACTOR.md
+README.md
+PERFORMANCE.md
+ROADMAP.md
+build-pages.mjs
+jsconfig.json
+package.json
+package-lock.json
+.gitignore
+.pagesignore
