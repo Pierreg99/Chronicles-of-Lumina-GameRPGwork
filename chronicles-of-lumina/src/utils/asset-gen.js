@@ -234,7 +234,10 @@ function rock() {
   strokeFill(x, rock, { fill: '#a3a8b0', stroke: '#1a1d22', strokeWidth: 4 });
   // Cell-shade: light side top-left, dark side bottom-right
   x.save();
-  x.clip(rock);
+  // Modern Canvas API: clip() takes a Path2D or fillRule, not a callback.
+  // Invoke rock() to set the current path, then clip() with no args.
+  rock();
+  x.clip();
   // Light
   const lg = x.createLinearGradient(0, 0, 0, 128);
   lg.addColorStop(0, 'rgba(255,255,255,0.45)');
@@ -491,7 +494,7 @@ function heartFull() {
   };
   strokeFill(x, heart, { fill: '#e74c3c', stroke: '#3a0a08', strokeWidth: 5 });
   // Light side (top-left of heart)
-  x.save(); x.clip(heart);
+  x.save(); heart(); x.clip();
   const lg = x.createLinearGradient(0, 0, 128, 128);
   lg.addColorStop(0, 'rgba(255,255,255,0.55)');
   lg.addColorStop(0.5, 'rgba(255,255,255,0)');
@@ -558,7 +561,7 @@ function crystal() {
   };
   strokeFill(x, diamond, { fill: '#5fb3ff', stroke: '#0a1d3a', strokeWidth: 4 });
   // Facets
-  x.save(); x.clip(diamond);
+  x.save(); diamond(); x.clip();
   // Top-left light facet
   x.fillStyle = 'rgba(255,255,255,0.55)';
   x.beginPath();
@@ -601,7 +604,7 @@ function berry() {
   };
   strokeFill(x, leaf, { fill: '#4ea43a', stroke: '#1d4a18', strokeWidth: 3 });
   // Leaf vein
-  x.save(); x.clip(leaf);
+  x.save(); leaf(); x.clip();
   x.strokeStyle = '#1d4a18'; x.lineWidth = 1.4;
   x.beginPath(); x.moveTo(64, 24); x.lineTo(88, 40); x.stroke();
   x.restore();
@@ -616,7 +619,7 @@ function berry() {
   };
   strokeFill(x, berry, { fill: '#d63031', stroke: '#3a0a08', strokeWidth: 4 });
   // Highlight
-  x.save(); x.clip(berry);
+  x.save(); berry(); x.clip();
   const lg = x.createRadialGradient(46, 60, 0, 46, 60, 60);
   lg.addColorStop(0, 'rgba(255,255,255,0.6)');
   lg.addColorStop(0.5, 'rgba(255,255,255,0)');
@@ -648,7 +651,7 @@ function drawSlimeBody(ctx, cx, cy, r, palette) {
   };
   strokeFill(ctx, blob, { fill: base, stroke: outline, strokeWidth: 4 });
   // Light highlight
-  ctx.save(); ctx.clip(blob);
+  ctx.save(); blob(); ctx.clip();
   const lg = ctx.createRadialGradient(cx - r * 0.4, cy - r * 0.4, 0, cx - r * 0.4, cy - r * 0.4, r * 1.2);
   lg.addColorStop(0, light);
   lg.addColorStop(0.5, 'rgba(255,255,255,0)');
@@ -816,7 +819,7 @@ function bossNebelkolossPortrait() {
   };
   strokeFill(x, body, { fill: '#3a2a5a', stroke: '#0a0510', strokeWidth: 4 });
   // Body shading
-  x.save(); x.clip(body);
+  x.save(); body(); x.clip();
   const dg = x.createLinearGradient(0, 0, 128, 0);
   dg.addColorStop(0, 'rgba(120,90,180,0.5)');
   dg.addColorStop(0.5, 'rgba(0,0,0,0)');
@@ -1034,7 +1037,7 @@ export const AssetGen = {
       x.closePath();
     };
     strokeFill(x, diamond, { fill: '#5fb3ff', stroke: '#0a1d3a', strokeWidth: size * 0.02 });
-    x.save(); x.clip(diamond);
+    x.save(); diamond(); x.clip();
     x.fillStyle = 'rgba(255,255,255,0.55)';
     x.beginPath();
     x.moveTo(cx, cy - s * 0.45); x.lineTo(cx + s * 0.4, cy); x.lineTo(cx, cy); x.closePath(); x.fill();
