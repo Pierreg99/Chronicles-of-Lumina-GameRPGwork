@@ -1,16 +1,18 @@
 // systems/interaction-system.js — handles E key for shrine and elder.
+// Phase R1: takes `game`.
 
 import { EVENTS } from '../core/constants.js';
 import { state } from '../core/state.js';
 
 export class InteractionSystem {
-  constructor({ bus, player, shrine, elder, dialogueSystem, questSystem }) {
-    this.bus = bus;
-    this.player = player;
-    this.shrine = shrine;
-    this.elder = elder;
-    this.dialogueSystem = dialogueSystem;
-    this.questSystem = questSystem;
+  constructor(game) {
+    this.game = game;
+    this.bus = game.bus;
+    this.player = game.player;
+    this.shrine = game.world.shrine;
+    this.elder = game.elder;
+    this.dialogueSystem = game.dialogueSystem;
+    this.questSystem = game.questSystem;
   }
 
   // Returns 'shrine' | 'elder' | null

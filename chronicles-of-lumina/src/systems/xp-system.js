@@ -1,13 +1,15 @@
 // systems/xp-system.js — XP curve + level-ups.
+// Phase R1: takes `game`.
 
 import { state } from '../core/state.js';
 import { EVENTS } from '../core/constants.js';
 import { CONFIG } from '../core/config.js';
 
 export class XpSystem {
-  constructor(bus, player) {
-    this.bus = bus;
-    this.player = player;
+  constructor(game) {
+    this.game = game;
+    this.bus = game.bus;
+    this.player = game.player;
     this.xp = 0;
     this.level = 1;
     this.next = CONFIG.xp.baseNext;

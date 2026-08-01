@@ -1,13 +1,13 @@
 // systems/dialogue-system.js — small queue of dialog lines + 4s display.
-// Phase 5: optional choice list. If choices are provided, the dialog stays
-// open until a choice is made.
+// Phase R1: takes `game`.
 
 import { EVENTS } from '../core/constants.js';
 import { CONFIG } from '../core/config.js';
 
 export class DialogueSystem {
-  constructor(bus) {
-    this.bus = bus;
+  constructor(game) {
+    this.game = game;
+    this.bus = game.bus;
     this.queue = [];
     this.current = null;
     this.until = 0;
@@ -30,9 +30,6 @@ export class DialogueSystem {
     this.say('Dorfälteste', CONFIG.quest.victory.join(' '));
   }
 
-  // say(who, text)              → auto-dismiss after 4.5s
-  // say(who, text, choices)     → stays open until a choice is made
-  //   choices: [{ id, label, onPick }]
   say(who, text, choices = null) {
     this.current = { who, text, choices: choices || null };
     this._hasChoices = !!(choices && choices.length);

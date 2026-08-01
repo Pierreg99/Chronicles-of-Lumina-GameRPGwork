@@ -1,18 +1,23 @@
 // systems/boss-system.js — wraps BossNebelkoloss with spawn, AI tick, and death.
+// Phase R1: takes `game`. R2: emits BOSS_DAMAGE / BOSS_DIED directly.
 
 import * as THREE from 'three';
+import { EVENTS } from '../core/constants.js';
 import { BossNebelkoloss } from '../entities/boss-nebelkoloss.js';
 import { playSfx } from '../engine/audio.js';
 
 const BOSS_SPAWN_POS = new THREE.Vector3(4, 0, 20);
 
 export class BossSystem {
-  constructor(scene, materials, projectileSystem, particleSystem, feedback) {
-    this.scene = scene;
-    this.boss = new BossNebelkoloss(scene, materials);
-    this.projectiles = projectileSystem;
-    this.particles = particleSystem;
-    this.feedback = feedback;
+  constructor(game) {
+    this.game = game;
+    this.scene = game.scene;
+    this.materials = game.materials;
+    this.bus = game.bus;
+    this.boss = new BossNebelkoloss(game.scene, game.materials);
+    this.projectiles = game.projectiles;
+    this.particles = game.particles;
+    this.feedback = game.feedback;
   }
 
   spawn() {
@@ -24,8 +29,15 @@ export class BossSystem {
     playSfx('shrine');
   }
 
+  // R2: emit BOSS_DAMAGE / BOSS_DIED here instead of from a main.js monkey-patch.
   damage(n) {
-    return this.boss.damage(n);
+    const dead = this.boss.damage(n);
+    if (dead) {
+      this.bus.emit(EVENTS.BOSS_DIED);
+    } else {
+      this.bus.emit(EVENTS.BOSS_DAMAGE, { hp: this.boss.hp, maxHp: this.boss.maxHp });
+    }
+    return dead;
   }
 
   update(dt, player) {
@@ -41,12 +53,10 @@ export class BossSystem {
       if (this.boss.position.distanceTo(player.position) < 4) {
         player.takeDamage(1, this.boss.position);
       }
-      // Phase 1 feedback: bigger shake, slowmo, hit-stop
       if (this.feedback) {
         this.feedback.shakeBig();
         this.feedback.slowmoSlam();
         this.feedback.hitstopBig();
-        // Phase 2: camera kicks UP+OUT from the slam epicenter
         const dir = new THREE.Vector3()
           .subVectors(player.position, this.boss.position)
           .setY(0)

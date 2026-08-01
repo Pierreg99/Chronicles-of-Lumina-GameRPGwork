@@ -1,13 +1,9 @@
-// systems/codex-system.js — collects unlocked entries as the player explores.
-// Persists to localStorage so a returning player keeps their progress.
+// systems/codex-system.js — Phase R1: takes `game`.
 
 import { EVENTS } from '../core/constants.js';
-import { state } from '../core/state.js';
 
 const STORAGE_KEY = 'lumina_codex_v1';
 
-// All possible entries. Unlocked state is tracked separately so the
-// catalogue is always complete; only the unlocked bit is mutable.
 const ENTRIES = [
   { id: 'slime_blue',   category: 'Gegner', name: 'Wiesen-Schleim',  desc: 'Langsamer, blauer Schleim aus den Wiesen. 2 HP.' },
   { id: 'slime_green',  category: 'Gegner', name: 'Blatt-Schleim',   desc: 'Springt aggressiv an. 3 HP.' },
@@ -20,8 +16,9 @@ const ENTRIES = [
 ];
 
 export class CodexSystem {
-  constructor(bus) {
-    this.bus = bus;
+  constructor(game) {
+    this.game = game;
+    this.bus = game.bus;
     this.entries = new Map(ENTRIES.map((e) => [e.id, { ...e, unlocked: false }]));
     this._load();
     this._wire();

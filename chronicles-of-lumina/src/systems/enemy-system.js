@@ -1,7 +1,9 @@
 // systems/enemy-system.js — owns all enemy instances + their lifecycle.
+// Phase R1: takes a `game` reference instead of separate engine fields.
 
-import { SlimeBlue } from '../entities/slime-blue.js';
-import { SlimeGreen } from '../entities/slime-green.js';
+import { EVENTS } from '../core/constants.js';
+import { SlimeBlue }   from '../entities/slime-blue.js';
+import { SlimeGreen }  from '../entities/slime-green.js';
 import { SlimePurple } from '../entities/slime-purple.js';
 
 const INITIAL_SPAWNS = [
@@ -11,10 +13,12 @@ const INITIAL_SPAWNS = [
 ];
 
 export class EnemySystem {
-  constructor(scene, materials, projectileSystem) {
-    this.scene = scene;
-    this.materials = materials;
-    this.projectiles = projectileSystem;
+  constructor(game) {
+    this.game = game;
+    this.scene = game.scene;
+    this.materials = game.materials;
+    this.projectiles = game.projectiles;
+    this.bus = game.bus;
     this.enemies = [];
     this.spawnSystem = null;
   }
@@ -22,7 +26,6 @@ export class EnemySystem {
   attachSpawnSystem(spawnSystem) { this.spawnSystem = spawnSystem; }
 
   spawnInitial() {
-    // Phase 7: if a SpawnSystem gave us daily-seeded placements, use them.
     if (this.spawnSystem && typeof this.spawnSystem.applyDailySeed === 'function') {
       const placements = this.spawnSystem.applyDailySeed();
       if (placements) {
@@ -44,9 +47,12 @@ export class EnemySystem {
     return e;
   }
 
+  // R2: emit ENEMY_DIED here instead of from a main.js monkey-patch.
   kill(e) {
+    if (e.dead) return;
     e.dead = true;
     this.scene.remove(e.group);
+    this.bus.emit(EVENTS.ENEMY_DIED, e);
   }
 
   update(dt, player) {

@@ -10,73 +10,64 @@ Ziel: `main.js` auf 5 Zeilen reduzieren, alle Systems über `game`-Referenz mite
 
 ---
 
-## Phase R1 — Systems auf `game`-Parameter umstellen
+## Phase R1 — Systems auf `game`-Parameter umstellen  ✅
 
 Aktuell bekommen Systems `{ bus, ... }` als separate Parameter. In der neuen Form bekommen sie `game` und greifen via `this.game.bus` zu. Das beseitigt die langen Konstruktor-Argumentlisten und macht Systeme echt zu Game-Scoped-Komponenten.
 
+**Status: ✅ Abgeschlossen.**
+
+11 Systeme refactored:
+- `systems/enemy-system.js` — `constructor(game)`, kill() emittiert ENEMY_DIED intern
+- `systems/boss-system.js` — `constructor(game)`, damage() emittiert BOSS_DAMAGE/BOSS_DIED intern
+- `systems/combat-system.js` — `constructor(game)`, COMBO_HIT/COMBO_BREAK intern
+- `systems/quest-system.js` — `constructor(game)`
+- `systems/xp-system.js` — `constructor(game)`
+- `systems/inventory-system.js` — `constructor(game)`
+- `systems/dialogue-system.js` — `constructor(game)`
+- `systems/interaction-system.js` — `constructor(game)`
+- `systems/spawn-system.js` — `constructor(game)`
+- `systems/feedback-system.js` — `constructor(game)`
+- `systems/codex-system.js` — `constructor(game)`
+
 **Pattern:**
 ```js
-// Vorher
-new EnemySystem(scene, materials, projectiles)
-new BossSystem(scene, materials, projectiles, particles, feedback)
-new CombatSystem({ player, enemySystem, bossSystem, particleSystem, audio, feedback, bus })
-
-// Nachher
-new EnemySystem(game)
-new BossSystem(game)
-new CombatSystem(game)
+constructor(game) {
+  this.game = game;
+  this.bus = game.bus;            // direkter Bus-Zugriff
+  this.scene = game.scene;        // convenience-Aliase
+  this.materials = game.materials;
+  // ...
+}
 ```
 
-**Konkrete Schritte:**
-
-1. `systems/enemy-system.js`
-   - Konstruktor: `constructor(game) { this.game = game; ... this.scene = game.scene; this.materials = game.materials; this.projectiles = game.projectiles; this.bus = game.bus; }`
-   - `kill(e)` ruft direkt `this.bus.emit(EVENTS.ENEMY_DIED, e)` statt dass main.js monkey-patcht.
-   - `attachSpawnSystem()` bleibt als optionales Plugin.
-
-2. `systems/boss-system.js`
-   - Konstruktor nimmt `game`.
-   - `damage(n)` emittiert direkt `BOSS_DAMAGE` / `BOSS_DIED` über `this.bus`.
-
-3. `systems/combat-system.js`
-   - Vereinfachter Konstruktor: `new CombatSystem(game)`.
-   - Greift auf `game.player`, `game.enemySystem`, `game.bossSystem`, `game.particles`, `game.feedback`, `game.bus` zu.
-
-4. `systems/dialogue-system.js`, `systems/quest-system.js`, `systems/xp-system.js`, `systems/inventory-system.js`, `systems/interaction-system.js`, `systems/spawn-system.js` — analog.
-
-5. `world/world-builder.js` (oder neue `buildWorld(game)`-Variante) — nimmt `game` statt einzelner Parameter.
-
-6. `world/environment.js`, `world/minimap.js`, `world/particles.js` — analog.
-
-7. `entities/player.js` Konstruktor: `constructor(game)` oder zumindest `constructor(scene, materials, bus)`. Letzteres ist okay, weil der Player sehr eng mit dem Bus ist.
+main.js wurde umgebaut: ein zentrales `game = { ... }` Plain-Object wird stufenweise mit Engine-, Entity- und System-Instanzen befüllt. Systeme bekommen nur `game`.
 
 ---
 
-## Phase R2 — Monkey-Patches aus `main.js` eliminieren
+## Phase R2 — Monkey-Patches aus `main.js` eliminieren  ✅
 
 ```js
-// Aktuell in main.js:
+// Vorher in main.js:
 const _origKill = enemySystem.kill.bind(enemySystem);
-enemySystem.kill = (e) => {
-  _origKill(e);
-  bus.emit(EVENTS.ENEMY_DIED, e);
-};
+enemySystem.kill = (e) => { _origKill(e); bus.emit(EVENTS.ENEMY_DIED, e); };
 
 const _origBossDamage = bossSystem.damage.bind(bossSystem);
 bossSystem.damage = (n) => {
   const dead = _origBossDamage(n);
   if (dead) bus.emit(EVENTS.BOSS_DIED);
-  else bus.emit(EVENTS.BOSS_DAMAGE, ...);
+  else bus.emit(EVENTS.BOSS_DAMAGE, { hp: ..., maxHp: ... });
   return dead;
 };
 ```
 
-**Verschieben in die jeweiligen Systeme**, dort wo die Logik natürlich hingehört:
+**Status: ✅ Abgeschlossen.**
 
-- `EnemySystem.kill(e)` → `this.bus.emit(EVENTS.ENEMY_DIED, e)` am Ende der Methode.
-- `BossSystem.damage(n)` → bei `dead === true` `BOSS_DIED`, sonst `BOSS_DAMAGE` mit HP-Payload.
+Verschoben in die jeweiligen Systeme:
+- `EnemySystem.kill(e)` → `this.bus.emit(EVENTS.ENEMY_DIED, e)` am Ende
+- `BossSystem.damage(n)` → `BOSS_DAMAGE` oder `BOSS_DIED` je nach dead-Status
+- `CombatSystem.update()` emittiert `COMBO_HIT` / `COMBO_BREAK` direkt
 
-Effekt: 15 Zeilen Monkey-Patch-Code verschwinden komplett aus `main.js`.
+**Effekt: ~17 Zeilen Monkey-Patch-Code verschwunden aus main.js.**
 
 ---
 

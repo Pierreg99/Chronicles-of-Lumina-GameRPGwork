@@ -1,23 +1,15 @@
 // systems/feedback-system.js — central feedback API.
-//
-// Provides a single point through which any system can request:
-//   - hit-stop  (small, medium, big — from config.feedback.hitstop*)
-//   - shake     (intensity + duration)
-//   - flash     (color overlay, via separate ui/feedback-overlay.js later)
-//   - slowmo    (time scale)
-//
-// The actual visual application lives in main.js (which owns the camera and
-// game loop). This class is just a clean façade so systems don't have to know
-// about config keys, event names, or how to read time-scale.
+// Phase R1: takes `game`.
 
 import { EVENTS } from '../core/constants.js';
 import { CONFIG } from '../core/config.js';
 import { settings } from '../core/settings.js';
 
 export class FeedbackSystem {
-  constructor(bus, hitstop) {
-    this.bus = bus;
-    this.hitstop = hitstop;
+  constructor(game) {
+    this.game = game;
+    this.bus = game.bus;
+    this.hitstop = game.hitstop;
     this.timeScale = 1.0;
     this._slowmoTimer = 0;
   }
@@ -41,14 +33,11 @@ export class FeedbackSystem {
     this.bus.emit(EVENTS.SLOWMO, { factor: this.timeScale, duration: this._slowmoTimer });
   }
 
-  // Phase 2: camera kick. The cameraRig subscribes to a kickRequested payload
-  // and applies it as an additive offset that decays. direction is a Vector3.
   cameraKick(direction, intensity = 0.5, duration = 0.22) {
     if (this._reduceMotion()) return;
     this.bus.emit(EVENTS.CAMERA_KICK, { direction, intensity, duration });
   }
 
-  // Called every frame; recovers time scale to 1.0 when timer expires.
   update(dt) {
     if (this.timeScale !== 1.0) {
       this._slowmoTimer -= dt;

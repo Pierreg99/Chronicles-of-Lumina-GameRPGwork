@@ -1,13 +1,15 @@
 // systems/inventory-system.js — tracks item counts. Crystals are quest items
 // (also counted by QuestSystem), berries are consumed on pickup.
+// Phase R1: takes `game`.
 
 import { state } from '../core/state.js';
 import { EVENTS } from '../core/constants.js';
 
 export class InventorySystem {
-  constructor(bus, player) {
-    this.bus = bus;
-    this.player = player;
+  constructor(game) {
+    this.game = game;
+    this.bus = game.bus;
+    this.player = game.player;
     this.items = { crystal: 0, berry: 0 };
   }
 
