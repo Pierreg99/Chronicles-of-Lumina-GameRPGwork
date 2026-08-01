@@ -8,7 +8,19 @@ import { playSfx } from '../engine/audio.js';
 
 const BOSS_SPAWN_POS = new THREE.Vector3(4, 0, 20);
 
+/**
+ * @typedef {import('../core/game.js').Game} Game
+ */
+
+/**
+ * Wraps the {@link BossNebelkoloss} entity with spawn, AI tick, and damage events.
+ * @see EVENTS.BOSS_DAMAGE
+ * @see EVENTS.BOSS_DIED
+ */
 export class BossSystem {
+  /**
+   * @param {Game} game
+   */
   constructor(game) {
     this.game = game;
     this.scene = game.scene;
@@ -20,6 +32,11 @@ export class BossSystem {
     this.feedback = game.feedback;
   }
 
+  /**
+   * Place the boss at its spawn position, reset HP, mark active. Idempotent
+   * — safe to call multiple times across restarts.
+   * @returns {void}
+   */
   spawn() {
     this.boss.group.position.copy(BOSS_SPAWN_POS);
     this.boss.hp = this.boss.maxHp;
@@ -29,7 +46,11 @@ export class BossSystem {
     playSfx('shrine');
   }
 
-  // R2: emit BOSS_DAMAGE / BOSS_DIED here instead of from a main.js monkey-patch.
+  /**
+   * Apply `n` damage to the boss and emit the right event.
+   * @param {number} n
+   * @returns {boolean} true if the boss died this hit
+   */
   damage(n) {
     const dead = this.boss.damage(n);
     if (dead) {
@@ -40,6 +61,13 @@ export class BossSystem {
     return dead;
   }
 
+  /**
+   * Per-frame boss AI + reaction to player. Spawns projectiles, triggers
+   * screen-shake / slowmo / camera-kick on slam, deals contact damage.
+   * @param {number} dt
+   * @param {object} player
+   * @returns {void}
+   */
   update(dt, player) {
     if (!this.boss.active || this.boss.dead) return;
     const result = this.boss.update(dt, player);

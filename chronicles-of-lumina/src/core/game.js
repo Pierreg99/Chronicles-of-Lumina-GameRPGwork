@@ -57,6 +57,34 @@ import { Tutorial }        from '../ui/tutorial.js';
 import { CodexPanel }      from '../ui/codex-panel.js';
 import { SettingsPanel }   from '../ui/settings-panel.js';
 
+/**
+ * @typedef {import('../systems/feedback-system.js').FeedbackSystem} TFeedbackSystem
+ * @typedef {import('../systems/enemy-system.js').EnemySystem} TEnemySystem
+ * @typedef {import('../systems/boss-system.js').BossSystem} TBossSystem
+ * @typedef {import('../systems/combat-system.js').CombatSystem} TCombatSystem
+ * @typedef {import('../systems/quest-system.js').QuestSystem} TQuestSystem
+ * @typedef {import('../systems/xp-system.js').XpSystem} TXpSystem
+ * @typedef {import('../systems/inventory-system.js').InventorySystem} TInventorySystem
+ * @typedef {import('../systems/dialogue-system.js').DialogueSystem} TDialogueSystem
+ * @typedef {import('../systems/interaction-system.js').InteractionSystem} TInteractionSystem
+ * @typedef {import('../systems/spawn-system.js').SpawnSystem} TSpawnSystem
+ * @typedef {import('../systems/codex-system.js').CodexSystem} TCodexSystem
+ * @typedef {import('../core/settings.js').Settings} TSettings
+ * @typedef {import('../engine/materials.js').MaterialFactory} TMaterialFactory
+ * @typedef {import('./screen-state.js').screenBus} TscreenBus
+ * @typedef {import('three').Scene} TThreeScene
+ * @typedef {import('three').PerspectiveCamera} TThreeCamera
+ * @typedef {import('three').WebGLRenderer} TThreeRenderer
+ * @typedef {import('../entities/player.js').Player} TPlayer
+ * @typedef {import('../entities/npc-elder.js').NpcElder} TNpcElder
+ * @typedef {import('../systems/projectile-system.js').ProjectileSystem} TProjectileSystem
+ * @typedef {import('../systems/loot-system.js').LootSystem} TLootSystem
+ * @typedef {import('../systems/particle-system.js').ParticleSystem} TParticleSystem
+ * @typedef {import('../ui/settings-panel.js').SettingsPanel} TSettingsPanel
+ * @typedef {{village:object, shrine:object}} TWorld
+ * @typedef {{update:(dt:number)=>void, render:(alpha:number)=>void}} TLoopHooks
+ */
+
 export class Game {
   constructor(canvas) {
     this.canvas = canvas;
@@ -88,6 +116,9 @@ export class Game {
     this.player = new Player(this.scene, this.materials, this.bus);
     this.projectiles = new ProjectileSystem(this.scene);
     this.loot = new LootSystem(this.scene, this.materials);
+
+    // Settings singleton (used by FeedbackSystem for reduceMotion DI)
+    this.settings = settings;
 
     // Systems (each takes `this`; feedback also gets settings for DI)
     this.feedback = new FeedbackSystem(this, this.settings);

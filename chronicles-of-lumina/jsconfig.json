@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "allowJs": true,
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "noImplicitThis": false
+  },
+  "include": [
+    "src/core/event-bus.js",
+    "src/core/hitstop.js",
+    "src/core/loop.js",
+    "src/core/screen-state.js",
+    "src/core/settings.js",
+    "src/core/state.js",
+    "src/core/config.js",
+    "src/core/constants.js",
+    "src/systems/boss-system.js",
+    "src/systems/codex-system.js",
+    "src/systems/combat-system.js",
+    "src/systems/dialogue-system.js",
+    "src/systems/enemy-system.js",
+    "src/systems/feedback-system.js",
+    "src/systems/interaction-system.js",
+    "src/systems/inventory-system.js",
+    "src/systems/quest-system.js",
+    "src/systems/spawn-system.js",
+    "src/systems/xp-system.js"
+  ],
+  "exclude": ["node_modules", "bot", "desktop", "tests"]
+}

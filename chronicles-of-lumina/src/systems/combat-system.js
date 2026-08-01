@@ -9,7 +9,20 @@ import { EVENTS } from '../core/constants.js';
 const ATTACK_RANGE = 2.4;
 const SWING_DELAY = 0.12; // seconds before the hit connects
 
+/**
+ * @typedef {import('../core/game.js').Game} Game
+ */
+
+/**
+ * Resolves player sword hits against nearby enemies + the boss.
+ * Hit resolution is delayed by `SWING_DELAY` to match the swing animation.
+ * @see EVENTS.COMBO_HIT
+ * @see EVENTS.COMBO_BREAK
+ */
 export class CombatSystem {
+  /**
+   * @param {Game} game
+   */
   constructor(game) {
     this.game = game;
     this.player = game.player;
@@ -18,9 +31,15 @@ export class CombatSystem {
     this.particles = game.particles;
     this.feedback = game.feedback;
     this.bus = game.bus;
+    /** @type {Array<{at:number, damage:number}>} hits pending swing-delay resolution */
     this.pending = [];
   }
 
+  /**
+   * Trigger a sword swing. If the swing animation is already running, this is a no-op.
+   * The hit lands {@link SWING_DELAY} seconds later from {@link CombatSystem#update}.
+   * @returns {void}
+   */
   tryAttack() {
     if (!this.player.startSwordSwing()) return;
     playSfx('swing');

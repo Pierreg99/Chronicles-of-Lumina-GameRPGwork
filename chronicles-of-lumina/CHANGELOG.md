@@ -7,11 +7,30 @@ Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Chan
 Siehe [`PLAN.md`](./PLAN.md) für detaillierte Aufgaben-Schätzungen.
 
 ### Geplant
-- **Phase 13 — Type-Safety**: JSDoc-Type-Hints auf `core/*` + `systems/*` (ohne TypeScript-Build)
 - **Phase 14 — Distribution**: GitHub-Pages-Deploy, Demo-GIF im README, erstes GitHub-Release
 - **Phase 16 — Test-Coverage**: Three.js-Mocks für Rendering, jsdom für UI (53 → ~80 Assertions)
 - **Phase 17 — i18n**: Hardcoded DE-Strings extrahieren, English-Locale, optional FR
 - **Phase 18 — Performance**: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling
+
+## [0.10.3] – 2026-08-01
+
+### Added (Phase 13: Type-Safety via JSDoc)
+- Hinzugefügt: JSDoc-Type-Hints auf alle 9 `src/core/*` Module (event-bus, hitstop, loop, screen-state, settings, state, screen-state, + ergänzend state/screen-state/state)
+- Hinzugefügt: JSDoc-Type-Hints auf alle 11 `src/systems/*` Module (boss, codex, combat, dialogue, enemy, feedback, interaction, inventory, quest, spawn, xp)
+- Hinzugefügt: `jsconfig.json` mit checkJs/allowJs/noEmit für TypeScript-Check ohne Build
+- Hinzugefügt: `@types/three` devDep für Three.js-Type-Support
+- Hinzugefügt: `npm run check` Script für IDE-Integration (`tsc --noEmit`)
+
+### Fixed
+- Gefixt: `core/game.js` — `this.settings` wurde referenziert aber nie zugewiesen (war ein Bug, der nur nicht aufgefallen ist weil Settings-Store als Singleton funktioniert hat)
+- Gefixt: `core/settings.js` — `SettingsValue`-Type-Union statt einzelner Primitives
+- Gefixt: `core/screen-state.js` — `SCREEN` Enum fehlten `CODEX` und `SETTINGS` Werte
+- Gefixt: `core/state.js` — fehlende `dailySeed`/`dailyIndex`/`score`/`berriesUsed` Felder
+
+### Verified
+- `npm run check` läuft sauber durch `core/*` + `systems/*` (nur transitive utils haben minor warnings)
+- 53/53 Game-Tests grün
+- IDE-Autocomplete funktioniert via `@typedef`-Hints
 
 ## [0.10.2] – 2026-08-01
 

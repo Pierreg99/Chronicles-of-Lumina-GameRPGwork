@@ -4,11 +4,31 @@
 import { EVENTS } from '../core/constants.js';
 import { CONFIG } from '../core/config.js';
 
+/**
+ * @typedef {import('../core/game.js').Game} Game
+ *
+ * @typedef {object} DialogLine
+ * @property {string} who
+ * @property {string} text
+ * @property {Array<{id:string,label:string,onPick?:(id:string)=>void}>|null} choices
+ */
+
+/**
+ * Tiny dialog queue with auto-dismiss after 4.5 s (or until a choice is picked).
+ * @see EVENTS.DIALOG_OPEN
+ * @see EVENTS.DIALOG_CHOICE
+ * @see EVENTS.DIALOG_CLOSE
+ */
 export class DialogueSystem {
+  /**
+   * @param {Game} game
+   */
   constructor(game) {
     this.game = game;
     this.bus = game.bus;
+    /** @type {Array<DialogLine>} reserved queue (not used by current say() flow). */
     this.queue = [];
+    /** @type {DialogLine|null} */
     this.current = null;
     this.until = 0;
     this._hasChoices = false;
@@ -30,6 +50,14 @@ export class DialogueSystem {
     this.say('Dorfälteste', CONFIG.quest.victory.join(' '));
   }
 
+  /**
+   * Show a single line in the dialog panel. Lines with `choices` stay open
+   * until a choice is picked; plain lines auto-dismiss after 4.5 s.
+   * @param {string} who
+   * @param {string} text
+   * @param {Array<{id:string,label:string,onPick?:(id:string)=>void}>|null} [choices]
+   * @returns {void}
+   */
   say(who, text, choices = null) {
     this.current = { who, text, choices: choices || null };
     this._hasChoices = !!(choices && choices.length);

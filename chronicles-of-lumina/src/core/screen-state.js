@@ -11,15 +11,23 @@
 import { state } from './state.js';
 import { EventBus } from './event-bus.js';
 
+/**
+ * @typedef {'start'|'playing'|'paused'|'dialog'|'inventory'|'codex'|'settings'|'endscreen'} ScreenName
+ */
+
+/** Enum of valid screen values. */
 export const SCREEN = Object.freeze({
   START:     'start',
   PLAYING:   'playing',
   PAUSED:    'paused',
   DIALOG:    'dialog',
   INVENTORY: 'inventory',
-  ENDScreen: 'endscreen',
+  CODEX:     'codex',
+  SETTINGS:  'settings',
+  ENDSCREEN: 'endscreen',
 });
 
+/** Adjacency list — what transitions are legal from each screen. */
 const VALID_TRANSITIONS = {
   start:     ['playing', 'endscreen'],
   playing:   ['paused', 'dialog', 'inventory', 'endscreen'],
@@ -29,8 +37,15 @@ const VALID_TRANSITIONS = {
   endscreen: ['start', 'playing'],
 };
 
+/** Bus for screen-change notifications (event: `'change'`). */
 export const screenBus = new EventBus();
 
+/**
+ * Try to transition the global screen. Validates the move against
+ * `VALID_TRANSITIONS`; invalid moves are warned and ignored.
+ * @param {ScreenName} to
+ * @returns {boolean} true if the transition happened
+ */
 export function transition(to) {
   const from = state.screen;
   if (from === to) return false;
@@ -46,4 +61,5 @@ export function transition(to) {
 // Initialize
 state.screen = SCREEN.START;
 
+/** @returns {ScreenName} current screen from global state. */
 export function currentScreen() { return state.screen; }

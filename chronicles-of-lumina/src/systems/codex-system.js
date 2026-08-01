@@ -15,10 +15,30 @@ const ENTRIES = [
   { id: 'village',      category: 'Orte',   name: 'Dorf Sonnenhain',     desc: 'Heimatdorf des Helden.' },
 ];
 
+/**
+ * @typedef {import('../core/game.js').Game} Game
+ *
+ * @typedef {object} CodexEntry
+ * @property {string} id
+ * @property {string} category
+ * @property {string} name
+ * @property {string} desc
+ * @property {boolean} unlocked
+ */
+
+/**
+ * Bestiary + lore catalogue. Auto-unlocks entries based on game events,
+ * persists `unlocked` flags to localStorage.
+ * @see EVENTS.CODEX_UNLOCK
+ */
 export class CodexSystem {
+  /**
+   * @param {Game} game
+   */
   constructor(game) {
     this.game = game;
     this.bus = game.bus;
+    /** @type {Map<string, CodexEntry>} */
     this.entries = new Map(ENTRIES.map((e) => [e.id, { ...e, unlocked: false }]));
     this._load();
     this._wire();
@@ -33,6 +53,12 @@ export class CodexSystem {
     this.bus.on('village:visit', () => this.unlock('village'));
   }
 
+  /**
+   * Mark an entry as unlocked. Idempotent — already-unlocked entries emit nothing.
+   * Unknown ids are silently ignored.
+   * @param {string} id
+   * @returns {void}
+   */
   unlock(id) {
     const entry = this.entries.get(id);
     if (!entry) return;
@@ -42,8 +68,15 @@ export class CodexSystem {
     this._save();
   }
 
+  /** @returns {CodexEntry[]} all entries the player has unlocked so far. */
   getUnlocked() { return Array.from(this.entries.values()).filter((e) => e.unlocked); }
+
+  /** @returns {CodexEntry[]} the full catalogue, unlocked + locked. */
   getAll() { return Array.from(this.entries.values()); }
+
+  /**
+   * @returns {{total:number, unlocked:number, pct:number}} discovery progress.
+   */
   progress() {
     const total = this.entries.size;
     const unlocked = this.getUnlocked().length;
@@ -69,6 +102,10 @@ export class CodexSystem {
     } catch (_) { /* ignore */ }
   }
 
+  /**
+   * Mark every entry as locked again, persist.
+   * @returns {void}
+   */
   reset() {
     for (const e of this.entries.values()) e.unlocked = false;
     this._save();

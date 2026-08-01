@@ -4,7 +4,20 @@
 import { EVENTS } from '../core/constants.js';
 import { state } from '../core/state.js';
 
+/**
+ * @typedef {import('../core/game.js').Game} Game
+ *
+ * @typedef {'shrine'|'elder'|null} Interactable
+ */
+
+/**
+ * Resolves the E-key interaction: shrine-cleanse and elder-dialog.
+ * @see EVENTS.SHRINE_CLEANSE
+ */
 export class InteractionSystem {
+  /**
+   * @param {Game} game
+   */
   constructor(game) {
     this.game = game;
     this.bus = game.bus;
@@ -15,7 +28,9 @@ export class InteractionSystem {
     this.questSystem = game.questSystem;
   }
 
-  // Returns 'shrine' | 'elder' | null
+  /**
+   * @returns {Interactable} the closest interactable within reach, or `null`.
+   */
   nearestInteractable() {
     if (!this.player) return null;
     const pp = this.player.position;
@@ -28,6 +43,10 @@ export class InteractionSystem {
     return null;
   }
 
+  /**
+   * Trigger the appropriate interaction. No-op if no target is in range.
+   * @returns {void}
+   */
   interact() {
     const target = this.nearestInteractable();
     if (!target) return;

@@ -5,12 +5,27 @@
 import { EVENTS } from '../core/constants.js';
 import { CONFIG } from '../core/config.js';
 
+/**
+ * @typedef {import('../core/game.js').Game} Game
+ * @typedef {import('../core/settings.js').Settings} Settings
+ */
+
+/**
+ * Central feedback façade. Wraps hit-stop, screen-shake, slowmo, flash, and
+ * camera-kick behind a single API. Honour the `reduceMotion` setting by
+ * short-circuiting shake / slowmo / camera-kick calls.
+ */
 export class FeedbackSystem {
+  /**
+   * @param {Game} game
+   * @param {Settings} settings — DI'd so tests can inject a fresh instance.
+   */
   constructor(game, settings) {
     this.game = game;
     this.bus = game.bus;
     this.hitstop = game.hitstop;
     this.settings = settings;
+    /** @type {number} current time scale (1.0 = real time, < 1 = slowmo). */
     this.timeScale = 1.0;
     this._slowmoTimer = 0;
   }

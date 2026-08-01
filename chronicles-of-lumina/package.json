@@ -3,9 +3,13 @@
   "version": "0.9.2",
   "private": true,
   "type": "module",
-  "description": "3D browser action-adventure — vanilla JS + Three.js. Phase 0–9 + R1–R7 + 10 done.",
+  "description": "3D browser action-adventure — vanilla JS + Three.js. Phase 0–9 + R1–R7 + 10–13 done.",
   "scripts": {
     "test": "node tests/run.mjs",
-    "start": "python3 -m http.server 8080"
+    "start": "python3 -m http.server 8080",
+    "check": "tsc --noEmit -p jsconfig.json"
+  },
+  "devDependencies": {
+    "@types/three": "^0.185.3"
   }
 }

@@ -26,6 +26,12 @@ function makeCanvas(size = 128) {
 
 function ctxOf(c) { return c.getContext('2d'); }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {() => void} pathFn
+ * @param {{fill?: string, stroke?: string, strokeWidth?: number, lineJoin?: CanvasLineJoin}} [opts]
+ * @returns {void}
+ */
 function strokeFill(ctx, pathFn, { fill, stroke = '#0e0a14', strokeWidth = 4, lineJoin = 'round' } = {}) {
   ctx.save();
   if (lineJoin) ctx.lineJoin = lineJoin;
