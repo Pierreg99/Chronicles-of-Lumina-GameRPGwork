@@ -58,6 +58,20 @@ export const EVENTS = Object.freeze({
   UI_SHOW: 'ui:show',
   UI_HIDE: 'ui:hide',
   UI_REFRESH: 'ui:refresh',
+
+  // Phase 1+ feedback events
+  HITSTOP: 'feedback:hitstop',
+  SHAKE:   'feedback:shake',
+  FLASH:   'feedback:flash',
+  SLOWMO:  'feedback:slowmo',
+
+  // Phase 5+ UX events
+  TUTORIAL_STEP: 'tutorial:step',
+  TUTORIAL_DISMISS: 'tutorial:dismiss',
+  DIALOG_CHOICE: 'dialog:choice',
+
+  // Phase 6+ codex events
+  CODEX_UNLOCK: 'codex:unlock',
 });
 
 export const LAYERS = Object.freeze({

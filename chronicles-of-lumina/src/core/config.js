@@ -163,4 +163,16 @@ export const CONFIG = {
     poolAmbient: 32,
     poolLoot: 24,
   },
+
+  // ── Feedback (Phase 1+) ───────────────────────────────────
+  feedback: {
+    hitstopSmall: 0.05,   // seconds; small enemy hit
+    hitstopBig:   0.12,   // seconds; boss hit / slam
+    hitstopBoss:  0.18,   // seconds; boss death
+    shakeSmall:   { intensity: 0.15, duration: 0.18 },
+    shakeMedium:  { intensity: 0.30, duration: 0.25 },
+    shakeBig:     { intensity: 0.60, duration: 0.40 },
+    flashDamage:  { color: '#ff5555', duration: 0.15 },
+    slowmoSlam:   { factor: 0.35, duration: 0.30 },
+  },
 };
