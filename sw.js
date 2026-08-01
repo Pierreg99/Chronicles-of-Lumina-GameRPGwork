@@ -1,7 +1,7 @@
 // sw.js — minimal service worker for PWA / TWA support.
 // Cache-first for assets, network-first for the HTML shell.
 
-const CACHE = 'lumina-v0.9.1';
+const CACHE = 'lumina-v0.10.7';
 const ASSETS = [
   './',
   './index.html',
