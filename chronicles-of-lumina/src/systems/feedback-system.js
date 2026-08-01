@@ -1,20 +1,21 @@
 // systems/feedback-system.js — central feedback API.
 // Phase R1: takes `game`.
+// Phase R7: takes `settings` (DI) so tests can inject a fresh instance.
 
 import { EVENTS } from '../core/constants.js';
 import { CONFIG } from '../core/config.js';
-import { settings } from '../core/settings.js';
 
 export class FeedbackSystem {
-  constructor(game) {
+  constructor(game, settings) {
     this.game = game;
     this.bus = game.bus;
     this.hitstop = game.hitstop;
+    this.settings = settings;
     this.timeScale = 1.0;
     this._slowmoTimer = 0;
   }
 
-  _reduceMotion() { return !!settings.get('reduceMotion'); }
+  _reduceMotion() { return !!(this.settings && this.settings.get('reduceMotion')); }
 
   hitstopSmall() { this.hitstop.freeze(CONFIG.feedback.hitstopSmall); this.bus.emit(EVENTS.HITSTOP, { size: 'small' }); }
   hitstopBig()   { this.hitstop.freeze(CONFIG.feedback.hitstopBig);   this.bus.emit(EVENTS.HITSTOP, { size: 'big' }); }

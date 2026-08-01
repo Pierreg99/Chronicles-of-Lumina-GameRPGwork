@@ -1,0 +1,11 @@
+{
+  "name": "chronicles-of-lumina",
+  "version": "0.9.1",
+  "private": true,
+  "type": "module",
+  "description": "3D browser action-adventure — vanilla JS + Three.js. Phase 0–9 + R1–R7 done.",
+  "scripts": {
+    "test": "node tests/run.mjs",
+    "start": "python3 -m http.server 8080"
+  }
+}

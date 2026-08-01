@@ -2,6 +2,21 @@
 
 Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [0.9.1] – 2026-08-01
+
+### Added (Refactor R7)
+- Hinzugefügt: Unit-Test-Suite (`tests/`) für Pure-JS-Module — 7 Test-Dateien, **53 Assertions**, alle grün
+- Hinzugefügt: `package.json` mit `npm test`-Script (kein Framework, custom 50-Line-Runner in `tests/_runner.mjs`)
+- Hinzugefügt: Mock-Helfer (`tests/_setup.mjs`) für `localStorage`, `performance`, `requestAnimationFrame`, `window`
+- Hinzugefügt: Multi-Plattform-Deployment-Pipeline (`DEPLOY.md`) — 🌐 Web (statisch), 🤖 Android (PWA / Bubblewrap-TWA), 🖥️ Desktop (Electron)
+- Hinzugefügt: Electron-Desktop-Wrapper (`desktop/main.js` + `preload.js` + `package.json`) — Cross-Build via `electron-builder` für Win / Mac / Linux
+- Hinzugefügt: PWA-Manifest (`manifest.webmanifest`) + Service-Worker (`sw.js`) für TWA-Installierbarkeit
+- Hinzugefügt: `FeedbackSystem(settings)`-DI — Settings werden jetzt injiziert statt importiert (testbar)
+
+### Changed
+- Geändert: `game.html` bindet jetzt `manifest.webmanifest` + registriert `sw.js`
+- Geändert: Test-Setup schützt vor localStorage-Pollution zwischen Test-Runs
+
 ## [0.9.0] – 2026-08-01
 
 ### Changed (Refactor R1–R6)

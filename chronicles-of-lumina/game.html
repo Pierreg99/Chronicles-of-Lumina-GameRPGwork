@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Chronicles of Lumina</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#1d4d8a">
   <link rel="stylesheet" href="style.css">
   <script type="importmap">
   {
@@ -107,5 +109,12 @@
   </div>
 
   <script type="module" src="./src/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>

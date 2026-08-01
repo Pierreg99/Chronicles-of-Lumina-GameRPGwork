@@ -1,6 +1,6 @@
 # Chronicles of Lumina
 
-![Version](https://img.shields.io/badge/version-0.9.0-blue) ![Phases](https://img.shields.io/badge/phases-9%2F9-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R6-success)
+![Version](https://img.shields.io/badge/version-0.9.1-blue) ![Phases](https://img.shields.io/badge/phases-9%2F9-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R7-success)
 
 3D-Browser-Action-Adventure im farbenfrohen JRPG-Fantasy-Stil. Vanilla JS + Three.js, ES-Module, kein Build-Step.
 
@@ -138,6 +138,28 @@ MIT — siehe [`LICENSE`](./LICENSE) (TODO).
 
 ## Roadmap & Doku
 
-- [`ROADMAP.md`](./ROADMAP.md) — 13 Phasen (0–9 Feature-Phasen + R1–R6 Refactor), alle ✅
-- [`REFACTOR.md`](./REFACTOR.md) — Phase R1–R6 Plan und Status
+- [`ROADMAP.md`](./ROADMAP.md) — 14 Phasen (0–9 Feature-Phasen + R1–R7 Refactor), alle ✅
+- [`REFACTOR.md`](./REFACTOR.md) — Phase R1–R7 Plan und Status
 - [`CHANGELOG.md`](./CHANGELOG.md) — Versions-Historie (Keep-a-Changelog-Format)
+- [`DEPLOY.md`](./DEPLOY.md) — Multi-Plattform-Deployment (🌐 Web · 🤖 Android · 🖥️ Desktop)
+
+## Testing
+
+```bash
+npm test
+```
+
+53 Assertions in 7 Test-Dateien, alle grün. Abdeckung: `core/event-bus`, `core/settings`, `core/hitstop`,
+`utils/tween`, und die Pure-JS-Systems (`dialogue`, `codex`, `feedback`). Kein externes Framework —
+custom 50-Line-Runner in `tests/_runner.mjs`, Mock-Helfer in `tests/_setup.mjs`.
+Three.js-abhängige Systeme (Rendering, Scene-Graph) sind nicht unit-getestet.
+
+## Deployment
+
+Siehe [`DEPLOY.md`](./DEPLOY.md) für die vollständige Pipeline:
+
+| Plattform | Pfad | Verpackung |
+|---|---|---|
+| 🌐 Web | statischer Host | `python3 -m http.server 8080` |
+| 🤖 Android | PWA / TWA | `npx @bubblewrap/cli build` |
+| 🖥️ Desktop | Electron | `cd desktop && npm run build:win` |

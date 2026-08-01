@@ -162,3 +162,59 @@ main.js ist nur noch der Entry-Point. `core/game.js` ist 353 Zeilen, davon ~250 
 **Geschätzter Aufwand:** ~90 min, weil R1 die meisten Touchpoints hat.
 
 **Outcome:** `main.js` 5 Zeilen. Alle Systems in `core/` und `systems/` sind unit-testbar (sie brauchen nur ein Mock-Game mit `bus`, `scene`, `materials`). Keine globalen Modulscope-Variablen mehr.
+
+---
+
+## Phase R7 — Unit-Test-Suite + Multi-Plattform-Deployment  ✅
+
+**Status: ✅ Abgeschlossen.**
+
+### 1) Test-Suite
+Per Stack-Constraint *„kein Framework"* — Vitest/Jest wären Overkill. Stattdessen:
+
+- `tests/_runner.mjs` — **50 Zeilen** custom Runner mit `test`, `group`, `assert.{equal,deepEqual,truthy,falsy,approx,throws,notThrows}`, `done()`. Exit-Code 1 bei Fail.
+- `tests/_setup.mjs` — Mocks für `localStorage` (Map-backed), `performance`, `requestAnimationFrame`, `window`.
+- `tests/run.mjs` — Entry-Point, auto-discovers `*.test.mjs`, ruft am Ende `done()`.
+
+**7 Test-Dateien, 53 Assertions, alle grün:**
+
+| Datei | Modul | Assertions |
+|-------|-------|-----------:|
+| `event-bus.test.mjs` | `core/event-bus.js` | 7 |
+| `tween.test.mjs` | `utils/tween.js` | 9 |
+| `hitstop.test.mjs` | `core/hitstop.js` | 5 |
+| `settings.test.mjs` | `core/settings.js` | 7 |
+| `dialogue.test.mjs` | `systems/dialogue-system.js` | 7 |
+| `codex.test.mjs` | `systems/codex-system.js` | 10 |
+| `feedback.test.mjs` | `systems/feedback-system.js` | 8 |
+
+```bash
+$ npm test
+Chronicles of Lumina — unit tests (7 files)
+…
+53 passed, 0 failed
+```
+
+**Was NICHT getestet wird** (gewollt): Three.js-abhängige Systeme (Rendering, Scene-Graph, Mesh-Lifecycle) — bräuchten `jsdom` + `three-mock`. Pattern ist so designed, dass drei.js-freie Logik testbar bleibt; drei.js-Touchpoints sind klar von Pure-JS abgetrennt.
+
+**DI-Fix:** `FeedbackSystem` bekommt `settings` als 2. Constructor-Parameter statt importiertem Singleton — sonst sind die `reduceMotion`-Tests nicht isolierbar. `core/game.js` reicht jetzt `this.settings` durch.
+
+### 2) Multi-Plattform-Deployment
+Drei Plattformen, eine Pipeline:
+
+| Plattform | Verpackung | Datei-Pfad |
+|---|---|---|
+| 🌐 Web | statischer Host | `index.html` + `python3 -m http.server 8080` |
+| 🤖 Android | PWA / Bubblewrap-TWA | `manifest.webmanifest` + `sw.js` |
+| 🖥️ Desktop | Electron | `desktop/main.js` + `desktop/preload.js` + `desktop/package.json` |
+
+Vollständige Anleitung in [`DEPLOY.md`](./DEPLOY.md) mit Prompt-Tabelle für die AI-Steuerung:
+
+| Situation | Prompt |
+|---|---|
+| Erstes Setup aller drei | Komplette Pipeline |
+| Nur Web | Nur 🌐-Block |
+| Android-Debug | Nur 🤖-Block + `adb logcat` |
+| Neue EXE | 🖥️-Block + Version-Bump |
+
+**Outcome:** 53 Test-Assertions + 3 Plattformen. Refactor-Roadmap vollständig abgeschlossen.

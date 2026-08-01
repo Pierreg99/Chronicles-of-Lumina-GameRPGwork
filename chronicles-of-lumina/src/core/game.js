@@ -89,8 +89,8 @@ export class Game {
     this.projectiles = new ProjectileSystem(this.scene);
     this.loot = new LootSystem(this.scene, this.materials);
 
-    // Systems (each takes `this`)
-    this.feedback = new FeedbackSystem(this);
+    // Systems (each takes `this`; feedback also gets settings for DI)
+    this.feedback = new FeedbackSystem(this, this.settings);
     this.enemySystem = new EnemySystem(this);
     this.spawnSystem = new SpawnSystem(this);
     this.enemySystem.attachSpawnSystem(this.spawnSystem);

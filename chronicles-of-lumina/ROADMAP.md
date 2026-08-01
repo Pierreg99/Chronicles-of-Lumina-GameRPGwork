@@ -27,8 +27,9 @@ Evolution des Spiels in 9 Phasen. Jede Phase endet mit einem lauffähigen Spiel,
 | **R3** | Refactor: `applyShake` in `CameraRig` | 1 | ✅ |
 | **R4** | Refactor: `core/loop.js` benutzen statt eigener Loop | 1 | ✅ |
 | **R5+R6** | Refactor: Dead-Code weg, `main.js` → 5 Zeilen | 1 | ✅ |
+| **R7** | Refactor: Unit-Test-Suite + Multi-Plattform-Deployment | 1 | ✅ |
 
-**Total: 13 Commits, ~7h**
+**Total: 14 Commits, ~7.5h**
 
 ## Phasen-Details
 
