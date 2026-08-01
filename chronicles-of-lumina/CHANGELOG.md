@@ -7,9 +7,24 @@ Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Chan
 Siehe [`PLAN.md`](./PLAN.md) für detaillierte Aufgaben-Schätzungen.
 
 ### Geplant
-- **Phase 16 — Test-Coverage**: Three.js-Mocks für Rendering, jsdom für UI (53 → ~80 Assertions)
 - **Phase 17 — i18n**: Hardcoded DE-Strings extrahieren, English-Locale, optional FR
 - **Phase 18 — Performance**: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling
+
+## [0.10.4] – 2026-08-01
+
+### Added (Phase 16: Test-Coverage)
+- Hinzugefügt: `tests/state.test.mjs` — 5 Tests (state-Init, mutator, isPlaying/isPaused, setPhase, killed-counts)
+- Hinzugefügt: `tests/screen-state.test.mjs` — 4 Tests (SCREEN-Frozen, transition emits change, invalid-move, no-op)
+- Hinzugefügt: `tests/event-bus-edge.test.mjs` — 6 Tests (unsubscribe-handle, off-specific, no-listeners no-throw, throw-doesnt-stop-others, clear, set-dedup)
+- Hinzugefügt: `tests/loop.test.mjs` — 6 Tests (DT, start/stop, update DT=1/60, paused halts, resume, onPauseChange-once)
+
+### Changed
+- Geändert: Test-Coverage 53 → **74 Assertions** in 11 Test-Dateien (alle grün)
+- Geändert: `state.test.mjs` + `screen-state.test.mjs` reseten `state` zwischen Tests wegen cross-test-Kontamination (loop.test.mjs advance-ed `state.time`)
+
+### Verified
+- `npm test` grün: 74/74 in 11 Test-Dateien
+- `npm run check` weiterhin grün für `core/+systems/`
 
 ## [0.10.3] – 2026-08-01 — GitHub Release v0.10.3 (Draft)
 
