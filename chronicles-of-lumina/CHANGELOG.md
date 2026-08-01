@@ -9,6 +9,27 @@ Siehe [`PLAN.md`](./PLAN.md) für detaillierte Aufgaben-Schätzungen.
 ### Geplant
 - **Phase 18 — Performance**: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling
 
+## [0.10.7] – 2026-08-01
+
+### Added (Phase 18 Performance)
+- **FPS-Profiler-Overlay** (`src/ui/perf-overlay.js`): kleines Top-Left-DOM-Overlay mit FPS, Frame-Time-Avg, Max-Frame, JS-Heap (wenn `performance.memory` verfügbar). Aktiviert via `?debug=perf` Query-Param. Sample-Window 250ms, max 120 Samples.
+- **Object-Pool für Projektile** (`src/entities/projectile.js`): nutzt den vorhandenen `src/utils/pool.js` für `shots` (Pool-Size 24) und `slam rings` (Pool-Size 8). Recycling via `Pool.release()`. Hard-Cap `MAX_ALIVE_SHOTS=80` als Sicherheitsnetz. Allokationen pro Frame im Hot-Path ≈ 0.
+- **Audio-Sprite** (`src/engine/audio.js`): alle 5 SFX-Presets werden beim ersten `ensure()` in **einen** `AudioBuffer` gerendert (Phase 4 Procedural → Phase 18 Buffer). Playback via `BufferSource.start(when, offset, duration)` — keine OscillatorNode-Allocs pro Shot mehr. Fallback-Pfad bleibt für kaputte Browser.
+
+### Tests
+- `tests/pool.test.mjs` (5 Tests): prebuilt count, acquire/release roundtrip, grow-on-exhaustion, releaseAll, forEachActive
+- `tests/perf-overlay.test.mjs` (4 Tests): wantsPerfOverlay-URL-Parsing (true/false/empty/extra-params)
+- Total: **81 → 90 Assertions** in 14 Test-Files, **30/30 runs stabil**
+
+### Verified
+- `npm test`: 90/90 grün, 30/30 runs stabil
+- `npm run check`: 13 verbleibende Errors (alle in `ui/*`/`engine/input.js` DOM-Lib-Types, pre-existing)
+- Keine neuen Allocations im Hot-Path (Projektile + SFX)
+
+### CI
+- `webpack.yml`: `working-directory: chronicles-of-lumina`, `npm test` statt `npx webpack`
+- `nextjs.yml` Boilerplate entfernt (war für Next.js, nicht unser Stack)
+
 ## [0.10.6] – 2026-08-01
 
 ### Fixed (Phase 18-Vorbereitung: Quality-Hardening)

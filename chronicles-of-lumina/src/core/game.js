@@ -56,6 +56,7 @@ import { DamageDirection } from '../ui/damage-direction.js';
 import { Tutorial }        from '../ui/tutorial.js';
 import { CodexPanel }      from '../ui/codex-panel.js';
 import { SettingsPanel }   from '../ui/settings-panel.js';
+import { createPerfOverlay, wantsPerfOverlay } from '../ui/perf-overlay.js';
 
 /**
  * @typedef {import('../systems/feedback-system.js').FeedbackSystem} TFeedbackSystem
@@ -254,9 +255,16 @@ export class Game {
 
   // 5. Build the main loop and start it.
   _buildLoop() {
+    /** @type {(alpha: number) => void} */
+    let renderHook = () => this._render();
+    if (wantsPerfOverlay()) {
+      this.perfOverlay = createPerfOverlay(document);
+      const inner = renderHook;
+      renderHook = (alpha) => { inner(alpha); this.perfOverlay.tick(performance.now()); };
+    }
     this.loop = new Loop({
       update: (dt) => this._update(dt),
-      render: () => this._render(),
+      render: renderHook,
     });
     this.loop.start();
   }

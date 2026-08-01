@@ -14,3 +14,6 @@ Thumbs.db
 # Local artifacts
 attachments/
 reference/
+
+# SSH deploy key (never commit!)
+.ssh/

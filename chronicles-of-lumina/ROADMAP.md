@@ -37,9 +37,9 @@ Evolution des Spiels in 9 Phasen. Jede Phase endet mit einem lauffähigen Spiel,
 | **16** | Test-Coverage: 4 neue Test-Files (state/screen-state/loop/event-bus-edge), 53 → 74 Assertions | 1 | ✅ |
 | **17** | i18n: t()-Modul + DE/EN-Locales + Codex/Dialogue-Integration + Key-Coverage-Test | 1 | ✅ |
 | **18** | Quality: tsc-Error-Cleanup (34→14), Test-Flake-Fix, Random-Date-TS-Fix | 1 | ✅ |
-| **18** | Performance: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling | 1 | ⏳ |
+| **18** | Performance: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling | 1 | ✅ |
 
-**Total: 16 Commits done, 7 Phasen geplant, ~10h done + ~12h geplant = ~22h**
+**Total: 17 Commits done, 0 Phasen geplant, ~10h done = ~10h**
 
 ## Phasen-Details
 
