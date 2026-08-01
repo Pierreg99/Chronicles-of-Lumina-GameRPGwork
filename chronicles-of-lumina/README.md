@@ -138,7 +138,8 @@ MIT — siehe [`LICENSE`](./LICENSE) (TODO).
 
 ## Roadmap & Doku
 
-- [`ROADMAP.md`](./ROADMAP.md) — 15 Phasen (0–9 Feature + R1–R7 Refactor + 10 Visuals), alle ✅
+- [`ROADMAP.md`](./ROADMAP.md) — 16 Phasen done, 7 geplant (12–18)
+- [`PLAN.md`](./PLAN.md) — **Detaillierte Pläne für Phase 12–18** (Hygiene, JSDoc, Distribution, Security, Tests, i18n, Performance)
 - [`REFACTOR.md`](./REFACTOR.md) — Phase R1–R7 Plan und Status
 - [`CHANGELOG.md`](./CHANGELOG.md) — Versions-Historie (Keep-a-Changelog-Format)
 - [`DEPLOY.md`](./DEPLOY.md) — Multi-Plattform-Deployment (🌐 Web · 🤖 Android · 🖥️ Desktop)

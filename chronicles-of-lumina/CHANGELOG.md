@@ -2,6 +2,21 @@
 
 Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [Unreleased] — Phase 12–18 in Planung
+
+Siehe [`PLAN.md`](./PLAN.md) für detaillierte Aufgaben-Schätzungen.
+
+### Geplant
+- **Phase 12 — Code-Hygiene**: `ui-system.js` Dead-Code weg, CI-Workflows SHA-pinnen, REFACTOR-Doku fixen
+- **Phase 13 — Type-Safety**: JSDoc-Type-Hints auf `core/*` + `systems/*` (ohne TypeScript-Build)
+- **Phase 14 — Distribution**: GitHub-Pages-Deploy, Demo-GIF im README, erstes GitHub-Release
+- **Phase 15 — Security**: SECURITY.md, Dependabot-Config, optional CodeQL-Analyse
+- **Phase 16 — Test-Coverage**: Three.js-Mocks für Rendering, jsdom für UI (53 → ~80 Assertions)
+- **Phase 17 — i18n**: Hardcoded DE-Strings extrahieren, English-Locale, optional FR
+- **Phase 18 — Performance**: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling
+
+
+
 ## [0.10.0] – 2026-08-01
 
 ### Added (Phase 11: LuminaBot Discord-Bot)

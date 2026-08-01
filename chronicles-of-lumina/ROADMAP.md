@@ -30,8 +30,15 @@ Evolution des Spiels in 9 Phasen. Jede Phase endet mit einem lauffähigen Spiel,
 | **R7** | Refactor: Unit-Test-Suite + Multi-Plattform-Deployment | 1 | ✅ |
 | **10** | Visuell: Prozedurale Asset-Generierung (Canvas-2D, kein Build-Step) | 1 | ✅ |
 | **11** | Community: LuminaBot Discord-Bot (discord.js v14, 8 Commands, 4 Events) | 1 | ✅ |
+| **12** | Hygiene: `ui-system.js` Dead-Code weg, CI-Workflows SHA-pinnen, REFACTOR-Doku fixen | 1 | ⏳ |
+| **13** | Type-Safety: JSDoc-Type-Hints auf `core/*` + `systems/*` (ohne TypeScript-Build) | 1 | ⏳ |
+| **14** | Distribution: GitHub-Pages-Deploy, Demo-GIF im README, erstes GitHub-Release | 1 | ⏳ |
+| **15** | Security: SECURITY.md, Dependabot-Config, optional CodeQL-Analyse | 1 | ⏳ |
+| **16** | Test-Coverage: Three.js-Mocks für Rendering, jsdom für UI (53 → ~80 Assertions) | 1 | ⏳ |
+| **17** | i18n: Hardcoded DE-Strings extrahieren, English-Locale, optional FR | 1 | ⏳ |
+| **18** | Performance: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling | 1 | ⏳ |
 
-**Total: 16 Commits, ~10h**
+**Total: 16 Commits done, 7 Phasen geplant, ~10h done + ~12h geplant = ~22h**
 
 ## Phasen-Details
 
