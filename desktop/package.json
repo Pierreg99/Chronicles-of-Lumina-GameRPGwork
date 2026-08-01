@@ -1,0 +1,39 @@
+{
+  "name": "lumina-desktop",
+  "version": "0.9.1",
+  "description": "Chronicles of Lumina — desktop wrapper (Electron)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win --x64",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.pierreg99.lumina",
+    "productName": "Chronicles of Lumina",
+    "files": [
+      "main.js",
+      "preload.js",
+      "../index.html",
+      "../src/**/*",
+      "../assets/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "devDependencies": {
+    "electron": "^43.2.0",
+    "electron-builder": "^26.15.3"
+  }
+}

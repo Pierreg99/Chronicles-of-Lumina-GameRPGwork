@@ -1,0 +1,16 @@
+{
+  "name": "chronicles-of-lumina",
+  "version": "0.9.2",
+  "private": true,
+  "type": "module",
+  "description": "3D browser action-adventure \u2014 vanilla JS + Three.js. Phase 0\u20139 + R1\u2013R7 + 10\u201313 done.",
+  "scripts": {
+    "test": "node tests/run.mjs",
+    "start": "python3 -m http.server 8080",
+    "check": "tsc --noEmit -p jsconfig.json",
+    "build-pages": "node build-pages.mjs"
+  },
+  "devDependencies": {
+    "@types/three": "^0.185.3"
+  }
+}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Chronicles of Lumina</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#1d4d8a">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="flash-overlay"></div>
+  <button id="mute-btn">Stumm: AUS</button>
+
+  <!-- HUD: player -->
+  <div id="player-panel" class="panel">
+    <div class="name">AREN</div>
+    <div id="hearts"></div>
+    <div class="bar"><div></div></div>
+  </div>
+
+  <!-- HUD: XP -->
+  <div id="xp-panel" class="panel">
+    <div class="lvl" id="xp-level">LVL 1</div>
+    <div id="xp-bar"><div></div></div>
+  </div>
+
+  <!-- Boss bar -->
+  <div id="boss-panel" class="panel">
+    <div class="bname">NEBEL-KOLOSS</div>
+    <div id="boss-bar"><div></div></div>
+  </div>
+
+  <!-- Quest -->
+  <div id="quest-panel" class="panel">
+    <div class="title">MISSION: SCHREIN REINIGEN</div>
+    <div id="quest-count">0 / 10</div>
+  </div>
+
+  <!-- Hint -->
+  <div id="hint" class="panel">[E] Schrein reinigen</div>
+
+  <!-- Dialog -->
+  <div id="dialog" class="panel">
+    <div class="who"></div>
+    <div class="text"></div>
+  </div>
+
+  <!-- Minimap -->
+  <canvas id="minimap" width="120" height="120"></canvas>
+
+  <!-- Mobile controls -->
+  <div id="mobile-ui">
+    <div class="joystick" id="joy"><div class="knob"></div></div>
+    <div class="actbtns">
+      <div class="actbtn" id="btn-int">E</div>
+      <div class="actbtn" id="btn-roll">Rollen</div>
+      <div class="actbtn" id="btn-atk">Angriff</div>
+    </div>
+  </div>
+
+  <!-- Start screen -->
+  <div id="start-screen" class="overlay">
+    <h1>Chronicles of <span>Lumina</span></h1>
+    <div class="sub">Ein 3D-Abenteuer · Sammle 10 Lichtkristalle · Reinige den Schrein</div>
+    <div id="daily-info" class="controls-grid" style="grid-template-columns:1fr;gap:4px;text-align:center">
+      <span>Daily Run #<span id="daily-index">—</span> · Seed <span id="daily-seed">—</span></span>
+    </div>
+    <div class="controls-grid">
+      <span>WASD</span><span>Bewegen</span>
+      <span>Maus</span><span>Kamera</span>
+      <span>Leertaste / Klick</span><span>Angriff</span>
+      <span>Shift</span><span>Ausweichrolle</span>
+      <span>E</span><span>Interaktion</span>
+      <span>Esc</span><span>Pause</span>
+      <span>I / C</span><span>Inventar / Codex</span>
+    </div>
+    <button class="btn primary" id="start-btn">Abenteuer beginnen</button>
+  </div>
+
+  <!-- Pause -->
+  <div id="pause-screen" class="overlay" style="display:none">
+    <h1>Pause</h1>
+    <button class="btn primary" id="resume-btn">Fortsetzen</button>
+    <button class="btn" id="pause-settings-btn">Einstellungen</button>
+    <button class="btn" id="pause-quit-btn">Neustart</button>
+  </div>
+
+  <!-- End screen -->
+  <div id="end-screen" class="overlay" style="display:none">
+    <h1>Demo <span>abgeschlossen</span></h1>
+    <div class="controls-grid">
+      <span>Spielzeit</span><span id="end-time"></span>
+      <span>Besiegte Gegner</span><span id="end-kills"></span>
+      <span>Kristalle</span><span id="end-crystals"></span>
+      <span>Daily Seed</span><span id="end-seed"></span>
+      <span>Score</span><span id="end-score"></span>
+    </div>
+    <button class="btn primary" id="end-restart-btn">Neustart</button>
+    <button class="btn" id="end-share-btn">Seed teilen</button>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
