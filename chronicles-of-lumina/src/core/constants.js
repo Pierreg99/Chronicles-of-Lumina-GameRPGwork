@@ -48,6 +48,7 @@ export const EVENTS = Object.freeze({
   DIALOG_OPEN: 'dialog:open',
   DIALOG_CLOSE: 'dialog:close',
   DIALOG_NEXT: 'dialog:next',
+  DIALOG_CHOICE_REQUEST: 'dialog:choice:request',
 
   INTERACT_PROMPT: 'interact:prompt',
   INTERACT_TRIGGER: 'interact:trigger',

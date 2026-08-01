@@ -40,6 +40,17 @@ export class Menus {
         mute.textContent = muted ? 'Stumm: AN' : 'Stumm: AUS';
       });
     };
+
+    // Pause hierarchy (Phase 5): Resume / Settings placeholder / Quit
+    const pauseQuit = document.getElementById('pause-quit-btn');
+    if (pauseQuit) pauseQuit.onclick = () => this.cb.onRestart && this.cb.onRestart();
+    const pauseSettings = document.getElementById('pause-settings-btn');
+    if (pauseSettings) {
+      pauseSettings.onclick = () => {
+        // Phase 8 will wire a real settings modal. For now, toggle a notice.
+        alert('Settings werden in Phase 8 verfügbar.');
+      };
+    }
   }
 
   _apply(screen) {

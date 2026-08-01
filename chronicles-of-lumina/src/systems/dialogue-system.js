@@ -1,4 +1,6 @@
 // systems/dialogue-system.js — small queue of dialog lines + 4s display.
+// Phase 5: optional choice list. If choices are provided, the dialog stays
+// open until a choice is made.
 
 import { EVENTS } from '../core/constants.js';
 import { CONFIG } from '../core/config.js';
@@ -9,6 +11,7 @@ export class DialogueSystem {
     this.queue = [];
     this.current = null;
     this.until = 0;
+    this._hasChoices = false;
   }
 
   startIntro() {
@@ -27,18 +30,31 @@ export class DialogueSystem {
     this.say('Dorfälteste', CONFIG.quest.victory.join(' '));
   }
 
-  say(who, text) {
-    this.current = { who, text };
-    this.until = performance.now() / 1000 + 4.5;
+  // say(who, text)              → auto-dismiss after 4.5s
+  // say(who, text, choices)     → stays open until a choice is made
+  //   choices: [{ id, label, onPick }]
+  say(who, text, choices = null) {
+    this.current = { who, text, choices: choices || null };
+    this._hasChoices = !!(choices && choices.length);
+    this.until = this._hasChoices ? Infinity : (performance.now() / 1000 + 4.5);
     this.bus.emit(EVENTS.DIALOG_OPEN, this.current);
   }
 
+  pickChoice(id) {
+    if (!this.current || !this.current.choices) return;
+    const choice = this.current.choices.find((c) => c.id === id);
+    if (!choice) return;
+    this.bus.emit(EVENTS.DIALOG_CHOICE, { id, who: this.current.who });
+    choice.onPick && choice.onPick(id);
+    this.current = null;
+    this._hasChoices = false;
+    this.bus.emit(EVENTS.DIALOG_CLOSE);
+  }
+
   update() {
-    if (this.current && performance.now() / 1000 > this.until) {
+    if (this.current && !this._hasChoices && performance.now() / 1000 > this.until) {
       this.current = null;
       this.bus.emit(EVENTS.DIALOG_CLOSE);
     }
   }
-
-  get current2() { return this.current; }
 }

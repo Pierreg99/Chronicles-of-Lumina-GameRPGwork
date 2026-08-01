@@ -48,6 +48,7 @@ import { MobileControls } from './ui/mobile-controls.js';
 import { InteractionHint } from './ui/interaction-hint.js';
 import { ComboIndicator } from './ui/combo-indicator.js';
 import { DamageDirection } from './ui/damage-direction.js';
+import { Tutorial } from './ui/tutorial.js';
 import { transition, SCREEN } from './core/screen-state.js';
 import { playLayer, stopLayer, updateAudio } from './engine/audio.js';
 
@@ -94,6 +95,20 @@ new MobileControls();
 new InteractionHint(bus, { player, interactionSystem });
 new ComboIndicator(bus);
 new DamageDirection(bus, { camera: cameraRig, player });
+const tutorial = new Tutorial(bus);
+tutorial.register('move',    (s) => s.time > 1 && s.time < 2, 'Bewege Aren mit WASD oder den Pfeiltasten.');
+tutorial.register('attack',  (s) => s.time > 6 && s.time < 7, 'Drücke Leertaste oder klicke, um anzugreifen.');
+tutorial.register('dodge',   (s) => s.time > 12 && s.time < 13, 'Shift = Ausweichrolle. Kurz unverwundbar!');
+tutorial.register('interact',(s) => s.time > 18 && s.time < 19, 'Drücke E, um mit Personen und dem Schrein zu sprechen.');
+
+// Phase 5: dialog choice wiring
+bus.on(EVENTS.DIALOG_CHOICE_REQUEST, ({ id }) => dialogueSystem.pickChoice(id));
+
+// Phase 5: inventory toggle on 'I' (drives SCREEN)
+bus.on('inventory:toggle', () => {
+  if (state.screen === SCREEN.INVENTORY) transition(SCREEN.PLAYING);
+  else transition(SCREEN.INVENTORY);
+});
 
 // Adaptive music: ambient always, combat when enemies near
 playLayer('ambient');
@@ -280,6 +295,7 @@ function loop(t) {
     if (input.consumeDodge())     player.startDodge();
     if (input.consumeInteract())  interactionSystem.interact();
     if (input.consumePause())     { transition(SCREEN.PAUSED); }
+    if (input.consumeInventory()) { bus.emit('inventory:toggle'); }
 
     // Player death check
     if (player.hp <= 0) bus.emit(EVENTS.PLAYER_DIED);
