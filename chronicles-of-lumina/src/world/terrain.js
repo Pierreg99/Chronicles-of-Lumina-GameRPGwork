@@ -1,16 +1,18 @@
-// world/terrain.js — ground plane + path.
+// world/terrain.js — ground plane + path. Phase 19+: zone-aware colors.
 
 import * as THREE from 'three';
+import { getZone } from './zones/index.js';
 
-export function buildTerrain(scene, materials) {
+export function buildTerrain(scene, materials, zoneId = 'verdant') {
+  const zone = getZone(zoneId);
   const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(120, 120, 40, 40),
-    materials.toon(0x6ab04c)
+    materials.toon(zone.ground)
   );
   ground.rotation.x = -Math.PI / 2;
   ground.receiveShadow = true;
 
-  // Add gentle vertex noise away from the village
+  // Add gentle vertex noise away from the village hub
   const p = ground.geometry.attributes.position;
   for (let i = 0; i < p.count; i++) {
     const x = p.getX(i), y = p.getY(i);
@@ -20,8 +22,8 @@ export function buildTerrain(scene, materials) {
   ground.geometry.computeVertexNormals();
   scene.add(ground);
 
-  // Path strip from village toward shrine
-  const path = new THREE.Mesh(new THREE.PlaneGeometry(3, 32), materials.toon(0xd9c79a));
+  // Path strip from hub toward the boss/shrine
+  const path = new THREE.Mesh(new THREE.PlaneGeometry(3, 32), materials.toon(zone.path));
   path.rotation.x = -Math.PI / 2;
   path.position.set(2, 0.02, 10);
   scene.add(path);

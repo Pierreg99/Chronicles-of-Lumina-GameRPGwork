@@ -1,4 +1,5 @@
 // world/village.js — houses, well, fence, mushrooms, flowers.
+// Phase 19+: accepts a zone so the hub buildings match the biome palette.
 
 import * as THREE from 'three';
 
@@ -50,7 +51,7 @@ function well(scene, materials) {
   return g;
 }
 
-export function buildVillage(scene, materials) {
+export function buildVillage(scene, materials, zone = null) {
   // Trees scattered around the map
   const trees = [[-14,-8,1.2],[-18,4,1],[12,-14,1.3],[16,6,1],[22,-2,0.9],
                  [-8,16,1.1],[8,20,1],[-24,-16,1],[26,14,1.2]];

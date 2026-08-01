@@ -56,6 +56,7 @@ import { DamageDirection } from '../ui/damage-direction.js';
 import { Tutorial }        from '../ui/tutorial.js';
 import { CodexPanel }      from '../ui/codex-panel.js';
 import { SettingsPanel }   from '../ui/settings-panel.js';
+import { ZonePicker }      from '../ui/zone-picker.js';
 import { createPerfOverlay, wantsPerfOverlay } from '../ui/perf-overlay.js';
 
 /**
@@ -112,7 +113,7 @@ export class Game {
     this.particles = new ParticleSystem(this.scene);
 
     // World + entities
-    this.world = buildWorld({ scene: this.scene, materials: this.materials });
+    this.world = buildWorld({ scene: this.scene, materials: this.materials, zoneId: state.currentZone });
     this.elder = new NpcElder(this.scene, this.materials, new THREE.Vector3(2, 0, 0));
     this.player = new Player(this.scene, this.materials, this.bus);
     this.projectiles = new ProjectileSystem(this.scene);
@@ -161,6 +162,7 @@ export class Game {
     this.damageDirection = new DamageDirection(this.bus, { camera: this.cameraRig, player: this.player });
     this.codexPanel = new CodexPanel(this.bus, this.codex);
     this.settingsPanel = new SettingsPanel();
+    this.zonePicker = new ZonePicker(this.bus);
 
     const tutorial = new Tutorial(this.bus);
     tutorial.register('move',     (s) => s.time > 1  && s.time < 2,  'Bewege Aren mit WASD oder den Pfeiltasten.');

@@ -81,6 +81,18 @@
   <!-- Minimap -->
   <canvas id="minimap" width="120" height="120"></canvas>
 
+  <!-- Phase 19+: current-zone indicator (top center, in-world) -->
+  <div id="zone-indicator" role="status" aria-live="polite">
+    <span class="swatch" id="zone-swatch"></span>
+    <span class="name" id="zone-name">Smaragdwald</span>
+  </div>
+
+  <!-- Phase 19+: portal interaction hint (separate from generic hint) -->
+  <div id="portal-hint">
+    <span class="icon" data-icon="target"></span>
+    <span>Portal: <kbd>E</kbd> <span id="portal-target-name">betreten</span></span>
+  </div>
+
   <!-- Mobile controls -->
   <div id="mobile-ui">
     <div class="joystick" id="joy"><div class="knob"></div></div>
@@ -107,6 +119,22 @@
       Chronicles of <span>Lumina</span>
     </h1>
     <div class="sub">Ein 3D-Abenteuer · Sammle 10 Lichtkristalle · Reinige den Schrein</div>
+
+    <!-- Phase 19+: zone / biome picker -->
+    <div id="zone-picker" class="zone-grid" aria-label="Biom-Auswahl">
+      <div class="zone-grid-title">
+        <span class="icon" data-icon="target"></span>
+        <span>Biom wählen</span>
+      </div>
+      <div id="zone-cards" class="zone-cards"></div>
+      <div class="zone-shared" id="zone-shared">
+        <span class="icon" data-icon="share"></span>
+        <span>Map-Code:</span>
+        <input type="text" id="map-code-input" placeholder="verdant:20473104" maxlength="40" />
+        <button class="btn" id="map-code-load" type="button">Laden</button>
+      </div>
+    </div>
+
     <div id="daily-info" class="controls-grid" style="grid-template-columns:1fr;gap:4px;text-align:center">
       <span>Daily Run #<span id="daily-index">—</span> · Seed <span id="daily-seed">—</span></span>
     </div>
@@ -115,7 +143,7 @@
       <span><kbd>Maus</kbd></span><span>Kamera</span>
       <span><kbd>Leertaste</kbd> / <kbd>Klick</kbd></span><span>Angriff</span>
       <span><kbd>Shift</kbd></span><span>Ausweichrolle</span>
-      <span><kbd>E</kbd></span><span>Interaktion</span>
+      <span><kbd>E</kbd></span><span>Interaktion / Portal</span>
       <span><kbd>Esc</kbd></span><span>Pause</span>
       <span><kbd>I</kbd> / <kbd>C</kbd></span><span>Inventar / Codex</span>
     </div>

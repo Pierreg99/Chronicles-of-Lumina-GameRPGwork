@@ -4,7 +4,7 @@ import * as THREE from 'three';
 
 export const SHRINE_POS = new THREE.Vector3(4, 0, 26);
 
-export function buildShrine(scene, materials) {
+export function buildShrine(scene, materials, zone = null) {
   const g = new THREE.Group();
   const base = new THREE.Mesh(
     new THREE.CylinderGeometry(2.2, 2.6, 1, 8),
