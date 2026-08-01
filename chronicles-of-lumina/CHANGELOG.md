@@ -2,6 +2,22 @@
 
 Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [0.10.0] – 2026-08-01
+
+### Added (Phase 11: LuminaBot Discord-Bot)
+- Hinzugefügt: `bot/` — kompletter discord.js v14 Bot (ESM, Node 18+)
+- Hinzugefügt: 8 Slash-Commands — `/help`, `/status`, `/announce`, `/patch`, `/lore`, `/leaderboard`, `/bugreport`, `/suggestion`
+- Hinzugefügt: 4 Event-Handler — `welcome` (guildMemberAdd), `levelup` (🎉-Reaction), `screenshot` (Auto-React), `moderation` (Soft-Deeskalation)
+- Hinzugefügt: `lib/embeds.js` — 8 geteilte Embed-Builder mit Lumina-Farbpalette (Lila, Grün, Gold, Blau, Rot, Nebel)
+- Hinzugefügt: `lib/store.js` — JSON-File-Persistenz für Reports, Suggestions, Leaderboard + Complexity-Heuristik
+- Hinzugefügt: `lib/parser.js` — parst `/patch`-Beschreibung in Neu/Geändert/Gefixt-Sektionen
+- Hinzugefügt: `lib/loader.js` — auto-load aller `commands/*.js` und `events/*.js`
+- Hinzugefügt: `data/lore.json` — 7 atmosphärische Lore-Einträge
+- Hinzugefügt: `deploy.js` — registriert Slash-Commands (Guild- oder Global-Scope)
+- Hinzugefügt: `Dockerfile` + `docker-compose.yml` für Production-Deployment
+- Hinzugefügt: `test/load.test.js` — 8+4+8 Modul-Tests, kein Discord-Connect nötig
+- Hinzugefügt: `.env.example` mit Platzhaltern für `DISCORD_TOKEN`, `DISCORD_CLIENT_ID`, `WELCOME_CHANNEL_ID`, `SCREENSHOT_CHANNEL_ID`
+
 ## [0.9.2] – 2026-08-01
 
 ### Added (Phase 10: Procedural Asset-Generation)
