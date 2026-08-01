@@ -150,15 +150,17 @@ export function listZones() {
 
 // Encode a custom map as a short URL-safe code: "verdant:20473104"
 export function encodeMapCode(zoneId, seed) {
-  return `${zoneId}:${(seed >>> 0).toString(36)}`;
+  return `${zoneId}:${(seed >>> 0).toString(36).padStart(7, '0')}`;
 }
 
 // Decode a map code. Returns { zoneId, seed } or null if invalid.
 export function decodeMapCode(code) {
   if (!code || typeof code !== 'string') return null;
+  if (!code.includes(':')) return null;
   const [zoneId, seedStr] = code.split(':');
   if (!ZONES[zoneId]) return null;
+  if (!seedStr) return null;
   const seed = parseInt(seedStr, 36);
-  if (isNaN(seed)) return null;
+  if (Number.isNaN(seed)) return null;
   return { zoneId, seed: seed >>> 0 };
 }
