@@ -57,4 +57,47 @@ assert.equal(classifyComplexity('mehr Sound'), '🟢 einfach');
 assert.equal(classifyComplexity('Boss mit neuer KI'), '🟠 mittel');
 assert.equal(classifyComplexity('komplett neue Story'), '🟣 komplex');
 
-console.log(`✓ ${cmds.length} commands, ${evts.length} events, ${sample.length} embeds, parser + store OK`);
+// 7. GitHub release — format + mock fetch
+import { createRelease, formatReleaseBody, isGitHubConfigured } from '../lib/github.js';
+const body = formatReleaseBody({ neu: ['Asset-Gen'], geaendert: ['materials.js'], gefixt: ['Test-Pollution'] }, '0.9.2');
+assert.match(body, /# v0\.9\.2/);
+assert.match(body, /- Asset-Gen/);
+assert.match(body, /- materials\.js/);
+assert.match(body, /- Test-Pollution/);
+
+assert.equal(isGitHubConfigured(), false); // no env in test
+
+// Mock fetch for createRelease
+process.env.GITHUB_TOKEN = 'ghp_test';
+process.env.GITHUB_REPO   = 'foo/bar';
+assert.equal(isGitHubConfigured(), true);
+
+let capturedRequest = null;
+const mockFetch = async (url, opts) => {
+  capturedRequest = { url, opts: { ...opts, body: JSON.parse(opts.body) } };
+  return new Response(JSON.stringify({ html_url: 'https://github.com/foo/bar/releases/tag/v0.9.2', id: 1 }), {
+    status: 201, headers: { 'content-type': 'application/json' },
+  });
+};
+const release = await createRelease({ tag: 'v0.9.2', name: 'v0.9.2', body, draft: true, fetchImpl: mockFetch });
+assert.equal(release.html_url, 'https://github.com/foo/bar/releases/tag/v0.9.2');
+assert.equal(capturedRequest.url, 'https://api.github.com/repos/foo/bar/releases');
+assert.equal(capturedRequest.opts.body.tag_name, 'v0.9.2');
+assert.equal(capturedRequest.opts.body.draft, true);
+assert.match(capturedRequest.opts.headers.Authorization, /^Bearer ghp_test$/);
+
+// 422 already-exists error path
+const mockFetch422 = async () => new Response('{"message":"Validation Failed","errors":[{"resource":"Release","code":"already_exists"}]}', { status: 422 });
+await assert.rejects(
+  () => createRelease({ tag: 'v0.9.2', name: 'v0.9.2', body, fetchImpl: mockFetch422 }),
+  /Tag v0\.9\.2 existiert bereits/,
+);
+
+// Network error
+const mockFetchFails = async () => { throw new Error('socket hang up'); };
+await assert.rejects(() => createRelease({ tag: 'v0.9.2', name: 'v0.9.2', body, fetchImpl: mockFetchFails }), /socket hang up/);
+
+delete process.env.GITHUB_TOKEN;
+delete process.env.GITHUB_REPO;
+
+console.log(`✓ ${cmds.length} commands, ${evts.length} events, ${sample.length} embeds, parser + store + github OK`);

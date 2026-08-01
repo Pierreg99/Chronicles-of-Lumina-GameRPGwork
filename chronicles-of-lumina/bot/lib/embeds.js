@@ -24,15 +24,17 @@ export function announceEmbed(text, author) {
 }
 
 /** /patch — patch-notes embed (grün) */
-export function patchEmbed(version, sections) {
+export function patchEmbed(version, sections, { releaseUrl, releaseError } = {}) {
   const e = new EmbedBuilder()
     .setColor(COLORS.green)
     .setTitle(`🛠️ Patch v${version}`)
     .setTimestamp()
     .setFooter(FOOTER(`v${version}`));
-  if (sections.neu?.length)      e.addFields({ name: '🆕 Neu',     value: sections.neu.join('\n'),     inline: false });
+  if (sections.neu?.length)       e.addFields({ name: '🆕 Neu',      value: sections.neu.join('\n'),      inline: false });
   if (sections.geaendert?.length) e.addFields({ name: '🔄 Geändert', value: sections.geaendert.join('\n'), inline: false });
-  if (sections.gefixt?.length)    e.addFields({ name: '🐛 Gefixt',  value: sections.gefixt.join('\n'),  inline: false });
+  if (sections.gefixt?.length)    e.addFields({ name: '🐛 Gefixt',   value: sections.gefixt.join('\n'),   inline: false });
+  if (releaseUrl)   e.addFields({ name: '🔗 GitHub-Release', value: `[Draft v${version}](${releaseUrl})`, inline: false });
+  if (releaseError) e.addFields({ name: '⚠️ GitHub-Release fehlgeschlagen', value: releaseError, inline: false });
   return e;
 }
 

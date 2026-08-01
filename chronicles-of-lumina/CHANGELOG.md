@@ -11,12 +11,16 @@ Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Chan
 - Hinzugefügt: `lib/embeds.js` — 8 geteilte Embed-Builder mit Lumina-Farbpalette (Lila, Grün, Gold, Blau, Rot, Nebel)
 - Hinzugefügt: `lib/store.js` — JSON-File-Persistenz für Reports, Suggestions, Leaderboard + Complexity-Heuristik
 - Hinzugefügt: `lib/parser.js` — parst `/patch`-Beschreibung in Neu/Geändert/Gefixt-Sektionen
+- Hinzugefügt: `lib/github.js` — GitHub-Releases-API-Client + Markdown-Body-Formatierung
 - Hinzugefügt: `lib/loader.js` — auto-load aller `commands/*.js` und `events/*.js`
 - Hinzugefügt: `data/lore.json` — 7 atmosphärische Lore-Einträge
 - Hinzugefügt: `deploy.js` — registriert Slash-Commands (Guild- oder Global-Scope)
 - Hinzugefügt: `Dockerfile` + `docker-compose.yml` für Production-Deployment
-- Hinzugefügt: `test/load.test.js` — 8+4+8 Modul-Tests, kein Discord-Connect nötig
-- Hinzugefügt: `.env.example` mit Platzhaltern für `DISCORD_TOKEN`, `DISCORD_CLIENT_ID`, `WELCOME_CHANNEL_ID`, `SCREENSHOT_CHANNEL_ID`
+- Hinzugefügt: `test/load.test.js` — 8+4+8 Modul-Tests + GitHub-Mock-Tests, kein Discord-Connect nötig
+- Hinzugefügt: `.env.example` mit Platzhaltern für `DISCORD_TOKEN`, `DISCORD_CLIENT_ID`, `WELCOME_CHANNEL_ID`, `SCREENSHOT_CHANNEL_ID`, `GITHUB_TOKEN`, `GITHUB_REPO`
+
+### Changed
+- Geändert: `/patch` akzeptiert optionalen `github_release`-Boolean; erstellt Draft-Release mit denselben Notizen als Markdown wenn `GITHUB_TOKEN` + `GITHUB_REPO` gesetzt sind
 
 ## [0.9.2] – 2026-08-01
 
