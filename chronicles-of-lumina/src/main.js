@@ -36,6 +36,7 @@ import { InteractionSystem } from './systems/interaction-system.js';
 import { UiSystem } from './systems/ui-system.js';
 import { FeedbackSystem } from './systems/feedback-system.js';
 import { CodexSystem } from './systems/codex-system.js';
+import { SpawnSystem } from './systems/spawn-system.js';
 import { HitStop } from './core/hitstop.js';
 
 import { HUD } from './ui/hud.js';
@@ -53,6 +54,7 @@ import { Tutorial } from './ui/tutorial.js';
 import { CodexPanel } from './ui/codex-panel.js';
 import { transition, SCREEN } from './core/screen-state.js';
 import { playLayer, stopLayer, updateAudio } from './engine/audio.js';
+import { dailySeed, dailyIndex } from './utils/random.js';
 
 // ── Bootstrap ──────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -84,6 +86,14 @@ const interactionSystem = new InteractionSystem({
   bus, player, shrine: world.shrine, elder, dialogueSystem, questSystem,
 });
 const combatSystem = new CombatSystem({ player, enemySystem, bossSystem, particleSystem: particles, audio: null, feedback, bus });
+const codex = new CodexSystem(bus);
+const spawnSystem = new SpawnSystem(scene, materials, projectiles, enemySystem);
+enemySystem.attachSpawnSystem(spawnSystem);
+
+// Phase 7: daily seed
+const urlSeed = new URLSearchParams(location.search).get('seed');
+state.dailySeed  = urlSeed ? (Number(urlSeed) >>> 0) : dailySeed();
+state.dailyIndex = dailyIndex();
 
 // UI panels
 new HUD(bus, player);
@@ -223,14 +233,34 @@ function onRestart() { location.reload(); }
 
 function endGame(win) {
   state.endTime = state.time;
+  const time = state.endTime - state.startTime;
+  // Score: time-based + crystal-based; lose points for deaths.
+  const score = Math.max(0, Math.round(
+    state.crystals * 100
+    + player.kills * 25
+    + (win ? 500 : 0)
+    - (state.damageTaken * 5)
+    - Math.floor(time * 0.5)
+  ));
+  state.score = score;
   menus.showEndscreen({
     win,
-    time: state.endTime - state.startTime,
+    time,
     kills: player.kills,
     crystals: state.crystals,
+    seed: state.dailySeed,
+    score,
   });
   transition(SCREEN.ENDScreen);
 }
+
+function renderStartInfo() {
+  const idx = document.getElementById('daily-index');
+  const seed = document.getElementById('daily-seed');
+  if (idx) idx.textContent = state.dailyIndex;
+  if (seed) seed.textContent = state.dailySeed;
+}
+renderStartInfo();
 
 // ── Resize ────────────────────────────────────────────────
 function onResize() {

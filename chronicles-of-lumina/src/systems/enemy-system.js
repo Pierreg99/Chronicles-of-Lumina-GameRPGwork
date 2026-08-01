@@ -16,9 +16,20 @@ export class EnemySystem {
     this.materials = materials;
     this.projectiles = projectileSystem;
     this.enemies = [];
+    this.spawnSystem = null;
   }
 
+  attachSpawnSystem(spawnSystem) { this.spawnSystem = spawnSystem; }
+
   spawnInitial() {
+    // Phase 7: if a SpawnSystem gave us daily-seeded placements, use them.
+    if (this.spawnSystem && typeof this.spawnSystem.applyDailySeed === 'function') {
+      const placements = this.spawnSystem.applyDailySeed();
+      if (placements) {
+        for (const p of placements) this._spawn(p.type, p.x, p.z);
+        return;
+      }
+    }
     for (const [type, x, z] of INITIAL_SPAWNS) {
       this._spawn(type, x, z);
     }

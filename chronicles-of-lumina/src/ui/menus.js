@@ -33,6 +33,17 @@ export class Menus {
     const endRestart = document.getElementById('end-restart-btn');
     if (endRestart) endRestart.onclick = () => this.cb.onRestart && this.cb.onRestart();
 
+    const share = document.getElementById('end-share-btn');
+    if (share) share.onclick = () => {
+      const url = new URL(location.href);
+      const seedEl = document.getElementById('end-seed');
+      const s = seedEl ? seedEl.textContent : '';
+      if (s && s !== '—') url.searchParams.set('seed', s);
+      navigator.clipboard?.writeText(url.toString());
+      share.textContent = 'Kopiert!';
+      setTimeout(() => { share.textContent = 'Seed teilen'; }, 1500);
+    };
+
     const mute = document.getElementById('mute-btn');
     if (mute) mute.onclick = () => {
       import('../engine/audio.js').then((m) => {
@@ -66,7 +77,7 @@ export class Menus {
     }
   }
 
-  showEndscreen({ win, time, kills, crystals }) {
+  showEndscreen({ win, time, kills, crystals, seed, score }) {
     const el = document.getElementById('end-screen');
     if (!el) return;
     el.style.display = 'flex';
@@ -74,5 +85,9 @@ export class Menus {
     document.getElementById('end-time').textContent = Math.round(time) + 's';
     document.getElementById('end-kills').textContent = kills;
     document.getElementById('end-crystals').textContent = crystals;
+    const seedEl = document.getElementById('end-seed');
+    if (seedEl) seedEl.textContent = seed ?? '—';
+    const scoreEl = document.getElementById('end-score');
+    if (scoreEl) scoreEl.textContent = score ?? 0;
   }
 }

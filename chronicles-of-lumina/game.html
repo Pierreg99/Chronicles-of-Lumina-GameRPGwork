@@ -69,6 +69,9 @@
   <div id="start-screen" class="overlay">
     <h1>Chronicles of <span>Lumina</span></h1>
     <div class="sub">Ein 3D-Abenteuer · Sammle 10 Lichtkristalle · Reinige den Schrein</div>
+    <div id="daily-info" class="controls-grid" style="grid-template-columns:1fr;gap:4px;text-align:center">
+      <span>Daily Run #<span id="daily-index">—</span> · Seed <span id="daily-seed">—</span></span>
+    </div>
     <div class="controls-grid">
       <span>WASD</span><span>Bewegen</span>
       <span>Maus</span><span>Kamera</span>
@@ -76,6 +79,7 @@
       <span>Shift</span><span>Ausweichrolle</span>
       <span>E</span><span>Interaktion</span>
       <span>Esc</span><span>Pause</span>
+      <span>I / C</span><span>Inventar / Codex</span>
     </div>
     <button class="btn primary" id="start-btn">Abenteuer beginnen</button>
   </div>
@@ -95,8 +99,11 @@
       <span>Spielzeit</span><span id="end-time"></span>
       <span>Besiegte Gegner</span><span id="end-kills"></span>
       <span>Kristalle</span><span id="end-crystals"></span>
+      <span>Daily Seed</span><span id="end-seed"></span>
+      <span>Score</span><span id="end-score"></span>
     </div>
     <button class="btn primary" id="end-restart-btn">Neustart</button>
+    <button class="btn" id="end-share-btn">Seed teilen</button>
   </div>
 
   <script type="module" src="./src/main.js"></script>
