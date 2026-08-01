@@ -1,0 +1,9 @@
+Contact: mailto:cryofreee+security@example.com
+Contact: https://github.com/Pierreg99/Lumina-Game/security/advisories/new
+Expires: 2027-08-01T00:00:00.000Z
+Preferred-Languages: de, en
+Canonical: https://github.com/Pierreg99/Lumina-Game/blob/main/.well-known/security.txt
+Encryption: https://github.com/Pierreg99.gpg
+Acknowledgments: https://github.com/Pierreg99/Lumina-Game/blob/main/SECURITY.md
+Hiring: https://github.com/Pierreg99
+Policy: https://github.com/Pierreg99/Lumina-Game/blob/main/SECURITY.md

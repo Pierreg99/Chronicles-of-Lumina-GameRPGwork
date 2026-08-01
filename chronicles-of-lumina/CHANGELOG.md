@@ -9,10 +9,25 @@ Siehe [`PLAN.md`](./PLAN.md) für detaillierte Aufgaben-Schätzungen.
 ### Geplant
 - **Phase 13 — Type-Safety**: JSDoc-Type-Hints auf `core/*` + `systems/*` (ohne TypeScript-Build)
 - **Phase 14 — Distribution**: GitHub-Pages-Deploy, Demo-GIF im README, erstes GitHub-Release
-- **Phase 15 — Security**: SECURITY.md, Dependabot-Config, optional CodeQL-Analyse
 - **Phase 16 — Test-Coverage**: Three.js-Mocks für Rendering, jsdom für UI (53 → ~80 Assertions)
 - **Phase 17 — i18n**: Hardcoded DE-Strings extrahieren, English-Locale, optional FR
 - **Phase 18 — Performance**: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling
+
+## [0.10.2] – 2026-08-01
+
+### Added (Phase 15: Security & Supply-Chain)
+- Hinzugefügt: `SECURITY.md` — Supported-Versions-Tabelle, Reporting via GitHub Security Advisories, Response-Targets (7d/30d/90d), Scope-Definition
+- Hinzugefügt: `.github/dependabot.yml` — 4 Ecosystems (game/bot/desktop/GitHub-Actions), wöchentlich, gruppierte PRs mit Labels
+- Hinzugefügt: `.well-known/security.txt` — Responsible-Disclosure-Kontakt, Expires 2027-08-01
+- Hinzugefügt: Root `.gitignore` für OS/IDE/Logs/Local-Artifacts
+
+### Changed
+- Geändert: `chronicles-of-lumina/desktop/package.json` — `electron ^31.0.0` → `^33.2.0`, `electron-builder ^24.13.3` → `^25.1.8` (16 Dependabot-Vulnerabilities gefixt: 4 high, 9 moderate, 3 low)
+
+### Verified
+- `npm audit` clean in `desktop/` (0 Vulnerabilities) und `bot/` (0 Vulnerabilities)
+- `chronicles-of-lumina/` (root) — 0 Deps, 0 Vulnerabilities
+- 53/53 Game-Tests grün, 8+4+8+3 Bot-Tests grün
 
 ## [0.10.1] – 2026-08-01
 

@@ -1,0 +1,69 @@
+# .github/dependabot.yml — keep dependencies fresh + get security PRs.
+version: 2
+updates:
+  # Game runtime (no prod deps, but future-proofing)
+  - package-ecosystem: "npm"
+    directory: "/chronicles-of-lumina"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+    labels: ["dependencies", "area:game"]
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  # Discord bot
+  - package-ecosystem: "npm"
+    directory: "/chronicles-of-lumina/bot"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    groups:
+      discord-stack:
+        patterns: ["discord.js*", "@discordjs/*"]
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+    labels: ["dependencies", "area:bot"]
+    commit-message:
+      prefix: "deps(bot)"
+      include: "scope"
+
+  # Electron desktop wrapper
+  - package-ecosystem: "npm"
+    directory: "/chronicles-of-lumina/desktop"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    groups:
+      electron-stack:
+        patterns: ["electron", "electron-*"]
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+    labels: ["dependencies", "area:desktop"]
+    commit-message:
+      prefix: "deps(desktop)"
+      include: "scope"
+
+  # GitHub Actions (for org security policy compliance)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "06:00"
+    groups:
+      actions:
+        patterns: ["*"]
+    labels: ["dependencies", "ci"]
+    commit-message:
+      prefix: "ci"
+      include: "scope"
