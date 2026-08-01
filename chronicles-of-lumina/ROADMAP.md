@@ -11,20 +11,24 @@ Evolution des Spiels in 9 Phasen. Jede Phase endet mit einem lauffähigen Spiel,
 
 ## Phasen-Übersicht
 
-| Phase | Thema | Commits | Geschätzter Aufwand |
-|-------|-------|---------|---------------------|
-| **0** | Plumbing: Tween-Lib, Settings-Store, erweiterte Events | 1 | ~10 min |
-| **1** | Spielgefühl-Foundation: Hit-Stop, Feedback-System | 1 | ~30 min |
-| **2** | Camera- & Combat-Polish | 1 | ~45 min |
-| **3** | UI-Architektur: Screen-State, deklarative HUD, schlankes `main.js` | 1 | ~45 min |
-| **4** | Extended Feedback: Combo, Slowmo, Damage-Direction, Adaptive Audio | 1 | ~60 min |
-| **5** | UX-Features: Tutorial, Dialog-Choices, Pause-Hierarchie, Tooltips | 1 | ~60 min |
-| **6** | Add-on: Codex/Bestiarium mit Persistenz | 1 | ~45 min |
-| **7** | Add-on: Daily-Seed-Run | 1 | ~30 min |
-| **8** | Polish: Settings, Accessibility, Minimap-Zoom | 1 | ~45 min |
-| **9** | Doku-Finalisierung | 1 | ~15 min |
+| Phase | Thema | Commits | Status |
+|-------|-------|---------|--------|
+| **0** | Plumbing: Tween-Lib, Settings-Store, erweiterte Events | 1 | ✅ |
+| **1** | Spielgefühl-Foundation: Hit-Stop, Feedback-System | 1 | ✅ |
+| **2** | Camera- & Combat-Polish | 1 | ✅ |
+| **3** | UI-Architektur: Screen-State, deklarative HUD | 1 | ✅ |
+| **4** | Extended Feedback: Combo, Slowmo, Damage-Direction, Adaptive Audio | 1 | ✅ |
+| **5** | UX-Features: Tutorial, Dialog-Choices, Pause-Hierarchie, Tooltips | 1 | ✅ |
+| **6** | Add-on: Codex/Bestiarium mit Persistenz | 1 | ✅ |
+| **7** | Add-on: Daily-Seed-Run | 1 | ✅ |
+| **8** | Polish: Settings, Accessibility, Minimap-Zoom | 1 | ✅ |
+| **9** | Doku-Finalisierung | 1 | ✅ |
+| **R1+R2** | Refactor: Systems auf `game`-Parameter, Monkey-Patches weg | 1 | ✅ |
+| **R3** | Refactor: `applyShake` in `CameraRig` | 1 | ✅ |
+| **R4** | Refactor: `core/loop.js` benutzen statt eigener Loop | 1 | ✅ |
+| **R5+R6** | Refactor: Dead-Code weg, `main.js` → 5 Zeilen | 1 | ✅ |
 
-**Total: 9 Commits, ~6h**
+**Total: 13 Commits, ~7h**
 
 ## Phasen-Details
 

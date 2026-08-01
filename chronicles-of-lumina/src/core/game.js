@@ -1,205 +1,353 @@
 // game.js — top-level orchestrator. Wires engine, world, entities, systems, UI.
+// Phase R6: replaces the 350-line main.js with a structured Game class.
 
 import * as THREE from 'three';
 
-import { CONFIG } from './config.js';
-import { EVENTS, UI_PANELS } from './constants.js';
+import { CONFIG }  from './config.js';
+import { EVENTS }  from './constants.js';
 import { EventBus } from './event-bus.js';
-import { state, setPhase } from './state.js';
-import { Loop } from './loop.js';
+import { state }   from './state.js';
+import { Loop }    from './loop.js';
+import { HitStop } from './hitstop.js';
+import { transition, SCREEN } from './screen-state.js';
+import { settings } from './settings.js';
+import { dailySeed, dailyIndex } from '../utils/random.js';
 
-import { Renderer } from '../engine/renderer.js';
-import { Scene } from '../engine/scene.js';
-import { CameraRig } from '../engine/camera.js';
-import { Lighting } from '../engine/lighting.js';
+import { Renderer }        from '../engine/renderer.js';
+import { createScene }     from '../engine/scene.js';
+import { createCamera }    from '../engine/camera.js';
+import { createLighting }  from '../engine/lighting.js';
 import { MaterialFactory } from '../engine/materials.js';
-import { Audio } from '../engine/audio.js';
-import { Input } from '../engine/input.js';
-import { MobileInput } from '../engine/mobile-input.js';
-import { Collision } from '../engine/collision.js';
+import { Input }           from '../engine/input.js';
+import { playSfx, playLayer, stopLayer, updateAudio } from '../engine/audio.js';
 
-import { buildWorld } from '../world/world-builder.js';
-import { Player } from '../entities/player.js';
-import { EnemySystem } from '../systems/enemy-system.js';
-import { BossSystem } from '../systems/boss-system.js';
-import { CombatSystem } from '../systems/combat-system.js';
-import { ProjectileSystem } from '../entities/projectile.js';
-import { LootSystem } from '../entities/loot.js';
-import { QuestSystem } from '../systems/quest-system.js';
-import { XpSystem } from '../systems/xp-system.js';
-import { InventorySystem } from '../systems/inventory-system.js';
-import { DialogueSystem } from '../systems/dialogue-system.js';
-import { InteractionSystem } from '../systems/interaction-system.js';
-import { SpawnSystem } from '../systems/spawn-system.js';
+import { buildWorld }     from '../world/world-builder.js';
 import { ParticleSystem } from '../world/particles.js';
+import { Minimap }        from '../world/minimap.js';
 
-import { HUD } from '../ui/hud.js';
-import { Menus } from '../ui/menus.js';
-import { DialogPanel } from '../ui/dialog-panel.js';
-import { QuestPanel } from '../ui/quest-panel.js';
-import { XpPanel } from '../ui/xp-panel.js';
-import { BossBar } from '../ui/boss-bar.js';
-import { InventoryPanel } from '../ui/inventory-panel.js';
-import { MobileControls } from '../ui/mobile-controls.js';
-import { Minimap } from '../world/minimap.js';
+import { Player }           from '../entities/player.js';
+import { NpcElder }         from '../entities/npc-elder.js';
+import { ProjectileSystem } from '../entities/projectile.js';
+import { LootSystem }       from '../entities/loot.js';
+
+import { CombatSystem }      from '../systems/combat-system.js';
+import { EnemySystem }       from '../systems/enemy-system.js';
+import { BossSystem }        from '../systems/boss-system.js';
+import { QuestSystem }       from '../systems/quest-system.js';
+import { XpSystem }          from '../systems/xp-system.js';
+import { InventorySystem }   from '../systems/inventory-system.js';
+import { DialogueSystem }    from '../systems/dialogue-system.js';
+import { InteractionSystem } from '../systems/interaction-system.js';
+import { FeedbackSystem }    from '../systems/feedback-system.js';
+import { CodexSystem }       from '../systems/codex-system.js';
+import { SpawnSystem }       from '../systems/spawn-system.js';
+
+import { HUD }             from '../ui/hud.js';
+import { Menus }           from '../ui/menus.js';
+import { DialogPanel }     from '../ui/dialog-panel.js';
+import { QuestPanel }      from '../ui/quest-panel.js';
+import { XpPanel }         from '../ui/xp-panel.js';
+import { BossBar }         from '../ui/boss-bar.js';
+import { InventoryPanel }  from '../ui/inventory-panel.js';
+import { MobileControls }  from '../ui/mobile-controls.js';
+import { InteractionHint } from '../ui/interaction-hint.js';
+import { ComboIndicator }  from '../ui/combo-indicator.js';
+import { DamageDirection } from '../ui/damage-direction.js';
+import { Tutorial }        from '../ui/tutorial.js';
+import { CodexPanel }      from '../ui/codex-panel.js';
+import { SettingsPanel }   from '../ui/settings-panel.js';
 
 export class Game {
   constructor(canvas) {
     this.canvas = canvas;
     this.bus = new EventBus();
-
-    this._setup();
+    this.hitstop = new HitStop();
+    this._build();
+    this._wireUI();
+    this._wireGlobalEvents();
+    this._buildStartInfo();
+    this._buildLoop();
+    this._buildPauseWiring();
   }
 
-  _setup() {
-    // 1. Engine
+  // 1. Build the game object — engine, entities, systems, UI in dependency order.
+  _build() {
+    // Engine
     this.renderer = new Renderer(this.canvas);
-    this.sceneMgr = new Scene();
-    this.camera = new CameraRig(this.canvas, this.bus);
-    this.lighting = new Lighting(this.sceneMgr.scene);
+    this.scene = createScene();
+    this.cameraRig = createCamera();
+    createLighting(this.scene);
     this.materials = new MaterialFactory(this.renderer.renderer);
-    this.audio = new Audio();
-    this.input = new Input(this.canvas, this.bus);
-    this.mobileInput = new MobileInput(this.bus);
-    this.input.bindMobile(this.mobileInput);
-    this.collision = new Collision();
-
-    // 2. World
-    this.particleSystem = new ParticleSystem(this.sceneMgr.scene, this.materials);
+    this.input = new Input(this.canvas);
     this.minimap = new Minimap();
-    this.world = buildWorld({
-      scene: this.sceneMgr.scene,
-      materials: this.materials,
-      collision: this.collision,
-      minimap: this.minimap,
-    });
+    this.particles = new ParticleSystem(this.scene);
 
-    // 3. Entities
-    this.player = new Player({
-      scene: this.sceneMgr.scene,
-      materials: this.materials,
-      bus: this.bus,
-      input: this.input,
-      collision: this.collision,
-      spawn: CONFIG.world.wellPos,
-    });
-    state.player = this.player;
+    // World + entities
+    this.world = buildWorld({ scene: this.scene, materials: this.materials });
+    this.elder = new NpcElder(this.scene, this.materials, new THREE.Vector3(2, 0, 0));
+    this.player = new Player(this.scene, this.materials, this.bus);
+    this.projectiles = new ProjectileSystem(this.scene);
+    this.loot = new LootSystem(this.scene, this.materials);
 
-    // 4. Systems
+    // Systems (each takes `this`)
+    this.feedback = new FeedbackSystem(this);
     this.enemySystem = new EnemySystem(this);
+    this.spawnSystem = new SpawnSystem(this);
+    this.enemySystem.attachSpawnSystem(this.spawnSystem);
     this.bossSystem = new BossSystem(this);
     this.combatSystem = new CombatSystem(this);
-    this.projectileSystem = new ProjectileSystem(this);
-    this.lootSystem = new LootSystem(this);
     this.questSystem = new QuestSystem(this);
     this.xpSystem = new XpSystem(this);
     this.inventorySystem = new InventorySystem(this);
     this.dialogueSystem = new DialogueSystem(this);
     this.interactionSystem = new InteractionSystem(this);
-    this.spawnSystem = new SpawnSystem(this);
+    this.codex = new CodexSystem(this);
 
-    // 5. UI
-    this.hud = new HUD(this);
-    this.menus = new Menus(this);
-    this.dialogPanel = new DialogPanel(this);
-    this.questPanel = new QuestPanel(this);
-    this.xpPanel = new XpPanel(this);
-    this.bossBar = new BossBar(this);
-    this.inventoryPanel = new InventoryPanel(this);
-    this.mobileControls = new MobileControls(this);
+    // Daily seed
+    const urlSeed = new URLSearchParams(location.search).get('seed');
+    state.dailySeed  = urlSeed ? (Number(urlSeed) >>> 0) : dailySeed();
+    state.dailyIndex = dailyIndex();
+  }
 
-    // 6. Loop
-    this.loop = new Loop({
-      update: (dt) => this.update(dt),
-      render: (alpha) => this.render(alpha),
-      onPauseChange: (p) => this.bus.emit(p ? EVENTS.GAME_PAUSE : EVENTS.GAME_RESUME),
+  // 2. Wire UI panels (each manages its own DOM, no direct DOM in Game).
+  _wireUI() {
+    this.hud = new HUD(this.bus, this.player);
+    this.menus = new Menus(this.bus, {
+      onStart: () => this._handleStart(),
+      onRestart: () => location.reload(),
+      onResume: () => transition(SCREEN.PLAYING),
+      onOpenSettings: () => transition(SCREEN.PAUSED),
+    });
+    this.dialogPanel = new DialogPanel(this.bus);
+    this.questPanel = new QuestPanel(this.bus);
+    this.xpPanel = new XpPanel(this.bus);
+    this.bossBar = new BossBar(this.bus);
+    this.inventoryPanel = new InventoryPanel(this.bus, this.inventorySystem);
+    this.mobileControls = new MobileControls();
+    this.interactionHint = new InteractionHint(this.bus, { player: this.player, interactionSystem: this.interactionSystem });
+    this.comboIndicator = new ComboIndicator(this.bus);
+    this.damageDirection = new DamageDirection(this.bus, { camera: this.cameraRig, player: this.player });
+    this.codexPanel = new CodexPanel(this.bus, this.codex);
+    this.settingsPanel = new SettingsPanel();
+
+    const tutorial = new Tutorial(this.bus);
+    tutorial.register('move',     (s) => s.time > 1  && s.time < 2,  'Bewege Aren mit WASD oder den Pfeiltasten.');
+    tutorial.register('attack',   (s) => s.time > 6  && s.time < 7,  'Drücke Leertaste oder klicke, um anzugreifen.');
+    tutorial.register('dodge',    (s) => s.time > 12 && s.time < 13, 'Shift = Ausweichrolle. Kurz unverwundbar!');
+    tutorial.register('interact', (s) => s.time > 18 && s.time < 19, 'Drücke E, um mit Personen und dem Schrein zu sprechen.');
+    this.tutorial = tutorial;
+
+    this.bus.on(EVENTS.DIALOG_CHOICE_REQUEST, ({ id }) => this.dialogueSystem.pickChoice(id));
+    this.bus.on('inventory:toggle', () => {
+      if (state.screen === SCREEN.INVENTORY) transition(SCREEN.PLAYING);
+      else transition(SCREEN.INVENTORY);
+    });
+    this.bus.on('codex:toggle', () => this.bus.emit('inventory:toggle'));
+    this.bus.on('tick', () => {
+      if (state.screen !== 'playing') return;
+      const target = this.interactionSystem.nearestInteractable();
+      if (target === 'shrine') this.bus.emit('shrine:visit');
+      if (target === 'elder')  this.bus.emit('village:visit');
     });
 
-    this._wireGlobalEvents();
-    this._spawnInitialEntities();
-
-    setPhase('menu');
-    this.menus.show(UI_PANELS.START);
-    this.loop.start();
-    this.bus.emit(EVENTS.GAME_INIT);
+    playLayer('ambient');
   }
 
-  _spawnInitialEntities() {
-    this.enemySystem.spawnInitial();
-    this.world.elder.bind(this.dialogueSystem);
-  }
-
+  // 3. Global event wiring for player lifecycle + scene beats.
   _wireGlobalEvents() {
-    this.bus.on(EVENTS.GAME_START, () => {
-      setPhase('playing');
-      this.menus.hide(UI_PANELS.START);
-      state.startTime = state.time;
-      this.dialogueSystem.startIntro();
-    });
-
-    this.bus.on(EVENTS.GAME_OVER, () => {
-      setPhase('endscreen');
-      state.endTime = state.time;
-      this.menus.showEndscreen({ win: false });
-    });
-
-    this.bus.on(EVENTS.GAME_WIN, () => {
-      setPhase('endscreen');
-      state.endTime = state.time;
-      this.menus.showEndscreen({ win: true });
-    });
-
-    this.bus.on(EVENTS.GAME_PAUSE, () => {
-      if (state.phase === 'playing') {
-        setPhase('paused');
-        this.menus.show(UI_PANELS.PAUSE);
-        this.loop.setPaused(true);
-      }
-    });
-
-    this.bus.on(EVENTS.GAME_RESUME, () => {
-      if (state.phase === 'paused') {
-        setPhase('playing');
-        this.menus.hide(UI_PANELS.PAUSE);
-        this.loop.setPaused(false);
-      }
-    });
-
-    this.bus.on(EVENTS.DIALOG_OPEN, () => {
-      if (state.phase === 'playing') setPhase('dialog');
-    });
-    this.bus.on(EVENTS.DIALOG_CLOSE, () => {
-      if (state.phase === 'dialog') setPhase('playing');
-    });
-
+    this.bus.on(EVENTS.PLAYER_DAMAGE, () => this.bus.emit(EVENTS.UI_REFRESH));
+    this.bus.on(EVENTS.PLAYER_HEAL,   () => this.bus.emit(EVENTS.UI_REFRESH));
     this.bus.on(EVENTS.PLAYER_DIED, () => {
-      this.player.respawn(CONFIG.world.wellPos);
+      this.player.respawn(this.world.village.respawn);
+      this.dialogueSystem.say('System', 'Du wurdest am Brunnen wiederbelebt.');
+      this.bus.emit(EVENTS.UI_REFRESH);
     });
 
-    window.addEventListener('resize', () => this.bus.emit(EVENTS.RESIZE, {
-      w: window.innerWidth, h: window.innerHeight,
-    }));
+    this.bus.on(EVENTS.LOOT_PICKUP_CRYSTAL, () => {
+      this.questSystem.addCrystal();
+      this.inventorySystem.add('crystal');
+      this.bus.emit(EVENTS.UI_REFRESH);
+      playSfx('pickup');
+      this.particles.burst(this.player.position, '#5ad1ff', 8);
+    });
+    this.bus.on(EVENTS.LOOT_PICKUP_BERRY, () => {
+      this.inventorySystem.add('berry');
+      playSfx('pickup');
+      this.particles.burst(this.player.position, '#d94f4f', 8);
+    });
+
+    this.bus.on(EVENTS.ENEMY_DIED, (e) => {
+      const spec = e.spec;
+      state.killed[spec.id] = (state.killed[spec.id] || 0) + 1;
+      this.player.kills = (this.player.kills || 0) + 1;
+      this.xpSystem.gain(spec.hp * 5);
+      this.particles.burst(e.position, '#' + spec.col.toString(16).padStart(6, '0'), 18);
+      this.loot.drop(e.position);
+    });
+
+    this.bus.on(EVENTS.BOSS_DIED, () => {
+      state.bossDefeated = true;
+      for (let i = 0; i < 4; i++) {
+        const p = this.bossSystem.boss.position;
+        this.loot.drop(new THREE.Vector3(p.x + (Math.random() - 0.5) * 3, 0, p.z + (Math.random() - 0.5) * 3));
+      }
+      this.xpSystem.gain(50);
+      this.dialogueSystem.bossDefeated();
+    });
+
+    this.bus.on(EVENTS.SHRINE_CLEANSE, () => {
+      state.shrineClean = true;
+      const orb = this.world.shrine.orb;
+      orb.material.color.set(0x5ad1ff);
+      orb.material.emissive = new THREE.Color(0x2f7bff);
+      this.particles.burst(this.world.shrine.position.clone().add(new THREE.Vector3(0, 4, 0)), '#5ad1ff', 40);
+      this.scene.fog.color.set(0x9fd8f0);
+      this.scene.background.set(0x9fd8f0);
+      playSfx('shrine');
+      this.dialogueSystem.victory();
+      setTimeout(() => this._endGame(true), 1500);
+    });
+
+    this.bus.on(EVENTS.BOSS_SPAWN, () => this.dialogueSystem.bossWarning());
   }
 
-  update(dt) {
-    if (state.phase === 'menu' || state.phase === 'endscreen') return;
-    if (state.phase === 'paused') return;
-
-    this.input.poll();
-    this.player.update(dt);
-    this.enemySystem.update(dt);
-    this.bossSystem.update(dt);
-    this.projectileSystem.update(dt);
-    this.lootSystem.update(dt);
-    this.particleSystem.update(dt);
-    this.spawnSystem.update(dt);
-    this.interactionSystem.update(dt);
-    this.world.update(dt);
-    this.camera.update(dt, this.player, this.input);
-    this.minimap.update(this.player, this.world, this.bossSystem);
+  // 4. Render daily seed / index on the start overlay.
+  _buildStartInfo() {
+    const idx = document.getElementById('daily-index');
+    const seed = document.getElementById('daily-seed');
+    if (idx) idx.textContent = state.dailyIndex;
+    if (seed) seed.textContent = state.dailySeed;
   }
 
-  render(alpha) {
-    this.renderer.render(this.sceneMgr.scene, this.camera.camera);
+  // 5. Build the main loop and start it.
+  _buildLoop() {
+    this.loop = new Loop({
+      update: (dt) => this._update(dt),
+      render: () => this._render(),
+    });
+    this.loop.start();
+  }
+
+  // 6. Pause wiring — Esc/Pause button flips screen state.
+  _buildPauseWiring() {
+    window.addEventListener('resize', () => {
+      this.renderer.resize();
+      this.cameraRig.setAspect(window.innerWidth / window.innerHeight);
+    });
+    this.bus.on(EVENTS.SHAKE,       ({ intensity, duration }) => this.cameraRig.addShake(intensity, duration));
+    this.bus.on(EVENTS.CAMERA_KICK, ({ direction, intensity, duration }) => this.cameraRig.kickToward(direction, intensity, duration));
+    this.bus.on(EVENTS.FLASH,       ({ color, duration }) => {
+      const f = document.getElementById('flash-overlay');
+      if (f) {
+        f.style.background = color;
+        f.style.opacity = '0.5';
+        setTimeout(() => { f.style.opacity = '0'; }, Math.max(50, duration * 1000));
+      }
+    });
+  }
+
+  // ── Run-loop callbacks ────────────────────────────────────
+  _update(dt) {
+    // FPS counter (Phase 8, opt-in)
+    this._fpsAccum = (this._fpsAccum || 0) + dt;
+    this._fpsFrames = (this._fpsFrames || 0) + 1;
+    if (this._fpsAccum >= 0.5) {
+      const fps = Math.round(this._fpsFrames / this._fpsAccum);
+      this._fpsAccum = 0; this._fpsFrames = 0;
+      if (settings.get('showFPS')) document.documentElement.dataset.fps = String(fps);
+      else delete document.documentElement.dataset.fps;
+    }
+
+    // Slowmo scales the game dt; UI animations tick on real dt.
+    const gameDt = dt * this.feedback.timeScale;
+    state.time += dt;
+    state.cameraYaw = this.cameraRig.yaw;
+
+    // Render the static menus even when not playing
+    if (state.screen !== 'playing') return;
+
+    // Camera yaw input
+    const dYaw = this.input.consumeCameraYaw();
+    if (dYaw !== 0) this.cameraRig.yaw += dYaw;
+    state.cameraYaw = this.cameraRig.yaw;
+
+    this.hitstop.update(dt);
+    if (this.hitstop.active) return;
+
+    if (this.input.consumeAttack())    this.combatSystem.tryAttack();
+    if (this.input.consumeDodge())     this.player.startDodge();
+    if (this.input.consumeInteract())  this.interactionSystem.interact();
+    if (this.input.consumePause())     { transition(SCREEN.PAUSED); }
+    if (this.input.consumeInventory()) { this.bus.emit('inventory:toggle'); }
+    if (this.input.consumeCodex())     { this.bus.emit('codex:toggle'); }
+
+    if (this.player.hp <= 0) this.bus.emit(EVENTS.PLAYER_DIED);
+
+    this.player.update(gameDt, state.time, this.input);
+    this.enemySystem.update(gameDt, this.player);
+    this.bossSystem.update(gameDt, this.player);
+    this.projectiles.update(gameDt, this.player, (shotPos) => this.player.takeDamage(1, shotPos));
+    this.loot.update(gameDt, this.player,
+      () => this.bus.emit(EVENTS.LOOT_PICKUP_CRYSTAL),
+      () => this.bus.emit(EVENTS.LOOT_PICKUP_BERRY)
+    );
+    this.particles.update(gameDt);
+    this.combatSystem.update(gameDt);
+    this.dialogueSystem.update();
+    this.feedback.update(dt);
+    updateAudio(dt);
+
+    // Adaptive music: combat layer fades in when an enemy is within 10 units.
+    let enemiesNear = false;
+    for (const e of this.enemySystem.enemies) {
+      if (e.dead) continue;
+      if (e.position.distanceTo(this.player.position) < 10) { enemiesNear = true; break; }
+    }
+    if (this.bossSystem.boss && this.bossSystem.boss.active && !this.bossSystem.boss.dead) enemiesNear = true;
+    if (enemiesNear) playLayer('combat'); else stopLayer('combat');
+
+    this.cameraRig.update(gameDt, this.player.position, this.player.velocity);
+    this.minimap.draw(this.player, this.world.shrine, state.crystals, state.bossActive);
+    this.bus.emit('tick');
+  }
+
+  _render() {
+    this.renderer.render(this.scene, this.cameraRig.camera);
+  }
+
+  // ── Game actions ─────────────────────────────────────────
+  _handleStart() {
+    transition(SCREEN.PLAYING);
+    state.startTime = state.time;
+    this.enemySystem.spawnInitial();
+    this.bus.emit(EVENTS.UI_REFRESH);
+    this.dialogueSystem.startIntro();
+  }
+
+  _endGame(win) {
+    state.endTime = state.time;
+    const time = state.endTime - state.startTime;
+    const score = Math.max(0, Math.round(
+      state.crystals * 100
+      + this.player.kills * 25
+      + (win ? 500 : 0)
+      - (state.damageTaken * 5)
+      - Math.floor(time * 0.5)
+    ));
+    state.score = score;
+    document.getElementById('end-time').textContent     = Math.round(time) + 's';
+    document.getElementById('end-kills').textContent    = this.player.kills;
+    document.getElementById('end-crystals').textContent = state.crystals;
+    const seedEl = document.getElementById('end-seed');
+    if (seedEl) seedEl.textContent = state.dailySeed ?? '—';
+    const scoreEl = document.getElementById('end-score');
+    if (scoreEl) scoreEl.textContent = score;
+    const endScreen = document.getElementById('end-screen');
+    if (endScreen) {
+      endScreen.style.display = 'flex';
+      const h1 = endScreen.querySelector('h1');
+      if (h1) h1.innerHTML = win ? 'Demo <span>abgeschlossen</span>' : 'Demo <span>beendet</span>';
+    }
+    transition(SCREEN.ENDScreen);
   }
 }

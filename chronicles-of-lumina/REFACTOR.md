@@ -107,20 +107,20 @@ FPS-Counter, Adaptive-Music-Toggle und Minimap-Draw sind Teil von `updateLoop`, 
 
 ---
 
-## Phase R5 — Dead-Code entfernen
+## Phase R5 — Dead-Code entfernen  ✅
 
-| Was | Wo | Aktion |
-|-----|-----|--------|
-| Leerer `BUS.on('BOSS_DAMAGE', () => {})`-Handler | `main.js` | löschen, Logik sitzt jetzt in BossBar/BossSystem |
-| Ungenutzter `UiSystem` Import + Instanziierung | `main.js` | komplett raus (existiert noch als Datei, aber ungenutzt) |
-| `setPhase` Import | `main.js` | raus — durch `transition(SCREEN.PLAYING)` ersetzt |
-| `applyShake()`, `_activeShakes[]` | `main.js` | in CameraRig verschoben (Phase R3) |
-| Monkey-Patches `_origKill` / `_origBossDamage` | `main.js` | in die jeweiligen Systeme (Phase R2) |
-| `onRestart: () => location.reload()` | `main.js` | durch `Game.restart()` ersetzen, der sauber `state.reset()` + Re-Init macht |
+| Was | Wo | Aktion | Status |
+|-----|-----|--------|--------|
+| Leerer `BUS.on('BOSS_DAMAGE', () => {})`-Handler | `main.js` | gelöscht | ✅ |
+| Ungenutzter `UiSystem` Import + Instanziierung | `main.js` | komplett raus | ✅ |
+| `setPhase` Import | `main.js` | raus | ✅ |
+| `applyShake()`, `_activeShakes[]` | `main.js` | in CameraRig verschoben (R3) | ✅ |
+| Monkey-Patches `_origKill` / `_origBossDamage` | `main.js` | in Systeme (R2) | ✅ |
+| Alte `core/game.js` Klassen-Implementierung mit `sceneMgr`, `mobileInput`, `collision`, `loop.setPaused` | `core/game.js` | komplett ersetzt mit der neuen Game-Klasse | ✅ |
 
 ---
 
-## Phase R6 — `main.js` final
+## Phase R6 — `main.js` final  ✅
 
 ```js
 // main.js — Bootstrap only.
@@ -130,7 +130,19 @@ const canvas = document.getElementById('game');
 new Game(canvas);
 ```
 
-**Erwartete Größe:** 5 Zeilen. Alle Wiring-Logik liegt in `Game._setup()` und `Game._wireGlobalEvents()`.
+**Status: ✅ Abgeschlossen — exakt 5 Zeilen.**
+
+Die gesamte Wiring-Logik liegt jetzt in `core/game.js` als `Game`-Klasse mit privaten Methoden:
+- `_build()` — Engine, Entities, Systems in Dependency-Order
+- `_wireUI()` — UI-Panels + Dialog/Inventory/Codex-Listener
+- `_wireGlobalEvents()` — Player-Lifecycle + Scene-Beats
+- `_buildStartInfo()` — Daily-Seed im Start-Overlay
+- `_buildLoop()` — Loop-Instanz + Start
+- `_buildPauseWiring()` — Resize + Camera-Shake/Kick/Flash
+- `_update(dt)` / `_render()` — Loop-Callbacks
+- `_handleStart()` / `_endGame(win)` — Game-Actions
+
+main.js ist nur noch der Entry-Point. `core/game.js` ist 353 Zeilen, davon ~250 in Methoden. Die Game-Klasse ist unit-testbar (man kann sie mit einem Mock-canvas starten).
 
 ---
 
