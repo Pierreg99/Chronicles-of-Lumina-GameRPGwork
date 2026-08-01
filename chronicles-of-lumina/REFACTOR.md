@@ -218,3 +218,76 @@ Vollständige Anleitung in [`DEPLOY.md`](./DEPLOY.md) mit Prompt-Tabelle für di
 | Neue EXE | 🖥️-Block + Version-Bump |
 
 **Outcome:** 53 Test-Assertions + 3 Plattformen. Refactor-Roadmap vollständig abgeschlossen.
+
+---
+
+## Phase 10 — Prozedurale Asset-Generierung  ✅
+
+**Status: ✅ Abgeschlossen.**
+
+### Ziel
+Alle 21 Placeholder-PNGs in `assets/` durch prozedurale Canvas-2D-Generierung ersetzen.
+**Kein Build-Step**, keine externen Bilddateien, alles läuft im Browser zur Spielstart-Zeit.
+
+### Architektur: `src/utils/asset-gen.js`
+
+```js
+import { AssetGen } from '../utils/asset-gen.js';
+
+// Master-Atlas (512×512, 16 Zellen) — wird in materials.js verwendet
+const atlasCanvas = AssetGen.atlas();  // → THREE.CanvasTexture
+
+// Einzelne Zellen (16)
+AssetGen.cells.grassTile()          // → HTMLCanvasElement 128×128
+AssetGen.cells.heartFull()          // → ...
+// ... 14 weitere
+
+// Standalone Portraits + Icons (5)
+AssetGen.portraits.slimeGreen()     // → HTMLCanvasElement 128×128
+AssetGen.portraits.bossNebelkoloss()
+AssetGen.icons.bossNebelkoloss()    // → HTMLCanvasElement 48×48
+
+// Alle 21 Assets auf einmal
+const map = AssetGen.generateAll();  // → Map<string, HTMLCanvasElement>
+
+// Export als PNG (Browser-Download)
+AssetGen.exportAll();  // löst 23 Downloads aus (21 Assets + 2 PWA-Icons)
+```
+
+### Visueller Stil
+Granblue Fantasy / Star Ocean UI:
+- 3-4px dicke dunkle Outlines auf allen Formen
+- 2-3 Töne pro Objekt (Cell-Shading via `toonShade`/`radialGlow`)
+- Anime-Augen mit Pupille + Highlight (`drawEye`)
+- 4-Punkt-Sparkles auf UI-Items (`sparkle`)
+- Boss-Portrait: dunkle Vignette, glühende Augen, leuchtender Brust-Kern
+
+### Integration in `materials.js`
+
+```js
+// VORHER:
+this.atlas = new THREE.TextureLoader().load('assets/texture_atlas.png');
+
+// NACHHER:
+import { AssetGen } from '../utils/asset-gen.js';
+this.atlas = new THREE.CanvasTexture(AssetGen.atlas());
+```
+
+UV-Mapping (`getUVForAsset`) bleibt unverändert — die 4×4-Grid-Layout-Positionen stimmen
+mit dem prozeduralen Atlas überein.
+
+### Gelöschte Dateien
+21 Placeholder-PNGs aus `assets/`:
+- 16 Atlas-Zellen (`texture_atlas.png` + 15 einzelne)
+- 4 Standalone-Portraits/Icons
+- 1 `texture_atlas.png` (durch prozedurales Pendant ersetzt)
+
+Übrig: `assets/texture_atlas.json` (Layout-Dokumentation, nicht geladen).
+
+### Tests
+Die bestehende Test-Suite (53 Assertions) läuft weiterhin grün. Eine direkte Asset-Gen-Test
+braucht `document.createElement('canvas')` und ist im Node-Setup nicht ausführbar — visuelle
+Verifikation erfolgt im Browser via `python3 -m http.server 8080`.
+
+**Outcome:** Keine externen Assets mehr. `assets/` ist fast leer (nur die JSON-Doku).
+Spielstart ist deterministisch und offline-fähig ohne Bildmaterial.

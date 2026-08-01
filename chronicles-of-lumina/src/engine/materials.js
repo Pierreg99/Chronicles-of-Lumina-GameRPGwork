@@ -1,10 +1,10 @@
-// materials.js — loads the real texture_atlas.png, exposes toon materials and
-// sprite-from-atlas helpers.
+// materials.js — uses the procedurally generated texture atlas
+// (utils/asset-gen.js) to expose toon materials and atlasSprite helpers.
 
 import * as THREE from 'three';
 import { getUVForAsset } from '../utils/uv_helper.js';
+import { AssetGen } from '../utils/asset-gen.js';
 
-const ATLAS_PATH = 'assets/texture_atlas.png';
 const TOON_GRADIENT_STEPS = ['#555', '#999', '#ccc', '#fff'];
 
 function makeToonGradientTexture() {
@@ -25,7 +25,8 @@ function makeToonGradientTexture() {
 export class MaterialFactory {
   constructor(renderer) {
     this.renderer = renderer;
-    this.atlas = new THREE.TextureLoader().load(ATLAS_PATH);
+    // Procedural atlas (no PNG, no HTTP fetch)
+    this.atlas = new THREE.CanvasTexture(AssetGen.atlas());
     this.atlas.magFilter = THREE.NearestFilter;
     this.atlas.minFilter = THREE.NearestFilter;
     this.toonGradient = makeToonGradientTexture();

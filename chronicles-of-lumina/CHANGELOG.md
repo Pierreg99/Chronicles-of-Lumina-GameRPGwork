@@ -2,6 +2,23 @@
 
 Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [0.9.2] – 2026-08-01
+
+### Added (Phase 10: Procedural Asset-Generation)
+- Hinzugefügt: `src/utils/asset-gen.js` — vollständige prozedurale Canvas-2D Asset-Generierung zur Laufzeit
+- Hinzugefügt: 16 Atlas-Zellen (128×128) — Grass, Path, Water, Rock, Tree, House, Shrine, Minimap, Heart×2, Crystal, Berry, 3× Slime-Icon, Slime-Blue-Portrait
+- Hinzugefügt: 4 Standalone-Portraits/Icons — Slime Green, Slime Purple, Boss Nebelkoloss Portrait, Boss Icon
+- Hinzugefügt: PWA-Icon-Generator (`pwaIcon(size)`) — Lumina-Emblem mit Kristall, Gold-Ring, Runen
+- Hinzugefügt: `AssetGen.exportAll()` — exportiert alle 21+ Assets als PNG-Downloads via DevTools-Console
+- Hinzugefügt: `AssetGen.generateAll()` — Map<string, HTMLCanvasElement> mit Originaldateinamen als Keys
+
+### Changed
+- Geändert: `src/engine/materials.js` nutzt `AssetGen.atlas()` (Canvas) statt `TextureLoader().load('assets/texture_atlas.png')` (HTTP-Fetch)
+- Geändert: Visuelle Pipeline komplett prozedural — keine Build-Step, keine externen Bilder
+
+### Removed
+- Entfernt: 21 Placeholder-PNGs aus `assets/` (durch prozedurale Generierung ersetzt)
+
 ## [0.9.1] – 2026-08-01
 
 ### Added (Refactor R7)

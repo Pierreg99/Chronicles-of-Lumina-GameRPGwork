@@ -1,6 +1,6 @@
 # Chronicles of Lumina
 
-![Version](https://img.shields.io/badge/version-0.9.1-blue) ![Phases](https://img.shields.io/badge/phases-9%2F9-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R7-success)
+![Version](https://img.shields.io/badge/version-0.9.2-blue) ![Phases](https://img.shields.io/badge/phases-9%2F9-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R7-success) ![Assets](https://img.shields.io/badge/assets-procedural-success)
 
 3D-Browser-Action-Adventure im farbenfrohen JRPG-Fantasy-Stil. Vanilla JS + Three.js, ES-Module, kein Build-Step.
 
@@ -138,10 +138,26 @@ MIT — siehe [`LICENSE`](./LICENSE) (TODO).
 
 ## Roadmap & Doku
 
-- [`ROADMAP.md`](./ROADMAP.md) — 14 Phasen (0–9 Feature-Phasen + R1–R7 Refactor), alle ✅
+- [`ROADMAP.md`](./ROADMAP.md) — 15 Phasen (0–9 Feature + R1–R7 Refactor + 10 Visuals), alle ✅
 - [`REFACTOR.md`](./REFACTOR.md) — Phase R1–R7 Plan und Status
 - [`CHANGELOG.md`](./CHANGELOG.md) — Versions-Historie (Keep-a-Changelog-Format)
 - [`DEPLOY.md`](./DEPLOY.md) — Multi-Plattform-Deployment (🌐 Web · 🤖 Android · 🖥️ Desktop)
+- [`src/utils/asset-gen.js`](./src/utils/asset-gen.js) — prozeduraler Asset-Generator
+
+## Assets (prozedural)
+
+Alle Texturen werden zur Laufzeit im Browser via **Canvas-2D** generiert — keine externen
+Bilddateien, kein Build-Step. Der Master-Atlas (`512×512`, 4×4 Grid) wird in
+`engine/materials.js` als `THREE.CanvasTexture` geladen. Die 16 Zellen + 4 Standalone-Portraits
+sind einzeln abrufbar via `AssetGen.cells.*` / `AssetGen.portraits.*` / `AssetGen.icons.*`.
+
+Visueller Stil: Granblue Fantasy / Star Ocean — dicke Outlines, satte Cell-Shading-Töne,
+Glanzpunkte, Sparkles und Glows auf UI-Items. Boss- und Codex-Portraits haben
+Hintergrund-Vignette und dramatische Beleuchtung.
+
+**Assets exportieren** (für Marketing, PWA-Manifest-Icons, statisches Hosting):
+Browser-Console öffnen und `AssetGen.exportAll();` ausführen — alle 23 Dateien (21 Game-Assets
++ 2 PWA-Icons) werden als PNG-Downloads gespeichert.
 
 ## Testing
 
