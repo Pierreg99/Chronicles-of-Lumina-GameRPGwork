@@ -148,7 +148,7 @@ export class Game {
       onStart: () => this._handleStart(),
       onRestart: () => location.reload(),
       onResume: () => transition(SCREEN.PLAYING),
-      onOpenSettings: () => transition(SCREEN.PAUSED),
+      onOpenSettings: () => this.settingsPanel.show(),
     });
     this.dialogPanel = new DialogPanel(this.bus);
     this.questPanel = new QuestPanel(this.bus);

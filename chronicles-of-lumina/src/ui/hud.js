@@ -1,11 +1,16 @@
 // ui/hud.js — heart display + HP bar.
 //
-// Phase 3 refactor: subscribes to UI_REFRESH + SCREEN change. Renders
-// declaratively from a render(player) call. main.js no longer needs to
-// poke any DOM in the hearts path.
+// Phase 9 visual refresh: hearts are now inline SVG icons (filled / outline).
+// The HP bar is driven by the player's actual hp/maxHp — previously it was
+// incorrectly rendering the crystal count, which is already shown in the
+// quest panel.
+//
+// Subscribes to UI_REFRESH + SCREEN change. Renders declaratively from
+// render(player). main.js no longer needs to poke any DOM in the hearts path.
 
 import { EVENTS } from '../core/constants.js';
 import { screenBus, SCREEN } from '../core/screen-state.js';
+import { ICONS } from './icons.js';
 
 const VISIBLE_SCREENS = new Set([SCREEN.PLAYING, SCREEN.DIALOG, SCREEN.INVENTORY]);
 
@@ -35,12 +40,23 @@ export class HUD {
     const p = this.player;
     this.heartsEl.innerHTML = '';
     for (let i = 0; i < p.maxHp; i++) {
-      const h = document.createElement('div');
+      const h = document.createElement('span');
       h.className = 'heart' + (i < p.hp ? '' : ' empty');
+      h.setAttribute('aria-label', i < p.hp ? 'HP verbleibend' : 'HP verloren');
+      h.innerHTML = i < p.hp ? ICONS.heart : ICONS.heartOutline;
       this.heartsEl.appendChild(h);
     }
-    if (this.hpBarEl) {
-      this.hpBarEl.style.width = (p.crystals / 10 * 100) + '%';
+    if (this.hpBarEl && p.maxHp > 0) {
+      const pct = Math.max(0, Math.min(100, (p.hp / p.maxHp) * 100));
+      this.hpBarEl.style.width = pct + '%';
+      // Switch bar color to warning when low HP
+      if (pct <= 30) {
+        this.hpBarEl.style.background = 'linear-gradient(90deg, #B45309, #F59E0B)';
+        this.hpBarEl.style.boxShadow = '0 0 8px rgba(245, 158, 11, 0.5)';
+      } else {
+        this.hpBarEl.style.background = '';
+        this.hpBarEl.style.boxShadow = '';
+      }
     }
   }
 }

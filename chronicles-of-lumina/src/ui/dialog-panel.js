@@ -11,7 +11,9 @@ export class DialogPanel {
     this.bus = bus;
     this._hideTimer = null;
     this.el = document.getElementById('dialog');
-    this.whoEl = this.el && this.el.querySelector('.who');
+    // The .who div now contains an icon span + a .who-name span.
+    // We only update the name span so the icon stays intact.
+    this.whoEl = this.el && this.el.querySelector('.who-name');
     this.textEl = this.el && this.el.querySelector('.text');
     this.choicesHost = document.createElement('div');
     this.choicesHost.id = 'dialog-choices';

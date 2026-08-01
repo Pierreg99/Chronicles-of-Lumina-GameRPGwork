@@ -3,10 +3,11 @@
 
 import { EVENTS } from '../core/constants.js';
 import { screenBus, SCREEN } from '../core/screen-state.js';
+import { ICONS } from './icons.js';
 
 const ITEMS = {
-  crystal: { name: 'Lichtkristall', desc: 'Quest-Item: 10 reinigen den Schrein.' },
-  berry:   { name: 'Heilbeere',     desc: 'Stellt 2 HP sofort wieder her.' },
+  crystal: { name: 'Lichtkristall', desc: 'Quest-Item: 10 reinigen den Schrein.', icon: 'crystal' },
+  berry:   { name: 'Heilbeere',     desc: 'Stellt 2 HP sofort wieder her.',       icon: 'berry' },
 };
 
 const VISIBLE_SCREENS = new Set([SCREEN.INVENTORY]);
@@ -66,14 +67,26 @@ export class InventoryPanel {
 
   _render(items) {
     this.host.innerHTML = `
-      <div style="font-size:.85rem;letter-spacing:.05em;color:var(--muted);margin-bottom:8px">INVENTAR [I zum Schließen]</div>
+      <div class="title">
+        <span class="icon" data-icon="backpack"></span>
+        <span>INVENTAR · [I] zum Schließen</span>
+      </div>
       <div style="display:flex;flex-direction:column;gap:8px">
         ${Object.keys(ITEMS).map((id) => `
-          <div class="inv-row" data-id="${id}" style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--surface2);border:var(--line);border-radius:8px;cursor:help">
-            <span>${ITEMS[id].name}</span>
+          <div class="inv-row" data-id="${id}">
+            <span style="display:flex;align-items:center;gap:6px">
+              <span class="icon icon-md" data-icon="${ITEMS[id].icon}"></span>
+              <span>${ITEMS[id].name}</span>
+            </span>
             <strong>${items[id] || 0}</strong>
           </div>`).join('')}
       </div>`;
+    // Re-hydrate data-icon attributes (innerHTML wiped them)
+    for (const el of this.host.querySelectorAll('[data-icon]')) {
+      const name = el.getAttribute('data-icon');
+      const svg = ICONS[name];
+      if (svg) el.innerHTML = svg;
+    }
     // Attach tooltip handlers
     this.host.querySelectorAll('.inv-row').forEach((row) => {
       const id = row.getAttribute('data-id');

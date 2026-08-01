@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Chronicles of Lumina</title>
   <link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#1d4d8a">
+  <meta name="theme-color" content="#0F0F1A">
   <link rel="stylesheet" href="style.css">
   <script type="importmap">
   {
@@ -18,39 +18,63 @@
 <body>
   <canvas id="game"></canvas>
   <div id="flash-overlay"></div>
-  <button id="mute-btn">Stumm: AUS</button>
+  <button id="mute-btn" type="button" aria-label="Stummschalten">
+    <span class="icon icon-md" id="mute-icon"></span>
+    <span id="mute-label">Stumm: AUS</span>
+  </button>
 
   <!-- HUD: player -->
   <div id="player-panel" class="panel">
-    <div class="name">AREN</div>
+    <div class="name">
+      <span class="icon" data-icon="heart"></span>
+      <span>AREN</span>
+    </div>
     <div id="hearts"></div>
     <div class="bar"><div></div></div>
   </div>
 
   <!-- HUD: XP -->
   <div id="xp-panel" class="panel">
-    <div class="lvl" id="xp-level">LVL 1</div>
+    <div class="lvl">
+      <span class="icon" data-icon="sparkle"></span>
+      <span id="xp-level">LVL 1</span>
+    </div>
     <div id="xp-bar"><div></div></div>
   </div>
 
   <!-- Boss bar -->
   <div id="boss-panel" class="panel">
-    <div class="bname">NEBEL-KOLOSS</div>
+    <div class="bname">
+      <span class="icon" data-icon="skull"></span>
+      <span>NEBEL-KOLOSS</span>
+    </div>
     <div id="boss-bar"><div></div></div>
   </div>
 
   <!-- Quest -->
   <div id="quest-panel" class="panel">
-    <div class="title">MISSION: SCHREIN REINIGEN</div>
-    <div id="quest-count">0 / 10</div>
+    <div class="title">
+      <span class="icon" data-icon="scroll"></span>
+      <span>MISSION: SCHREIN REINIGEN</span>
+    </div>
+    <div id="quest-count">
+      <span class="icon icon-md" data-icon="crystal"></span>
+      <span>0 / 10</span>
+    </div>
   </div>
 
   <!-- Hint -->
-  <div id="hint" class="panel">[E] Schrein reinigen</div>
+  <div id="hint">
+    <span class="icon icon-md" data-icon="crosshair"></span>
+    <span><kbd>E</kbd> Schrein reinigen</span>
+  </div>
 
   <!-- Dialog -->
   <div id="dialog" class="panel">
-    <div class="who"></div>
+    <div class="who">
+      <span class="icon" data-icon="book"></span>
+      <span class="who-name"></span>
+    </div>
     <div class="text"></div>
   </div>
 
@@ -61,53 +85,109 @@
   <div id="mobile-ui">
     <div class="joystick" id="joy"><div class="knob"></div></div>
     <div class="actbtns">
-      <div class="actbtn" id="btn-int">E</div>
-      <div class="actbtn" id="btn-roll">Rollen</div>
-      <div class="actbtn" id="btn-atk">Angriff</div>
+      <div class="actbtn" id="btn-int">
+        <span class="icon icon-md" data-icon="crosshair"></span>
+        <span>E</span>
+      </div>
+      <div class="actbtn" id="btn-roll">
+        <span class="icon icon-md" data-icon="shield"></span>
+        <span>Rollen</span>
+      </div>
+      <div class="actbtn" id="btn-atk">
+        <span class="icon icon-lg" data-icon="sword"></span>
+        <span>ATK</span>
+      </div>
     </div>
   </div>
 
   <!-- Start screen -->
   <div id="start-screen" class="overlay">
-    <h1>Chronicles of <span>Lumina</span></h1>
+    <h1>
+      <span class="icon" data-icon="sparkle"></span>
+      Chronicles of <span>Lumina</span>
+    </h1>
     <div class="sub">Ein 3D-Abenteuer · Sammle 10 Lichtkristalle · Reinige den Schrein</div>
     <div id="daily-info" class="controls-grid" style="grid-template-columns:1fr;gap:4px;text-align:center">
       <span>Daily Run #<span id="daily-index">—</span> · Seed <span id="daily-seed">—</span></span>
     </div>
     <div class="controls-grid">
-      <span>WASD</span><span>Bewegen</span>
-      <span>Maus</span><span>Kamera</span>
-      <span>Leertaste / Klick</span><span>Angriff</span>
-      <span>Shift</span><span>Ausweichrolle</span>
-      <span>E</span><span>Interaktion</span>
-      <span>Esc</span><span>Pause</span>
-      <span>I / C</span><span>Inventar / Codex</span>
+      <span><kbd>WASD</kbd></span><span>Bewegen</span>
+      <span><kbd>Maus</kbd></span><span>Kamera</span>
+      <span><kbd>Leertaste</kbd> / <kbd>Klick</kbd></span><span>Angriff</span>
+      <span><kbd>Shift</kbd></span><span>Ausweichrolle</span>
+      <span><kbd>E</kbd></span><span>Interaktion</span>
+      <span><kbd>Esc</kbd></span><span>Pause</span>
+      <span><kbd>I</kbd> / <kbd>C</kbd></span><span>Inventar / Codex</span>
     </div>
-    <button class="btn primary" id="start-btn">Abenteuer beginnen</button>
+    <button class="btn primary" id="start-btn" type="button">
+      <span class="icon" data-icon="play"></span>
+      Abenteuer beginnen
+    </button>
   </div>
 
   <!-- Pause -->
   <div id="pause-screen" class="overlay" style="display:none">
-    <h1>Pause</h1>
-    <button class="btn primary" id="resume-btn">Fortsetzen</button>
-    <button class="btn" id="pause-settings-btn">Einstellungen</button>
-    <button class="btn" id="pause-quit-btn">Neustart</button>
+    <h1>
+      <span class="icon" data-icon="pause"></span>
+      Pause
+    </h1>
+    <button class="btn primary" id="resume-btn" type="button">
+      <span class="icon" data-icon="play"></span>
+      Fortsetzen
+    </button>
+    <button class="btn" id="pause-settings-btn" type="button">
+      <span class="icon" data-icon="gear"></span>
+      Einstellungen
+    </button>
+    <button class="btn" id="pause-quit-btn" type="button">
+      <span class="icon" data-icon="refresh"></span>
+      Neustart
+    </button>
   </div>
 
   <!-- End screen -->
   <div id="end-screen" class="overlay" style="display:none">
-    <h1>Demo <span>abgeschlossen</span></h1>
+    <h1>
+      <span class="icon" data-icon="trophy"></span>
+      <span class="end-label">Demo <span>abgeschlossen</span></span>
+    </h1>
     <div class="controls-grid">
-      <span>Spielzeit</span><span id="end-time"></span>
-      <span>Besiegte Gegner</span><span id="end-kills"></span>
-      <span>Kristalle</span><span id="end-crystals"></span>
-      <span>Daily Seed</span><span id="end-seed"></span>
-      <span>Score</span><span id="end-score"></span>
+      <span><span class="icon icon-sm icon-muted" data-icon="play"></span> Spielzeit</span><span id="end-time"></span>
+      <span><span class="icon icon-sm icon-danger" data-icon="skull"></span> Besiegte Gegner</span><span id="end-kills"></span>
+      <span><span class="icon icon-sm icon-xp" data-icon="crystal"></span> Kristalle</span><span id="end-crystals"></span>
+      <span><span class="icon icon-sm icon-accent" data-icon="sparkle"></span> Daily Seed</span><span id="end-seed"></span>
+      <span><span class="icon icon-sm icon-warning" data-icon="trophy"></span> Score</span><span id="end-score"></span>
     </div>
-    <button class="btn primary" id="end-restart-btn">Neustart</button>
-    <button class="btn" id="end-share-btn">Seed teilen</button>
+    <button class="btn primary" id="end-restart-btn" type="button">
+      <span class="icon" data-icon="refresh"></span>
+      Neustart
+    </button>
+    <button class="btn" id="end-share-btn" type="button">
+      <span class="icon" data-icon="share"></span>
+      Seed teilen
+    </button>
   </div>
 
+  <script type="module">
+    // Hydrate data-icon attributes with inline SVGs before main.js boots.
+    // Icons render even on the start screen so the user sees the new look
+    // immediately, before any game logic initializes.
+    import { ICONS } from './src/ui/icons.js';
+    for (const el of document.querySelectorAll('[data-icon]')) {
+      const name = el.getAttribute('data-icon');
+      const svg = ICONS[name];
+      if (svg) el.innerHTML = svg;
+    }
+    // Mute button — swap icon based on state.
+    const muteIcon = document.getElementById('mute-icon');
+    if (muteIcon) {
+      // Default state: not muted
+      window.__updateMuteIcon = (muted) => {
+        muteIcon.innerHTML = ICONS[muted ? 'volumeOff' : 'volume'];
+      };
+      window.__updateMuteIcon(false);
+    }
+  </script>
   <script type="module" src="./src/main.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

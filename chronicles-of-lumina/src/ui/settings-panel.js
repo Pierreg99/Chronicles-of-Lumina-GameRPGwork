@@ -1,17 +1,25 @@
 // ui/settings-panel.js — modal with sliders for all persisted settings.
 // Phase 8: shown from the Pause screen 'Einstellungen' button. Writes
 // through core/settings.js and applies accessibility flags to the document.
+//
+// Phase 9: the panel is now a *modal* — it stays hidden until show() is
+// called explicitly from the Pause menu. Previously it auto-showed whenever
+// the screen was PAUSED, which made Escape dump the user into settings
+// instead of the pause menu.
 
 import { settings, SETTINGS_KEYS } from '../core/settings.js';
 import { screenBus, SCREEN } from '../core/screen-state.js';
+import { ICONS } from './icons.js';
 
-const VISIBLE_SCREENS = new Set([SCREEN.PAUSED, SCREEN.START]);
+const ALLOWED_SCREENS = new Set([SCREEN.PAUSED]); // modal only valid during pause
 
 export class SettingsPanel {
   constructor() {
     this._build();
-    screenBus.on('change', ({ to }) => this._apply(to));
-    this._apply(SCREEN.START);
+    // Auto-hide if the user leaves PAUSED while the modal is open.
+    screenBus.on('change', ({ to }) => {
+      if (this._isOpen && !ALLOWED_SCREENS.has(to)) this.hide();
+    });
   }
 
   _build() {
@@ -21,11 +29,26 @@ export class SettingsPanel {
     Object.assign(this.host.style, { display: 'none', gap: '12px' });
 
     this.host.innerHTML = `
-      <h1 style="font-size:1.5rem">Einstellungen</h1>
+      <h1 style="font-size:1.5rem">
+        <span class="icon" data-icon="gear"></span>
+        Einstellungen
+      </h1>
       <div id="settings-rows" style="display:flex;flex-direction:column;gap:14px;min-width:min(420px,80vw)"></div>
-      <button class="btn primary" id="settings-done">Schließen</button>
-      <button class="btn" id="settings-reset">Auf Standard zurücksetzen</button>
+      <button class="btn primary" id="settings-done">
+        <span class="icon" data-icon="play"></span>
+        Schließen
+      </button>
+      <button class="btn" id="settings-reset">
+        <span class="icon" data-icon="refresh"></span>
+        Auf Standard zurücksetzen
+      </button>
     `;
+    // Hydrate the new data-icon elements (this panel is built dynamically)
+    for (const el of this.host.querySelectorAll('[data-icon]')) {
+      const name = el.getAttribute('data-icon');
+      const svg = ICONS[name];
+      if (svg) el.innerHTML = svg;
+    }
     document.body.appendChild(this.host);
 
     document.getElementById('settings-done').onclick = () => this.hide();
@@ -38,17 +61,23 @@ export class SettingsPanel {
   }
 
   _apply(screen) {
-    this.host.style.display = VISIBLE_SCREENS.has(screen) ? 'flex' : 'none';
-    if (VISIBLE_SCREENS.has(screen)) this._applyFlags();
+    // Legacy hook kept for compatibility. The modal is now driven by
+    // show() / hide() explicitly; screen changes auto-hide via the
+    // constructor listener.
+    if (screen && ALLOWED_SCREENS.has(screen) && this._isOpen) {
+      this._applyFlags();
+    }
   }
 
   show() {
-    screenBus.emit('change', { from: state.screen, to: SCREEN.PAUSED });
+    this._isOpen = true;
+    this.host.style.display = 'flex';
     this._render();
     this._applyFlags();
   }
 
   hide() {
+    this._isOpen = false;
     this.host.style.display = 'none';
   }
 
