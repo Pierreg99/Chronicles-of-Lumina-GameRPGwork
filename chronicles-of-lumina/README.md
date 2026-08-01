@@ -1,5 +1,7 @@
 # Chronicles of Lumina
 
+![Version](https://img.shields.io/badge/version-0.9.0-blue) ![Phases](https://img.shields.io/badge/phases-9%2F9-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R6-success)
+
 3D-Browser-Action-Adventure im farbenfrohen JRPG-Fantasy-Stil. Vanilla JS + Three.js, ES-Module, kein Build-Step.
 
 > Vertikale Slice Demo: Sammle 10 Lichtkristalle, besiege den Nebel-Koloss, reinige den Schrein. Jeder Tag ein neuer Seed — spiele das Daily Run für die Highscore.
@@ -79,19 +81,31 @@ Mobile: virtueller Joystick + Aktions-Buttons (E / Rollen / Angriff).
 
 ```
 chronicles-of-lumina/src/
-├── main.js           # Bootstrap + Game-Loop
-├── core/             # config, constants, state, event-bus, settings, hitstop, screen-state
-├── engine/           # renderer, scene, camera, lighting, materials, audio, input, collision
-├── world/            # world-builder, terrain, village, forest, shrine, environment, props, particles, minimap
-├── entities/         # player (+animation, +combat), enemy-base, 3 slimes, boss, projectile, loot, npc
-├── systems/          # combat, enemy, boss, quest, xp, inventory, dialogue, interaction, feedback, codex, spawn, ui
-├── ui/               # hud, menus, dialog, quest, xp, boss-bar, inventory, mobile, interaction-hint, combo, damage-direction, tutorial, codex, settings
-└── utils/            # math, random, pool, dom, time, uv_helper, tween
+├── main.js           # 5-Zeilen-Bootstrap: new Game(canvas)
+├── core/             # Game-Klasse, Loop, Config, Constants, State, EventBus, Settings, HitStop, Screen-State
+├── engine/           # Renderer, Scene, Camera (inkl. Shake/Kick), Lighting, Materials, Audio (inkl. Layers), Input, Collision
+├── world/            # World-Builder, Terrain, Village, Forest, Shrine, Environment, Props, Particles, Minimap
+├── entities/         # Player (+ Animation, + Combat), Enemy-Base, 3 Slimes, Boss, Projectile, Loot, NPC-Elder
+├── systems/          # Combat, Enemy, Boss, Quest, XP, Inventory, Dialogue, Interaction, Feedback, Codex, Spawn
+├── ui/               # HUD, Menus, Dialog, Quest, XP, Boss-Bar, Inventory, Mobile, Interaction-Hint, Combo, Damage-Direction, Tutorial, Codex, Settings
+└── utils/            # Math, Random, Pool, DOM, Time, UV-Helper, Tween
 ```
+
+**Bootstrap:** `main.js` ist seit Refactor R5/R6 exakt 5 Zeilen — die gesamte Verdrahtung lebt in der `Game`-Klasse (`core/game.js`) mit privaten Build/Wire-Methoden.
 
 **Schichten:** `utils` → `core` → `engine` → `world`/`entities` → `systems` → `ui`
 **Kopplung:** Event-Bus + Dependency-Injection. Keine zirkulären Imports.
 **Source of Truth:** `core/config.js` für Balancing, `core/state.js` für Runtime-State, `core/screen-state.js` für UI-Phasen.
+
+**`Game`-Klasse (in `core/game.js`):**
+- `_build()` — Engine → Entities → Systems in Dependency-Order
+- `_wireUI()` — alle UI-Panels + Dialog/Inventory/Codex-Toggle
+- `_wireGlobalEvents()` — Player-Lifecycle + Scene-Beats
+- `_buildStartInfo()` / `_buildLoop()` / `_buildPauseWiring()`
+- `_update(dt)` / `_render()` — Loop-Callbacks
+- `_handleStart()` / `_endGame(win)` — Game-Actions
+
+**Systems:** Alle seit Refactor R1 mit `constructor(game)` statt langer Parameterlisten.
 
 ## Erweiterung
 
@@ -121,3 +135,9 @@ MIT — siehe [`LICENSE`](./LICENSE) (TODO).
 - Texturen: im `assets/`-Ordner
 - Musik/SFX: Web Audio API (synthetisiert, keine Audio-Assets)
 - Inspiration: klassische JRPGs (Final Fantasy, Dragon Quest) — ohne Marken, ohne Assets
+
+## Roadmap & Doku
+
+- [`ROADMAP.md`](./ROADMAP.md) — 13 Phasen (0–9 Feature-Phasen + R1–R6 Refactor), alle ✅
+- [`REFACTOR.md`](./REFACTOR.md) — Phase R1–R6 Plan und Status
+- [`CHANGELOG.md`](./CHANGELOG.md) — Versions-Historie (Keep-a-Changelog-Format)
