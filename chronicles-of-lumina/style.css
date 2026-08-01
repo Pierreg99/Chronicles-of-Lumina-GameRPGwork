@@ -237,3 +237,28 @@ canvas#game {
 }
 
 #inventory-panel { font-size: .9rem; }
+
+/* Phase 8: accessibility variants */
+html[data-colorblind="1"] {
+  --accent: #ffd23f;             /* swap electric blue for high-contrast yellow */
+  --accent-soft: rgba(255, 210, 63, 0.18);
+}
+html[data-reduce-motion="1"] #flash-overlay,
+html[data-reduce-motion="1"] #combo-indicator,
+html[data-reduce-motion="1"] #damage-direction {
+  transition: none !important;
+  animation: none !important;
+}
+html[data-show-fps="1"]::after {
+  content: 'FPS ' attr(data-fps);
+  position: fixed;
+  top: 8px; right: 8px;
+  background: var(--surface);
+  border: var(--line);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: .7rem;
+  color: var(--muted);
+  z-index: 100;
+  font-family: ui-monospace, monospace;
+}

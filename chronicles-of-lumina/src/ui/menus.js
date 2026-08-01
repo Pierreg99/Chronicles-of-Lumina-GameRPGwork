@@ -20,6 +20,11 @@ export class Menus {
     this._apply(SCREEN.START);
   }
 
+  // Phase 8: open the settings modal. Exposed so main.js can wire it to a key.
+  openSettings() {
+    if (this.cb.onOpenSettings) this.cb.onOpenSettings();
+  }
+
   _wireButtons() {
     const start = document.getElementById('start-btn');
     if (start) start.onclick = () => this.cb.onStart && this.cb.onStart();
@@ -52,16 +57,11 @@ export class Menus {
       });
     };
 
-    // Pause hierarchy (Phase 5): Resume / Settings placeholder / Quit
+    // Pause hierarchy (Phase 5): Resume / Settings / Quit
     const pauseQuit = document.getElementById('pause-quit-btn');
     if (pauseQuit) pauseQuit.onclick = () => this.cb.onRestart && this.cb.onRestart();
     const pauseSettings = document.getElementById('pause-settings-btn');
-    if (pauseSettings) {
-      pauseSettings.onclick = () => {
-        // Phase 8 will wire a real settings modal. For now, toggle a notice.
-        alert('Settings werden in Phase 8 verfügbar.');
-      };
-    }
+    if (pauseSettings) pauseSettings.onclick = () => this.openSettings();
   }
 
   _apply(screen) {

@@ -52,6 +52,8 @@ import { ComboIndicator } from './ui/combo-indicator.js';
 import { DamageDirection } from './ui/damage-direction.js';
 import { Tutorial } from './ui/tutorial.js';
 import { CodexPanel } from './ui/codex-panel.js';
+import { SettingsPanel } from './ui/settings-panel.js';
+import { settings } from './core/settings.js';
 import { transition, SCREEN } from './core/screen-state.js';
 import { playLayer, stopLayer, updateAudio } from './engine/audio.js';
 import { dailySeed, dailyIndex } from './utils/random.js';
@@ -97,7 +99,7 @@ state.dailyIndex = dailyIndex();
 
 // UI panels
 new HUD(bus, player);
-new Menus(bus, { onStart, onRestart, onResume });
+new Menus(bus, { onStart, onRestart, onResume, onOpenSettings: () => transition(SCREEN.PAUSED) });
 new DialogPanel(bus);
 new QuestPanel(bus);
 new XpPanel(bus);
@@ -108,6 +110,7 @@ new InteractionHint(bus, { player, interactionSystem });
 new ComboIndicator(bus);
 new DamageDirection(bus, { camera: cameraRig, player });
 new CodexPanel(bus, codex);
+new SettingsPanel();
 const tutorial = new Tutorial(bus);
 tutorial.register('move',    (s) => s.time > 1 && s.time < 2, 'Bewege Aren mit WASD oder den Pfeiltasten.');
 tutorial.register('attack',  (s) => s.time > 6 && s.time < 7, 'Drücke Leertaste oder klicke, um anzugreifen.');
@@ -309,10 +312,23 @@ function applyShake() {
 
 // ── Main loop ─────────────────────────────────────────────
 let lastT = 0;
+let fpsAccum = 0, fpsFrames = 0, fpsDisplay = 0;
 function loop(t) {
   requestAnimationFrame(loop);
   const rawDt = Math.min((t - lastT) / 1000, 0.05);
   lastT = t;
+
+  // FPS counter (Phase 8, opt-in)
+  fpsAccum += rawDt; fpsFrames++;
+  if (fpsAccum >= 0.5) {
+    fpsDisplay = Math.round(fpsFrames / fpsAccum);
+    fpsAccum = 0; fpsFrames = 0;
+    if (settings.get('showFPS')) {
+      document.documentElement.dataset.fps = String(fpsDisplay);
+    } else {
+      delete document.documentElement.dataset.fps;
+    }
+  }
 
   // Time scale (Phase 1+ slowmo)
   const dt = rawDt * feedback.timeScale;
