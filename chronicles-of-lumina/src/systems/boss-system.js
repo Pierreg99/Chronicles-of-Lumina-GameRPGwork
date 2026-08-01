@@ -47,6 +47,14 @@ export class BossSystem {
         this.feedback.shakeBig();
         this.feedback.slowmoSlam();
         this.feedback.hitstopBig();
+        // Phase 2: camera kicks UP+OUT from the slam epicenter
+        const dir = new THREE.Vector3()
+          .subVectors(player.position, this.boss.position)
+          .setY(0)
+          .normalize()
+          .multiplyScalar(0.7)
+          .add(new THREE.Vector3(0, 0.4, 0));
+        this.feedback.cameraKick(dir, 0.8, 0.35);
       }
     }
     if (result && result.melee) {

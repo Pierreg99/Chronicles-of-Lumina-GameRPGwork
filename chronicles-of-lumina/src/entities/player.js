@@ -1,7 +1,10 @@
 // entities/player.js — Arena, the hero. Holds HP, combo, invuln, dodge state.
+// Animation is delegated to player-animation.js; combat state to player-combat.js.
 
 import * as THREE from 'three';
 import { state } from '../core/state.js';
+import { PlayerAnimation } from './player-animation.js';
+import { PlayerCombat } from './player-combat.js';
 
 export class Player {
   constructor(scene, materials) {
@@ -12,6 +15,9 @@ export class Player {
     scene.add(this.group);
 
     this.position = this.group.position;
+    this.velocity = 0;
+    this._lastPos = new THREE.Vector3();
+
     this.hp = 5;
     this.maxHp = 5;
     this.inv = 0;
@@ -21,9 +27,10 @@ export class Player {
     this.kills = 0;
     this.crystals = 0;
     this.atkDmg = 1;
-    this.swordSwingT = 0;
-    this.swordSwingActive = false;
-    this.swordSwing = null;
+
+    // Sub-systems (Phase 2)
+    this.animation = new PlayerAnimation(this);
+    this.combat = new PlayerCombat(this);
   }
 
   _build() {
@@ -55,14 +62,14 @@ export class Player {
     this.position.set(pos.x, 0, pos.z);
     this.hp = this.maxHp;
     this.inv = 2;
+    this.combat.setInvulnerable(2.0);
   }
 
   // Returns true if the player just landed a hit (resolved by CombatSystem).
   startSwordSwing() {
     if (this.atkCd > 0 || this.rolling > 0) return false;
     this.atkCd = 0.45;
-    this.swordSwingActive = true;
-    this.swordSwingT = 0;
+    this.animation.startSwing();
     return true;
   }
 
@@ -72,11 +79,9 @@ export class Player {
   }
 
   takeDamage(dmg = 1) {
-    if (this.inv > 0 || this.rolling > 0) return false;
-    this.hp -= dmg;
-    this.inv = 1;
-    state.damageTaken = (state.damageTaken || 0) + dmg;
-    return true;
+    const taken = this.combat.takeDamage(dmg);
+    if (taken) state.damageTaken = (state.damageTaken || 0) + dmg;
+    return taken;
   }
 
   heal(n) {
@@ -88,16 +93,9 @@ export class Player {
     this.inv   = Math.max(0, this.inv - dt);
     this.rolling = Math.max(0, this.rolling - dt);
 
-    // Sword tween
-    if (this.swordSwingActive) {
-      this.swordSwingT += dt;
-      const u = Math.min(this.swordSwingT / 0.18, 1);
-      this.sword.rotation.z = -0.4 - Math.sin(u * Math.PI) * 1.6;
-      if (u >= 1) {
-        this.sword.rotation.z = -0.4;
-        this.swordSwingActive = false;
-      }
-    }
+    // Track velocity for camera lag.
+    this._lastPos.copy(this.position);
+    // (we set this.velocity at end of frame, after position is updated)
 
     // Movement
     let mx = input.moveX();
@@ -119,16 +117,19 @@ export class Player {
     } else {
       this.position.y *= 0.9;
     }
-    // Bounds
     this.position.x = Math.max(-38, Math.min(38, this.position.x));
     this.position.z = Math.max(-38, Math.min(38, this.position.z));
-    // Dodge wobble
     if (this.rolling > 0) {
       this.group.rotation.x = (this.rolling > 0) ? Math.sin(this.rolling / Math.PI * 6) * 0.5 : 0;
     } else {
       this.group.rotation.x = 0;
     }
-    // Blink on i-frames
-    this.group.visible = !(this.inv > 0 && Math.floor(t * 12) % 2 === 0);
+    // Phase 2: animation + combat sub-systems
+    this.animation.update(dt);
+    this.combat.update(dt);
+
+    // Compute velocity in units/sec for camera lag.
+    const moved = Math.hypot(this.position.x - this._lastPos.x, this.position.z - this._lastPos.z);
+    this.velocity = dt > 0 ? moved / dt : 0;
   }
 }

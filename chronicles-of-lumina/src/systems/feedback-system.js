@@ -37,6 +37,12 @@ export class FeedbackSystem {
     this.bus.emit(EVENTS.SLOWMO, { factor: this.timeScale, duration: this._slowmoTimer });
   }
 
+  // Phase 2: camera kick. The cameraRig subscribes to a kickRequested payload
+  // and applies it as an additive offset that decays. direction is a Vector3.
+  cameraKick(direction, intensity = 0.5, duration = 0.22) {
+    this.bus.emit(EVENTS.CAMERA_KICK, { direction, intensity, duration });
+  }
+
   // Called every frame; recovers time scale to 1.0 when timer expires.
   update(dt) {
     if (this.timeScale !== 1.0) {

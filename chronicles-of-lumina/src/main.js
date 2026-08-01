@@ -207,6 +207,9 @@ const _cameraBasePos = new THREE.Vector3();
 bus.on(EVENTS.SHAKE, ({ intensity, duration }) => {
   _activeShakes.push({ intensity, remaining: duration, total: duration });
 });
+bus.on(EVENTS.CAMERA_KICK, ({ direction, intensity, duration }) => {
+  cameraRig.kickToward(direction, intensity, duration);
+});
 bus.on(EVENTS.FLASH, ({ color, duration }) => {
   // Minimal full-screen flash via CSS overlay; created lazily in index.html
   const f = document.getElementById('flash-overlay');
@@ -286,7 +289,7 @@ function loop(t) {
     feedback.update(rawDt);
   }
 
-  cameraRig.update(dt, player.position);
+  cameraRig.update(dt, player.position, player.velocity);
   applyShake();
   minimap.draw(player, world.shrine, state.crystals, state.bossActive);
 

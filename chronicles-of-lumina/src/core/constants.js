@@ -64,6 +64,7 @@ export const EVENTS = Object.freeze({
   SHAKE:   'feedback:shake',
   FLASH:   'feedback:flash',
   SLOWMO:  'feedback:slowmo',
+  CAMERA_KICK: 'feedback:camera-kick',
 
   // Phase 5+ UX events
   TUTORIAL_STEP: 'tutorial:step',
