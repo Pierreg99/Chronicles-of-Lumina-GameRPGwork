@@ -35,6 +35,7 @@ import { DialogueSystem } from './systems/dialogue-system.js';
 import { InteractionSystem } from './systems/interaction-system.js';
 import { UiSystem } from './systems/ui-system.js';
 import { FeedbackSystem } from './systems/feedback-system.js';
+import { CodexSystem } from './systems/codex-system.js';
 import { HitStop } from './core/hitstop.js';
 
 import { HUD } from './ui/hud.js';
@@ -49,6 +50,7 @@ import { InteractionHint } from './ui/interaction-hint.js';
 import { ComboIndicator } from './ui/combo-indicator.js';
 import { DamageDirection } from './ui/damage-direction.js';
 import { Tutorial } from './ui/tutorial.js';
+import { CodexPanel } from './ui/codex-panel.js';
 import { transition, SCREEN } from './core/screen-state.js';
 import { playLayer, stopLayer, updateAudio } from './engine/audio.js';
 
@@ -95,6 +97,7 @@ new MobileControls();
 new InteractionHint(bus, { player, interactionSystem });
 new ComboIndicator(bus);
 new DamageDirection(bus, { camera: cameraRig, player });
+new CodexPanel(bus, codex);
 const tutorial = new Tutorial(bus);
 tutorial.register('move',    (s) => s.time > 1 && s.time < 2, 'Bewege Aren mit WASD oder den Pfeiltasten.');
 tutorial.register('attack',  (s) => s.time > 6 && s.time < 7, 'Drücke Leertaste oder klicke, um anzugreifen.');
@@ -108,6 +111,17 @@ bus.on(EVENTS.DIALOG_CHOICE_REQUEST, ({ id }) => dialogueSystem.pickChoice(id));
 bus.on('inventory:toggle', () => {
   if (state.screen === SCREEN.INVENTORY) transition(SCREEN.PLAYING);
   else transition(SCREEN.INVENTORY);
+});
+
+// Phase 6: codex on 'C' — same screen as inventory
+bus.on('codex:toggle', () => bus.emit('inventory:toggle'));
+
+// Phase 6: codex visit events fired when player nears an interactable
+bus.on('tick', () => {
+  if (state.screen !== 'playing') return;
+  const target = interactionSystem.nearestInteractable();
+  if (target === 'shrine') bus.emit('shrine:visit');
+  if (target === 'elder')  bus.emit('village:visit');
 });
 
 // Adaptive music: ambient always, combat when enemies near
@@ -296,6 +310,7 @@ function loop(t) {
     if (input.consumeInteract())  interactionSystem.interact();
     if (input.consumePause())     { transition(SCREEN.PAUSED); }
     if (input.consumeInventory()) { bus.emit('inventory:toggle'); }
+    if (input.consumeCodex())     { bus.emit('codex:toggle'); }
 
     // Player death check
     if (player.hp <= 0) bus.emit(EVENTS.PLAYER_DIED);

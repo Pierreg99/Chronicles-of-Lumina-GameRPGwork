@@ -13,6 +13,7 @@ export class Input {
     this.interactEdge = false;
     this.pauseEdge = false;
     this.inventoryEdge = false;
+    this.codexEdge = false;
     this._install();
   }
 
@@ -24,6 +25,7 @@ export class Input {
       if (e.code === 'KeyE') this.interactEdge = true;
       if (e.code === 'Escape' || e.code === 'KeyP') this.pauseEdge = true;
       if (e.code === 'KeyI') this.inventoryEdge = true;
+      if (e.code === 'KeyC') this.codexEdge = true;
     });
     window.addEventListener('keyup', (e) => this.keys.delete(e.code));
 
@@ -91,5 +93,6 @@ export class Input {
   consumeInteract()  { const v = this.interactEdge; this.interactEdge = false; return v; }
   consumePause()     { const v = this.pauseEdge;  this.pauseEdge  = false; return v; }
   consumeInventory() { const v = this.inventoryEdge; this.inventoryEdge = false; return v; }
+  consumeCodex()     { const v = this.codexEdge;     this.codexEdge     = false; return v; }
   consumeCameraYaw() { const v = this.cameraYawDelta || 0; this.cameraYawDelta = 0; return -v; } // sign flipped
 }
