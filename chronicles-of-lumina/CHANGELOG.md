@@ -2,12 +2,84 @@
 
 Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
-## [Unreleased] — Phase 12–18 in Planung
+## [Unreleased] — Phase 19+ in Planung
 
-Siehe [`PLAN.md`](./PLAN.md) für detaillierte Aufgaben-Schätzungen.
+Siehe [`ROADMAP.md`](./ROADMAP.md) für die offene Roadmap.
 
-### Geplant
-- **Phase 18 — Performance**: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling
+## [0.10.8] – 2026-08-01
+
+### Added (Phase 19 — Open World)
+
+#### Biome-System
+- **5 thematische Biome** als reines Data in `src/world/zones/index.js`:
+  Smaragdwald (Wald/Starter) · Golddünen (Wüste) · Sturmgipfel (Berge) · Nebelmarsch (Sumpf) · Glutkessel (Vulkan/Endgame).
+  Jedes Biom definiert eigenen Himmel, Fog, Boden-Farbe, Enemy-Pool, Boss-Pool, Difficulty und Spawn-Punkte.
+- **Biom-Cards auf dem Start-Screen** (`src/ui/zone-picker.js`) mit Schwierigkeits-Pips, Swatch und Hover/Selected-States.
+- **Map-Code-Input** akzeptiert `zoneId:base36-seed` und lädt die Karte direkt.
+
+#### Portale
+- **Sichtbare Torus-Portale** (`src/world/zone-portal.js`) im 3D-World, mit Sprite-Label "Portal: <Ziel>".
+  Jedes Biom spawnt 2-3 Portale, sortiert nach Difficulty-Proximity für natürliche Progression.
+- **Overlap-Detection** via `findPortalAt()` — `E` triggert Biome-Wechsel.
+- **In-World Zone-Indicator** oben in der Mitte zeigt aktuelles Biom mit farbigem Swatch.
+- **Portal-Hint** ([E] Portal: <Ziel>) ersetzt den generischen Hint, wenn Spieler in Reichweite ist.
+
+#### Zone-Transition
+- **White-Flash + 6-Frame Hit-Stop** vor dem World-Rebuild, damit der Mesh-Swap nicht poppt.
+- **Disposer** (`Game._disposeWorld()`) — entfernt Village/Forest/Shrine/Props, behält Player/Elder/Projectiles.
+- **Enemy-Clear-Hook** (`EnemySystem.clear()`) — alte Biome-Mobs verschwinden.
+- **Player-Reposition** — Spieler wird zum neuen Hub teleportiert.
+
+#### URL-Integration
+- `?map=verdant:20473104` lädt eine Custom-Map beim Start (überschreibt Daily-Seed).
+- End-Screen Share-Button emittiert `?map=` statt `?seed=`.
+
+### Added (Phase 9+ — Visual Refresh)
+- **Mystical-Violet-Palette** — durchgehendes Theme: Violet (Akzent), Cyan (XP), Rose (Boss/Damage), Emerald (HP).
+- **19 Lucide-Style inline SVG-Icons** in `src/ui/icons.js` — heart, sparkle, scroll, skull, sword, shield, crystal, berry, pause, play, gear, book, backpack, crosshair, volume, volumeOff, refresh, share, trophy, target.
+- **Frosted-Glass-Panels** mit `backdrop-filter: blur(14px)` + inner Top-Highlight.
+- **Cinzel Display-Font** für Titel, Inter für Body — Google-Fonts import.
+- **Custom-styled Sliders, Toggles, kbd-Badges** — kein Browser-Default mehr.
+- **Colorblind-Mode-Pattern** — Boss-Bar bekommt zusätzlich Diagonal-Streifen + Heart-Outlines.
+- **Reduced-Motion-Variants** — alle Transitions/Animations respektiert.
+
+### Fixed
+- `settings-panel.js` — fehlender `state`-Import (Crashes beim Settings-Öffnen) — **gefixt**.
+- `settings-panel.js` — auto-showte auf jedem PAUSED-Transition (Escape → Settings statt Pause) — **gefixt** (jetzt echtes Modal mit `show()`/`hide()`).
+- `hud.js` — HP-Bar zeigte Kristall-Count statt HP — **gefixt** (jetzt echte HP-Logik + Low-HP-Warn-Farbe).
+- `menus.js` — End-Screen `h1.innerHTML`-Write zerstörte Trophy-Icon — **gefixt** (Label-Span-Pattern).
+- `dialog-panel.js` — Who-Text überschrieb Icon — **gefixt** (`.who-name`-Span).
+- `menus.js` — Mute-Button-Write zerstörte Icon — **gefixt** (Label + Icon getrennt).
+- `enemy-system.js` — Stray `return e;` aus Refactor brach Dispose-Flow — **gefixt**.
+
+### Tests
+- `tests/zones.test.mjs` (9 Tests): Registry-Validität, Map-Code-Codec, Round-Trip.
+- Total: **90 → 99 Assertions** in 15 Test-Files, alle grün.
+
+### Verified
+- `npm test`: 99/99 grün
+- Playwright Headless: 0 runtime errors, Biome-Wechsel rendert korrekt (Wald → Wüste = warmer Sand-Boden mit Orange-Sky).
+
+## [0.10.7] – 2026-08-01
+
+### Added (Phase 18 Performance)
+- **FPS-Profiler-Overlay** (`src/ui/perf-overlay.js`): kleines Top-Left-DOM-Overlay mit FPS, Frame-Time-Avg, Max-Frame, JS-Heap (wenn `performance.memory` verfügbar). Aktiviert via `?debug=perf` Query-Param. Sample-Window 250ms, max 120 Samples.
+- **Object-Pool für Projektile** (`src/entities/projectile.js`): nutzt den vorhandenen `src/utils/pool.js` für `shots` (Pool-Size 24) und `slam rings` (Pool-Size 8). Recycling via `Pool.release()`. Hard-Cap `MAX_ALIVE_SHOTS=80` als Sicherheitsnetz. Allokationen pro Frame im Hot-Path ≈ 0.
+- **Audio-Sprite** (`src/engine/audio.js`): alle 5 SFX-Presets werden beim ersten `ensure()` in **einen** `AudioBuffer` gerendert (Phase 4 Procedural → Phase 18 Buffer). Playback via `BufferSource.start(when, offset, duration)` — keine OscillatorNode-Allocs pro Shot mehr. Fallback-Pfad bleibt für kaputte Browser.
+
+### Tests
+- `tests/pool.test.mjs` (5 Tests): prebuilt count, acquire/release roundtrip, grow-on-exhaustion, releaseAll, forEachActive
+- `tests/perf-overlay.test.mjs` (4 Tests): wantsPerfOverlay-URL-Parsing (true/false/empty/extra-params)
+- Total: **81 → 90 Assertions** in 14 Test-Files, **30/30 runs stabil**
+
+### Verified
+- `npm test`: 90/90 grün, 30/30 runs stabil
+- `npm run check`: 13 verbleibende Errors (alle in `ui/*`/`engine/input.js` DOM-Lib-Types, pre-existing)
+- Keine neuen Allocations im Hot-Path (Projektile + SFX)
+
+### CI
+- `webpack.yml`: `working-directory: chronicles-of-lumina`, `npm test` statt `npx webpack`
+- `nextjs.yml` Boilerplate entfernt (war für Next.js, nicht unser Stack)
 
 ## [0.10.7] – 2026-08-01
 

@@ -38,8 +38,9 @@ Evolution des Spiels in 9 Phasen. Jede Phase endet mit einem lauffähigen Spiel,
 | **17** | i18n: t()-Modul + DE/EN-Locales + Codex/Dialogue-Integration + Key-Coverage-Test | 1 | ✅ |
 | **18** | Quality: tsc-Error-Cleanup (34→14), Test-Flake-Fix, Random-Date-TS-Fix | 1 | ✅ |
 | **18** | Performance: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling | 1 | ✅ |
+| **19** | Open World: 5 Biome (Verdant/Dunes/Peaks/Mire/Ember) + Zone-Portale + URL-Map-Codes | 1 | ✅ |
 
-**Total: 17 Commits done, 0 Phasen geplant, ~10h done = ~10h**
+**Total: 19 Commits done, 0 Phasen geplant, ~12h done = ~12h**
 
 ## Phasen-Details
 
@@ -115,6 +116,19 @@ Evolution des Spiels in 9 Phasen. Jede Phase endet mit einem lauffähigen Spiel,
 - `README.md` — Update mit allen Features
 - Screenshots / Gameplay-Clip
 - Convenience-Scripts (optional `package.json`)
+
+### Phase 19 — Open World: Biomes + Portale + Custom Map Codes
+- `world/zones/index.js` — 5 Biome (Verdant / Dunes / Peaks / Mire / Ember) als Data, inkl. Sky/Fog/Ground/Enemy-Pool/Boss-Pool/Spawns/Difficulty
+- `world/zone-portal.js` — sichtbare Torus-Portale mit Sprite-Label, `findPortalAt()`-Overlap-Test
+- `ui/zone-picker.js` — Biome-Cards auf dem Start-Screen, Map-Code-Input, In-World-Zone-Indicator
+- `core/state.js` — `currentZone`, `visitedZones`, `mapCode` Felder
+- `core/constants.js` — neues `ZONE_CHANGE` Event
+- `core/game.js` — `_handleZoneChange()` + `_disposeWorld()` für biome swap
+- `systems/interaction-system.js` — Portal als drittes Interactable (Priority über Schrein/Elder)
+- `systems/enemy-system.js` — `clear()`-Hook für Biome-Wechsel
+- `ui/menus.js` — End-Screen Share-Button emittiert `?map=verdant:20473104` Format
+- URL-Support: `?map=verdant:20473104` lädt Custom-Map beim Start
+- 9 neue Tests in `tests/zones.test.mjs` (Registry, Map-Code-Codec, Round-Trip)
 
 ## Architektur-Konventionen
 
