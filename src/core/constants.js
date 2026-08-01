@@ -38,6 +38,7 @@ export const EVENTS = Object.freeze({
 
   QUEST_UPDATE: 'quest:update',
   QUEST_COMPLETE: 'quest:complete',
+  ZONE_CHANGE: 'zone:change',
   QUEST_OBJECTIVE: 'quest:objective',
 
   XP_GAIN: 'xp:gain',

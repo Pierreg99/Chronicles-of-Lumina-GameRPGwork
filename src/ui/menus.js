@@ -4,6 +4,7 @@
 
 import { EVENTS } from '../core/constants.js';
 import { screenBus, SCREEN, transition } from '../core/screen-state.js';
+import { state } from '../core/state.js';
 
 const PANELS = {
   [SCREEN.START]:     'start-screen',
@@ -44,7 +45,13 @@ export class Menus {
       const url = new URL(location.href);
       const seedEl = document.getElementById('end-seed');
       const s = seedEl ? seedEl.textContent : '';
-      if (s && s !== '—') url.searchParams.set('seed', s);
+      // Phase 19+: prefer the new map code (zone:seed) when set, fall
+      // back to legacy ?seed= for back-compat.
+      if (state.mapCode) {
+        url.searchParams.set('map', state.mapCode);
+      } else if (s && s !== '—') {
+        url.searchParams.set('seed', s);
+      }
       navigator.clipboard?.writeText(url.toString());
       share.textContent = 'Kopiert!';
       setTimeout(() => { share.textContent = 'Seed teilen'; }, 1500);
@@ -54,7 +61,9 @@ export class Menus {
     if (mute) mute.onclick = () => {
       import('../engine/audio.js').then((m) => {
         const muted = m.toggleMute();
-        mute.textContent = muted ? 'Stumm: AN' : 'Stumm: AUS';
+        const label = document.getElementById('mute-label');
+        if (label) label.textContent = muted ? 'Stumm: AN' : 'Stumm: AUS';
+        if (window.__updateMuteIcon) window.__updateMuteIcon(muted);
       });
     };
 
@@ -82,7 +91,18 @@ export class Menus {
     const el = document.getElementById('end-screen');
     if (!el) return;
     el.style.display = 'flex';
-    el.querySelector('h1').innerHTML = win ? 'Demo <span>abgeschlossen</span>' : 'Demo <span>beendet</span>';
+    // Preserve the trophy icon; only swap the text portion of the h1.
+    const h1 = el.querySelector('h1');
+    if (h1) {
+      // Find or create the text label span
+      let label = h1.querySelector('.end-label');
+      if (!label) {
+        label = document.createElement('span');
+        label.className = 'end-label';
+        h1.appendChild(label);
+      }
+      label.innerHTML = win ? 'Demo <span>abgeschlossen</span>' : 'Demo <span>beendet</span>';
+    }
     document.getElementById('end-time').textContent = Math.round(time) + 's';
     document.getElementById('end-kills').textContent = kills;
     document.getElementById('end-crystals').textContent = crystals;

@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 
-export function buildProps(scene, materials) {
+export function buildProps(scene, materials, zone = null) {
   // Welcome sign on the path
   const post = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.4, 0.1), materials.toon(0x5a3a1a));
   post.position.set(-2, 0.7, 8);

@@ -52,6 +52,10 @@ export const state = {
   dailyIndex: 0,
   score: 0,
   berriesUsed: 0,
+  // Phase 19+: current zone + map share code
+  currentZone: 'verdant',
+  visitedZones: new Set(['verdant']),
+  mapCode: null,
 };
 
 /** @returns {boolean} */

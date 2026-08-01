@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 
-export function buildForest(scene, materials) {
+export function buildForest(scene, materials, zone = null) {
   // More trees deeper in
   const extras = [[6,28,1.1],[10,32,0.9],[-6,30,1.2],[14,24,1],[18,30,1.1],[-10,32,1]];
   for (const [x, z, s] of extras) {

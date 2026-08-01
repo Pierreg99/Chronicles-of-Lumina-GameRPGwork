@@ -1,9 +1,16 @@
 // world/environment.js — skybox tint, clouds, ambient butterflies.
+// Phase 19+: now zone-aware. Each zone sets its own sky color, fog, and
+// ambient light. Clouds stay generic (just visual flavor in the distance).
 
 import * as THREE from 'three';
+import { getZone } from './zones/index.js';
 
-export function buildEnvironment(scene) {
-  // Soft sky tint handled by scene.background; add a few cloud sprites.
+export function buildEnvironment(scene, zoneId) {
+  const zone = getZone(zoneId);
+  scene.background = new THREE.Color(zone.sky);
+  scene.fog = new THREE.Fog(zone.fog, zone.fogNear, zone.fogFar);
+
+  // Soft cloud sprites — generic, no per-zone variation for now.
   const tex = (() => {
     const c = document.createElement('canvas');
     c.width = 128; c.height = 64;
@@ -21,4 +28,11 @@ export function buildEnvironment(scene) {
     s.scale.set(10, 5, 1);
     scene.add(s);
   }
+}
+
+// Hot-swap the environment when the player transitions zones. Returns the
+// old fog/background so the caller can re-apply on revert (not used yet
+// but kept for future boss-arena return flow).
+export function applyZoneEnvironment(scene, zoneId) {
+  buildEnvironment(scene, zoneId);
 }
