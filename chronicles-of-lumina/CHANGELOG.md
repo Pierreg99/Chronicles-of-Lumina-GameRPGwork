@@ -7,8 +7,25 @@ Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Chan
 Siehe [`PLAN.md`](./PLAN.md) für detaillierte Aufgaben-Schätzungen.
 
 ### Geplant
-- **Phase 17 — i18n**: Hardcoded DE-Strings extrahieren, English-Locale, optional FR
 - **Phase 18 — Performance**: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling
+
+## [0.10.5] – 2026-08-01
+
+### Added (Phase 17: i18n)
+- Hinzugefügt: `src/core/i18n.js` — `t(key, params)` Lookup, `setLocale()`/`getLocale()`, `availableLocales()`, {param}-Interpolation, Default-Locale-Fallback, localStorage-Persistenz
+- Hinzugefügt: `src/locales/de.json` — deutsche Strings (UI-Controls, HUD, Codex, Dialog-Sprecher, Dialog-Texte)
+- Hinzugefügt: `src/locales/en.json` — englische Übersetzung mit Key-übereinstimmung
+- Hinzugefügt: `tests/i18n.test.mjs` — 7 Tests (availableLocales, getLocale, setLocale, Param-Interpolation, Fallback, DE/EN-Key-Symmetry, Codex/Dialog-Coverage)
+- Hinzugefügt: `codex-system.retranslate()` Methode — re-derived name/desc nach Locale-Switch
+
+### Changed
+- Geändert: `codex-system.js` — `ENTRIES` → `ENTRIES_META` + `buildEntries()` (Texte aus i18n)
+- Geändert: `dialogue-system.js` — `startIntro`/`bossWarning`/`bossDefeated`/`victory` nutzen `t('dialog.*')` mit i18n-Speaker-Keys
+
+### Verified
+- `npm test` grün: 74 → **81 Assertions** in 12 Test-Dateien
+- 3/3 consecutive runs stabil
+- DE/EN-Locales sind key-symmetrisch (geprüft via Test)
 
 ## [0.10.4] – 2026-08-01
 

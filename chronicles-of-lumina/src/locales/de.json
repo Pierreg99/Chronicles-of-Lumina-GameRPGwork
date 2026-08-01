@@ -1,0 +1,71 @@
+{
+  "ui": {
+    "startTitle": "Chronicles of Lumina",
+    "startSub": "Ein 3D-Abenteuer · Sammle 10 Lichtkristalle · Reinige den Schrein",
+    "startBtn": "Abenteuer beginnen",
+    "controls": {
+      "move": "WASD",
+      "moveDesc": "Bewegen",
+      "camera": "Maus",
+      "cameraDesc": "Kamera",
+      "attack": "Leertaste / Klick",
+      "attackDesc": "Angriff",
+      "dodge": "Shift",
+      "dodgeDesc": "Ausweichrolle",
+      "interact": "E",
+      "interactDesc": "Interaktion",
+      "pause": "Esc",
+      "pauseDesc": "Pause",
+      "inventory": "I / C",
+      "inventoryDesc": "Inventar / Codex"
+    },
+    "pause": {
+      "title": "Pause",
+      "resume": "Fortsetzen",
+      "settings": "Einstellungen",
+      "restart": "Neustart"
+    },
+    "end": {
+      "title": "Demo abgeschlossen",
+      "time": "Spielzeit",
+      "kills": "Besiegte Gegner",
+      "crystals": "Kristalle",
+      "seed": "Daily Seed",
+      "score": "Score",
+      "restart": "Neustart",
+      "share": "Seed teilen"
+    }
+  },
+  "hud": {
+    "player": "AREN",
+    "boss": "NEBEL-KOLOSS",
+    "questTitle": "MISSION: SCHREIN REINIGEN",
+    "questCount": "{current} / {target}",
+    "muteOff": "Stumm: AUS",
+    "muteOn": "Stumm: AN",
+    "hintInteract": "[E] {action}"
+  },
+  "codex": {
+    "slime_blue":   { "name": "Wiesen-Schleim",   "desc": "Langsamer, blauer Schleim aus den Wiesen. 2 HP." },
+    "slime_green":  { "name": "Blatt-Schleim",    "desc": "Springt aggressiv an. 3 HP." },
+    "slime_purple": { "name": "Nebel-Schleim",    "desc": "Schießt lila Projektile aus der Ferne. 3 HP." },
+    "boss_nebelkoloss": { "name": "Nebel-Koloss", "desc": "Uralter Wächter des Schreins. 25 HP, 2 Angriffe." },
+    "crystal":      { "name": "Lichtkristall",   "desc": "Reinigt den Schrein. 10 Stück erforderlich." },
+    "berry":        { "name": "Heilbeere",       "desc": "Stellt 2 HP wieder her. Droppt von Schleimen." },
+    "shrine":       { "name": "Smaragdwald-Schrein", "desc": "Ein verfallener Schrein am Ende des Waldes." },
+    "village":      { "name": "Dorf Sonnenhain", "desc": "Heimatdorf des Helden." }
+  },
+  "dialog": {
+    "speakers": {
+      "elder": "Dorfälteste",
+      "colossus": "Nebel-Koloss",
+      "shrine": "Schrein"
+    },
+    "elder_intro": "Aren, mein Kind. Der Smaragdwald-Schrein liegt seit Jahrzehnten verdorben. Sammle zehn Lichtkristalle aus den Wiesen — sie reinigen das Heiligtum. Doch hüte dich: ein Uralter Wächter, der Nebel-Koloss, beschützt das Tor.",
+    "boss_warning": "Du spürst, wie der Boden bebt. Der Koloss erwacht. Sein Atem trägt das Gift der verlorenen Ära.",
+    "boss_defeated": "Der Wächter ist besiegt! Der Schrein liegt vor dir.",
+    "victory": "Du hast es geschafft, mein Kind! Der Schrein erstrahlt — die Kristalle haben das Licht zurückgebracht. Sonnenhain feiert deinen Namen.",
+    "shrine_locked_crystals": "Der Schrein ist noch verdorben. Ihm fehlen {remaining} Lichtkristalle.",
+    "shrine_locked_boss": "Der Nebel-Koloss blockiert den Schrein! Besiege ihn zuerst."
+  }
+}

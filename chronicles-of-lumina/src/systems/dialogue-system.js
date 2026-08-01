@@ -3,6 +3,7 @@
 
 import { EVENTS } from '../core/constants.js';
 import { CONFIG } from '../core/config.js';
+import { t } from '../core/i18n.js';
 
 /**
  * @typedef {import('../core/game.js').Game} Game
@@ -35,19 +36,29 @@ export class DialogueSystem {
   }
 
   startIntro() {
-    this.say('Dorfälteste', CONFIG.quest.elderIntro.join(' '));
+    // Pull from config if non-empty, otherwise the localized string.
+    const text = (CONFIG.quest.elderIntro?.length)
+      ? CONFIG.quest.elderIntro.join(' ')
+      : t('dialog.elder_intro');
+    this.say(t('dialog.speakers.elder'), text);
   }
 
   bossWarning() {
-    this.say('Nebel-Koloss', CONFIG.quest.bossWarning.join(' '));
+    const text = (CONFIG.quest.bossWarning?.length)
+      ? CONFIG.quest.bossWarning.join(' ')
+      : t('dialog.boss_warning');
+    this.say(t('dialog.speakers.colossus'), text);
   }
 
   bossDefeated() {
-    this.say('Nebel-Koloss', 'Der Wächter ist besiegt! Der Schrein liegt vor dir.');
+    this.say(t('dialog.speakers.colossus'), t('dialog.boss_defeated'));
   }
 
   victory() {
-    this.say('Dorfälteste', CONFIG.quest.victory.join(' '));
+    const text = (CONFIG.quest.victory?.length)
+      ? CONFIG.quest.victory.join(' ')
+      : t('dialog.victory');
+    this.say(t('dialog.speakers.elder'), text);
   }
 
   /**

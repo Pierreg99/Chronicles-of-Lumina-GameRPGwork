@@ -26,6 +26,28 @@ const ENTRIES = [
  * @property {boolean} unlocked
  */
 
+import { t } from '../core/i18n.js';
+
+const ENTRIES_META = [
+  { id: 'slime_blue',       category: 'Gegner' },
+  { id: 'slime_green',      category: 'Gegner' },
+  { id: 'slime_purple',     category: 'Gegner' },
+  { id: 'boss_nebelkoloss', category: 'Boss'   },
+  { id: 'crystal',          category: 'Items'  },
+  { id: 'berry',            category: 'Items'  },
+  { id: 'shrine',           category: 'Orte'   },
+  { id: 'village',          category: 'Orte'   },
+];
+
+function buildEntries() {
+  return ENTRIES_META.map((m) => ({
+    ...m,
+    name: t(`codex.${m.id}.name`),
+    desc: t(`codex.${m.id}.desc`),
+    unlocked: false,
+  }));
+}
+
 /**
  * Bestiary + lore catalogue. Auto-unlocks entries based on game events,
  * persists `unlocked` flags to localStorage.
@@ -39,9 +61,19 @@ export class CodexSystem {
     this.game = game;
     this.bus = game.bus;
     /** @type {Map<string, CodexEntry>} */
-    this.entries = new Map(ENTRIES.map((e) => [e.id, { ...e, unlocked: false }]));
+    this.entries = new Map(buildEntries().map((e) => [e.id, e]));
     this._load();
     this._wire();
+  }
+
+  /** Re-derive name/desc from the active locale (e.g. after a language switch). */
+  retranslate() {
+    for (const m of ENTRIES_META) {
+      const entry = this.entries.get(m.id);
+      if (!entry) continue;
+      entry.name = t(`codex.${m.id}.name`);
+      entry.desc = t(`codex.${m.id}.desc`);
+    }
   }
 
   _wire() {
