@@ -8,7 +8,7 @@ import { screenBus, SCREEN, transition } from '../core/screen-state.js';
 const PANELS = {
   [SCREEN.START]:     'start-screen',
   [SCREEN.PAUSED]:    'pause-screen',
-  [SCREEN.ENDScreen]: 'end-screen',
+  [SCREEN.ENDSCREEN]: 'end-screen',
 };
 
 export class Menus {
@@ -26,17 +26,18 @@ export class Menus {
   }
 
   _wireButtons() {
-    const start = document.getElementById('start-btn');
-    if (start) start.onclick = () => this.cb.onStart && this.cb.onStart();
+    const bind = (el, fn) => {
+      if (!el) return;
+      // Fire on both click and touchend (mobile fallback)
+      const handler = (e) => { e.preventDefault(); fn(); };
+      el.addEventListener('click', handler);
+      el.addEventListener('touchend', handler, { passive: false });
+    };
 
-    const resume = document.getElementById('resume-btn');
-    if (resume) resume.onclick = () => this.cb.onResume && this.cb.onResume();
-
-    const restart = document.getElementById('restart-btn');
-    if (restart) restart.onclick = () => this.cb.onRestart && this.cb.onRestart();
-
-    const endRestart = document.getElementById('end-restart-btn');
-    if (endRestart) endRestart.onclick = () => this.cb.onRestart && this.cb.onRestart();
+    bind(document.getElementById('start-btn'),     () => this.cb.onStart   && this.cb.onStart());
+    bind(document.getElementById('resume-btn'),    () => this.cb.onResume  && this.cb.onResume());
+    bind(document.getElementById('restart-btn'),   () => this.cb.onRestart && this.cb.onRestart());
+    bind(document.getElementById('end-restart-btn'), () => this.cb.onRestart && this.cb.onRestart());
 
     const share = document.getElementById('end-share-btn');
     if (share) share.onclick = () => {
