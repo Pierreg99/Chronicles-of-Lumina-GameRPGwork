@@ -1,6 +1,6 @@
 # Chronicles of Lumina
 
-![Version](https://img.shields.io/badge/version-0.9.2-blue) ![Phases](https://img.shields.io/badge/phases-9%2F9-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R7-success) ![Assets](https://img.shields.io/badge/assets-procedural-success)
+![Version](https://img.shields.io/badge/version-0.10.0-blue) ![Phases](https://img.shields.io/badge/phases-9%2F9-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R7-success) ![Assets](https://img.shields.io/badge/assets-procedural-success) ![Bot](https://img.shields.io/badge/bot-discord.js_v14-7B2FBE)
 
 3D-Browser-Action-Adventure im farbenfrohen JRPG-Fantasy-Stil. Vanilla JS + Three.js, ES-Module, kein Build-Step.
 
@@ -158,6 +158,24 @@ Hintergrund-Vignette und dramatische Beleuchtung.
 **Assets exportieren** (für Marketing, PWA-Manifest-Icons, statisches Hosting):
 Browser-Console öffnen und `AssetGen.exportAll();` ausführen — alle 23 Dateien (21 Game-Assets
 + 2 PWA-Icons) werden als PNG-Downloads gespeichert.
+
+## Discord-Bot (LuminaBot)
+
+Unter [`bot/`](./bot/) liegt der offizielle **LuminaBot** (discord.js v14, ESM, Node 18+).
+
+- 8 Slash-Commands: `/help` · `/status` · `/announce` · `/patch` · `/lore` · `/leaderboard` · `/bugreport` · `/suggestion`
+- 4 Event-Handler: Welcome, Levelup, Screenshot-Auto-React, Soft-Moderation
+- JSON-File-Persistenz für Reports, Suggestions, Leaderboard
+- Docker-Support (`Dockerfile` + `docker-compose.yml`)
+
+```bash
+cd bot
+cp .env.example .env       # DISCORD_TOKEN + DISCORD_CLIENT_ID eintragen
+npm install
+npm test                   # 20+ Modul-Tests, kein Discord-Connect
+npm run deploy             # Slash-Commands registrieren
+npm start                  # Bot online
+```
 
 ## Testing
 

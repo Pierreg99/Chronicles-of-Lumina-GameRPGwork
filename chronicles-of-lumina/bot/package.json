@@ -1,0 +1,18 @@
+{
+  "name": "lumina-bot",
+  "version": "0.1.0",
+  "description": "Official Discord bot for Chronicles of Lumina",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "deploy": "node deploy.js",
+    "test": "node test/load.test.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.4.5"
+  },
+  "engines": { "node": ">=18.0.0" }
+}

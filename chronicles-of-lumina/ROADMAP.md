@@ -29,8 +29,9 @@ Evolution des Spiels in 9 Phasen. Jede Phase endet mit einem lauffähigen Spiel,
 | **R5+R6** | Refactor: Dead-Code weg, `main.js` → 5 Zeilen | 1 | ✅ |
 | **R7** | Refactor: Unit-Test-Suite + Multi-Plattform-Deployment | 1 | ✅ |
 | **10** | Visuell: Prozedurale Asset-Generierung (Canvas-2D, kein Build-Step) | 1 | ✅ |
+| **11** | Community: LuminaBot Discord-Bot (discord.js v14, 8 Commands, 4 Events) | 1 | ✅ |
 
-**Total: 15 Commits, ~8.5h**
+**Total: 16 Commits, ~10h**
 
 ## Phasen-Details
 
