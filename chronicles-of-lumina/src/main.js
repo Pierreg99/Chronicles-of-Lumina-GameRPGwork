@@ -8,6 +8,7 @@ import { EVENTS }     from './core/constants.js';
 import { EventBus }   from './core/event-bus.js';
 import { state }      from './core/state.js';
 import { HitStop }    from './core/hitstop.js';
+import { Loop }       from './core/loop.js';
 import { transition, SCREEN } from './core/screen-state.js';
 import { settings }   from './core/settings.js';
 import { dailySeed, dailyIndex } from './utils/random.js';
@@ -276,74 +277,76 @@ game.bus.on(EVENTS.FLASH, ({ color, duration }) => {
   }
 });
 
-// ── Main loop ──────────────────────────────────────────────
-let lastT = 0;
+// ── Main loop (R4: use core/loop.js) ───────────────────────
 let fpsAccum = 0, fpsFrames = 0;
-function loop(t) {
-  requestAnimationFrame(loop);
-  const rawDt = Math.min((t - lastT) / 1000, 0.05);
-  lastT = t;
 
-  fpsAccum += rawDt; fpsFrames++;
+function updateLoop(dt) {
+  // FPS counter (Phase 8, opt-in)
+  fpsAccum += dt; fpsFrames++;
   if (fpsAccum >= 0.5) {
     const fps = Math.round(fpsFrames / fpsAccum);
-    fpsAccum = 0; fpsFrames = 0;
     if (settings.get('showFPS')) document.documentElement.dataset.fps = String(fps);
     else delete document.documentElement.dataset.fps;
+    fpsAccum = 0; fpsFrames = 0;
   }
 
-  const dt = rawDt * game.feedback.timeScale;
-  if (state.screen === 'playing' || state.screen === 'paused') {
-    state.time += (state.screen === 'playing') ? rawDt : 0;
-  }
-  if (state.screen !== 'playing') {
-    game.renderer.render(game.scene, game.cameraRig.camera);
-    return;
-  }
+  // Slowmo scales the effective game dt; UI / animations still tick on real dt.
+  const gameDt = dt * game.feedback.timeScale;
+  state.time += dt;
+  state.cameraYaw = game.cameraRig.yaw;
 
+  if (state.screen !== 'playing') return;
+
+  // Camera yaw input
   const dYaw = game.input.consumeCameraYaw();
   if (dYaw !== 0) game.cameraRig.yaw += dYaw;
   state.cameraYaw = game.cameraRig.yaw;
 
-  game.hitstop.update(rawDt);
-  if (!game.hitstop.active) {
-    if (game.input.consumeAttack())    game.combatSystem.tryAttack();
-    if (game.input.consumeDodge())     game.player.startDodge();
-    if (game.input.consumeInteract())  game.interactionSystem.interact();
-    if (game.input.consumePause())     { transition(SCREEN.PAUSED); }
-    if (game.input.consumeInventory()) { game.bus.emit('inventory:toggle'); }
-    if (game.input.consumeCodex())     { game.bus.emit('codex:toggle'); }
+  game.hitstop.update(dt);
+  if (game.hitstop.active) return;
 
-    if (game.player.hp <= 0) game.bus.emit(EVENTS.PLAYER_DIED);
+  if (game.input.consumeAttack())    game.combatSystem.tryAttack();
+  if (game.input.consumeDodge())     game.player.startDodge();
+  if (game.input.consumeInteract())  game.interactionSystem.interact();
+  if (game.input.consumePause())     { transition(SCREEN.PAUSED); }
+  if (game.input.consumeInventory()) { game.bus.emit('inventory:toggle'); }
+  if (game.input.consumeCodex())     { game.bus.emit('codex:toggle'); }
 
-    game.player.update(dt, t, game.input);
-    game.enemySystem.update(dt, game.player);
-    game.bossSystem.update(dt, game.player);
-    game.projectiles.update(dt, game.player, (shotPos) => game.player.takeDamage(1, shotPos));
-    game.loot.update(dt, game.player,
-      () => game.bus.emit(EVENTS.LOOT_PICKUP_CRYSTAL),
-      () => game.bus.emit(EVENTS.LOOT_PICKUP_BERRY)
-    );
-    game.particles.update(dt);
-    game.combatSystem.update(dt);
-    game.dialogueSystem.update();
-    game.feedback.update(rawDt);
-    updateAudio(rawDt);
+  if (game.player.hp <= 0) game.bus.emit(EVENTS.PLAYER_DIED);
 
-    let enemiesNear = false;
-    for (const e of game.enemySystem.enemies) {
-      if (e.dead) continue;
-      if (e.position.distanceTo(game.player.position) < 10) { enemiesNear = true; break; }
-    }
-    if (game.bossSystem.boss && game.bossSystem.boss.active && !game.bossSystem.boss.dead) enemiesNear = true;
-    if (enemiesNear) playLayer('combat'); else stopLayer('combat');
+  game.player.update(gameDt, state.time, game.input);
+  game.enemySystem.update(gameDt, game.player);
+  game.bossSystem.update(gameDt, game.player);
+  game.projectiles.update(gameDt, game.player, (shotPos) => game.player.takeDamage(1, shotPos));
+  game.loot.update(gameDt, game.player,
+    () => game.bus.emit(EVENTS.LOOT_PICKUP_CRYSTAL),
+    () => game.bus.emit(EVENTS.LOOT_PICKUP_BERRY)
+  );
+  game.particles.update(gameDt);
+  game.combatSystem.update(gameDt);
+  game.dialogueSystem.update();
+  game.feedback.update(dt);
+  updateAudio(dt);
+
+  let enemiesNear = false;
+  for (const e of game.enemySystem.enemies) {
+    if (e.dead) continue;
+    if (e.position.distanceTo(game.player.position) < 10) { enemiesNear = true; break; }
   }
+  if (game.bossSystem.boss && game.bossSystem.boss.active && !game.bossSystem.boss.dead) enemiesNear = true;
+  if (enemiesNear) playLayer('combat'); else stopLayer('combat');
 
-  game.cameraRig.update(dt, game.player.position, game.player.velocity);
+  game.cameraRig.update(gameDt, game.player.position, game.player.velocity);
   game.minimap.draw(game.player, game.world.shrine, state.crystals, state.bossActive);
   game.bus.emit('tick');
+}
 
+function renderLoop() {
   game.renderer.render(game.scene, game.cameraRig.camera);
 }
 
-requestAnimationFrame(loop);
+const gameLoop = new Loop({
+  update: updateLoop,
+  render: renderLoop,
+});
+gameLoop.start();

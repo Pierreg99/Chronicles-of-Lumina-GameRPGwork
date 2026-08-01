@@ -88,34 +88,22 @@ Aktuell hatte `main.js` ein privates `_activeShakes[]`-Array und einen `applySha
 
 ---
 
-## Phase R4 — `Game.update` benutzt `Loop`
+## Phase R4 — `Game.update` benutzt `Loop`  ✅
 
-Aktuell hat `main.js` seinen eigenen `requestAnimationFrame`-Loop mit `rawDt * feedback.timeScale`. Der `Loop` aus `core/loop.js` ist besser (Fixed-Timestep, Pause-Hook, Frame-Clamp).
+Aktuell hatte `main.js` seinen eigenen `requestAnimationFrame`-Loop mit `rawDt * feedback.timeScale`. Der `Loop` aus `core/loop.js` ist besser (Fixed-Timestep, Pause-Hook, Frame-Clamp).
 
-**Schritte:**
+**Status: ✅ Abgeschlossen.**
 
-1. `core/game.js` hat bereits `this.loop = new Loop({ update: ..., render: ... })`.
-2. `main.js` ruft am Ende `new Game(canvas)` und das wars.
-3. In `Game.update(dt)`: 
-   - `dt` ist jetzt `FIXED_DT = 1/60` aus `core/loop.js`.
-   - Slowmo: `const gameDt = dt * this.feedback.timeScale;` einmal oben berechnen, an alle Subsysteme weitergeben.
-   - Hit-Stop: `if (this.hitstop.active) { this.render(); return; }` — keine Updates, aber Render läuft.
+`main.js` importiert jetzt `Loop` aus `core/loop.js` und instanziiert ihn:
 
 ```js
-// Game.update(dt)
-update(dt) {
-  if (state.screen !== SCREEN.PLAYING) return;
-  if (this.hitstop.active) return;
-
-  const gameDt = dt * this.feedback.timeScale;
-  this.hitstop.update(dt);
-  this.player.update(gameDt, ...);
-  this.enemySystem.update(gameDt, ...);
-  // ... rest
-}
+const gameLoop = new Loop({ update: updateLoop, render: renderLoop });
+gameLoop.start();
 ```
 
-4. `Game.render(alpha)` macht nur noch `this.renderer.render(this.sceneMgr.scene, this.camera.camera)`.
+`updateLoop(dt)` und `renderLoop()` sind getrennt, der Loop treibt sie mit FIXED_DT=1/60. Slowmo: `const gameDt = dt * game.feedback.timeScale;` einmal oben, an alle Subsysteme weitergegeben. Hit-Stop: früher Return aus `updateLoop`, Render läuft trotzdem.
+
+FPS-Counter, Adaptive-Music-Toggle und Minimap-Draw sind Teil von `updateLoop`, also einmal pro Fixed-Tick — vorher waren sie im requestAnimationFrame-Handler.
 
 ---
 
