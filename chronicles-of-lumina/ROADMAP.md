@@ -32,7 +32,7 @@ Evolution des Spiels in 9 Phasen. Jede Phase endet mit einem lauffähigen Spiel,
 | **11** | Community: LuminaBot Discord-Bot (discord.js v14, 8 Commands, 4 Events) | 1 | ✅ |
 | **12** | Hygiene: `ui-system.js` Dead-Code weg, CI-Workflows SHA-pinnen, REFACTOR-Doku fixen | 1 | ✅ |
 | **13** | Type-Safety: JSDoc-Type-Hints auf `core/*` + `systems/*` + `utils/asset-gen.js` (ohne TypeScript-Build) | 1 | ✅ |
-| **14** | Distribution: GitHub-Pages-Deploy, Demo-GIF im README, erstes GitHub-Release | 1 | ⏳ |
+| **14** | Distribution: GitHub-Pages-Deploy, Showcase-Banner, erstes GitHub-Release v0.10.3 | 1 | ✅ |
 | **15** | Security: SECURITY.md, Dependabot-Config, npm-audit-Fix | 1 | ✅ |
 | **16** | Test-Coverage: Three.js-Mocks für Rendering, jsdom für UI (53 → ~80 Assertions) | 1 | ⏳ |
 | **17** | i18n: Hardcoded DE-Strings extrahieren, English-Locale, optional FR | 1 | ⏳ |

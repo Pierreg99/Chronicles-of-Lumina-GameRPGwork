@@ -1,0 +1,37 @@
+# .github/workflows/pages.yml — deploy Lumina to GitHub Pages on push to main.
+# Source: chronicles-of-lumina/ (no build step — pure static ES modules).
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2, pinned per org policy
+      - uses: actions/configure-pages@9834b71d4e07f4ed41e34b31b1e61b5a44c98bbe # v5.0.0, pinned per org policy
+      - uses: actions/upload-pages-artifact@7b4f8c966b35b51a4ff84bbed7b4a6c5fd9ba98c # v3.0.0, pinned per org policy
+        with:
+          path: chronicles-of-lumina
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@d6cd6e6cb4147d3ee1d8f6e1454b1ce7c24e95d0 # v4.0.0, pinned per org policy

@@ -1,6 +1,17 @@
 # Chronicles of Lumina
 
-![Version](https://img.shields.io/badge/version-0.10.0-blue) ![Phases](https://img.shields.io/badge/phases-9%2F9-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R7-success) ![Assets](https://img.shields.io/badge/assets-procedural-success) ![Bot](https://img.shields.io/badge/bot-discord.js_v14-7B2FBE)
+![Version](https://img.shields.io/badge/version-0.10.3-blue) ![Phases](https://img.shields.io/badge/phases-9%2F9-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R7-success) ![Assets](https://img.shields.io/badge/assets-procedural-success) ![Bot](https://img.shields.io/badge/bot-discord.js_v14-7B2FBE) ![Pages](https://img.shields.io/badge/pages-live-success)
+
+<p align="center">
+  <img src="docs/showcase.svg" alt="Chronicles of Lumina" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://pierreg99.github.io/Lumina-Game/"><strong>▶ Play the Live Demo</strong></a>
+  · <a href="chronicles-of-lumina/DEPLOY.md">Deploy docs</a>
+  · <a href="chronicles-of-lumina/PLAN.md">Roadmap</a>
+  · <a href="https://github.com/Pierreg99/Lumina-Game/releases">Releases</a>
+</p>
 
 3D-Browser-Action-Adventure im farbenfrohen JRPG-Fantasy-Stil. Vanilla JS + Three.js, ES-Module, kein Build-Step.
 

@@ -7,10 +7,22 @@ Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Chan
 Siehe [`PLAN.md`](./PLAN.md) für detaillierte Aufgaben-Schätzungen.
 
 ### Geplant
-- **Phase 14 — Distribution**: GitHub-Pages-Deploy, Demo-GIF im README, erstes GitHub-Release
 - **Phase 16 — Test-Coverage**: Three.js-Mocks für Rendering, jsdom für UI (53 → ~80 Assertions)
 - **Phase 17 — i18n**: Hardcoded DE-Strings extrahieren, English-Locale, optional FR
 - **Phase 18 — Performance**: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling
+
+## [0.10.3] – 2026-08-01 — GitHub Release v0.10.3 (Draft)
+
+### Added (Phase 14: Distribution)
+- Hinzugefügt: `docs/showcase.svg` — Hero-Banner mit zentralem Kristall, 2 Slimes, 2 Bäumen, 3 Herzen, Title "Chronicles of Lumina", Play-Button + v0.10.3-Badge
+- Hinzugefügt: `.github/workflows/pages.yml` — GitHub-Pages-Deploy (Actions SHA-pinned, source: `chronicles-of-lumina/`)
+- Hinzugefügt: GitHub-Release v0.10.3 (Draft) via API — https://github.com/Pierreg99/Lumina-Game/releases/tag/untagged-345dfa5bb273782e6916
+- Hinzugefügt: README-Banner + Live-Demo-Link (https://pierreg99.github.io/Lumina-Game/)
+
+### Verified
+- `npm test` grün (53/53 Game + 8+4+8+3 Bot)
+- `npm run check` grün für `core/+systems/`
+- GitHub-Actions-Workflow SHA-pinned
 
 ## [0.10.3] – 2026-08-01
 
