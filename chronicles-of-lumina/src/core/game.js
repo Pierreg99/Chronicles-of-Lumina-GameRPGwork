@@ -22,6 +22,7 @@ import { Input }           from '../engine/input.js';
 import { playSfx, playLayer, stopLayer, updateAudio } from '../engine/audio.js';
 
 import { buildWorld }     from '../world/world-builder.js';
+import { ZONES, getZone, decodeMapCode } from '../world/zones/index.js';
 import { ParticleSystem } from '../world/particles.js';
 import { Minimap }        from '../world/minimap.js';
 
@@ -140,6 +141,18 @@ export class Game {
     const urlSeed = new URLSearchParams(location.search).get('seed');
     state.dailySeed  = urlSeed ? (Number(urlSeed) >>> 0) : dailySeed();
     state.dailyIndex = dailyIndex();
+
+    // Phase 19+: URL-based custom map load (?map=verdant:20473104)
+    // Runs in priority over the daily seed when present.
+    const urlMap = new URLSearchParams(location.search).get('map');
+    if (urlMap) {
+      const decoded = decodeMapCode(urlMap);
+      if (decoded) {
+        state.currentZone = decoded.zoneId;
+        if (decoded.seed != null) state.dailySeed = decoded.seed >>> 0;
+        state.mapCode = urlMap;
+      }
+    }
   }
 
   // 2. Wire UI panels (each manages its own DOM, no direct DOM in Game).
@@ -245,6 +258,91 @@ export class Game {
     });
 
     this.bus.on(EVENTS.BOSS_SPAWN, () => this.dialogueSystem.bossWarning());
+
+    // Phase 19+: zone transitions. When the player steps through a
+    // portal (or the URL/map-code loads a custom map), tear down the
+    // current world and rebuild for the new zone. A short camera flash
+    // hides the swap.
+    this.bus.on(EVENTS.ZONE_CHANGE, (payload) => this._handleZoneChange(payload));
+  }
+
+  /**
+   * Switch to a different zone. Tears down the existing world meshes,
+   * rebuilds terrain/environment/props for the new biome, teleports
+   * the player to the new hub, and refreshes the zone indicator.
+   * @param {{ zoneId: string, source?: string, seed?: number }} payload
+   */
+  _handleZoneChange({ zoneId, source = 'code', seed = null }) {
+    if (!ZONES[zoneId]) return;
+    state.currentZone = zoneId;
+    state.visitedZones = state.visitedZones || new Set();
+    state.visitedZones.add(zoneId);
+    if (seed != null) state.mapCode = `${zoneId}:${(seed >>> 0).toString(36)}`;
+
+    // Trigger a quick screen flash (white) so the player doesn't see
+    // the world re-build pop.
+    this.bus.emit(EVENTS.FLASH, { color: 0xffffff, duration: 0.5 });
+    this.bus.emit(EVENTS.HITSTOP, { frames: 6 });
+
+    setTimeout(() => {
+      // Tear down current world
+      this._disposeWorld();
+      // Rebuild for the new zone
+      this.world = buildWorld({ scene: this.scene, materials: this.materials, zoneId });
+      // Reposition player at the new hub
+      const zone = getZone(zoneId);
+      const hubKey = Object.keys(zone.spawns || {})[0];
+      const hub = zone.spawns[hubKey] || { x: 0, z: 0 };
+      if (this.player && this.player.group) {
+        this.player.group.position.set(hub.x, 0, hub.z);
+        if (typeof this.player.position?.set === 'function') {
+          this.player.position.set(hub.x, 0, hub.z);
+        }
+      }
+      // Refresh dependent systems
+      if (this.interactionSystem) {
+        this.interactionSystem.shrine = this.world.shrine;
+        this.interactionSystem.portals = this.world.portals || [];
+      }
+      if (this.zonePicker) {
+        this.zonePicker.showZoneIndicator(zoneId);
+      }
+      this.bus.emit(EVENTS.UI_REFRESH);
+    }, 220);
+  }
+
+  _disposeWorld() {
+    // Whitelist of types to preserve across zone transitions. Everything
+    // else (village, forest, shrine, props, portals) is removed so the
+    // new zone can be built on a clean slate.
+    const preserved = new Set([
+      this.player?.group,
+      this.elder?.group,
+      this.projectiles?.group,
+    ].filter(Boolean));
+
+    const toRemove = [];
+    for (const child of this.scene.children) {
+      if (preserved.has(child)) continue;
+      if (child.isLight) continue;
+      if (child.isCamera) continue;
+      // Skip particle / projectile / loot roots if their system owns them
+      toRemove.push(child);
+    }
+    for (const obj of toRemove) {
+      this.scene.remove(obj);
+      if (obj.geometry) obj.geometry.dispose && obj.geometry.dispose();
+      if (obj.material) {
+        if (Array.isArray(obj.material)) {
+          for (const m of obj.material) m.dispose && m.dispose();
+        } else {
+          obj.material.dispose && obj.material.dispose();
+        }
+      }
+    }
+    // Clear enemy/loot systems since they're tied to the old zone
+    if (this.enemySystem) this.enemySystem.clear();
+    if (this.loot && this.loot.clear) this.loot.clear();
   }
 
   // 4. Render daily seed / index on the start overlay.

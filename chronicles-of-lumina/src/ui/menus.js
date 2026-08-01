@@ -4,6 +4,7 @@
 
 import { EVENTS } from '../core/constants.js';
 import { screenBus, SCREEN, transition } from '../core/screen-state.js';
+import { state } from '../core/state.js';
 
 const PANELS = {
   [SCREEN.START]:     'start-screen',
@@ -44,7 +45,13 @@ export class Menus {
       const url = new URL(location.href);
       const seedEl = document.getElementById('end-seed');
       const s = seedEl ? seedEl.textContent : '';
-      if (s && s !== '—') url.searchParams.set('seed', s);
+      // Phase 19+: prefer the new map code (zone:seed) when set, fall
+      // back to legacy ?seed= for back-compat.
+      if (state.mapCode) {
+        url.searchParams.set('map', state.mapCode);
+      } else if (s && s !== '—') {
+        url.searchParams.set('seed', s);
+      }
       navigator.clipboard?.writeText(url.toString());
       share.textContent = 'Kopiert!';
       setTimeout(() => { share.textContent = 'Seed teilen'; }, 1500);

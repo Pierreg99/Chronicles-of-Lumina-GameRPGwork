@@ -80,6 +80,18 @@ export class EnemySystem {
   }
 
   /**
+   * Remove all enemies from the world. Phase 19+: used when transitioning
+   * to a new zone so the old biome's mobs don't linger.
+   * @returns {void}
+   */
+  clear() {
+    for (const e of this.enemies) {
+      if (e && !e.dead && e.dispose) e.dispose();
+    }
+    this.enemies.length = 0;
+  }
+
+  /**
    * Mark `e` as dead, remove from scene, emit `ENEMY_DIED`. Idempotent.
    * @param {object} e
    * @returns {void}
