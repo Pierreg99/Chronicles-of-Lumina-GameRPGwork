@@ -3,18 +3,20 @@
 import * as THREE from 'three';
 import { playSfx } from '../engine/audio.js';
 import { state } from '../core/state.js';
+import { EVENTS } from '../core/constants.js';
 
 const ATTACK_RANGE = 2.4;
 const SWING_DELAY = 0.12; // seconds before the hit connects
 
 export class CombatSystem {
-  constructor({ player, enemySystem, bossSystem, particleSystem, feedback }) {
+  constructor({ player, enemySystem, bossSystem, particleSystem, feedback, bus }) {
     this.player = player;
     this.enemySystem = enemySystem;
     this.bossSystem = bossSystem;
     this.particles = particleSystem;
-    this.feedback = feedback; // optional; if present we trigger hit-stop + shake
-    this.pending = []; // { at: time, damage: number }
+    this.feedback = feedback;
+    this.bus = bus;
+    this.pending = []; // { at, damage }
   }
 
   tryAttack() {
@@ -28,14 +30,16 @@ export class CombatSystem {
     for (let i = this.pending.length - 1; i >= 0; i--) {
       const p = this.pending[i];
       if (p.at > now) continue;
-      this._resolve(p.damage);
+      const hit = this._resolve(p.damage);
+      if (hit) this.bus.emit(EVENTS.COMBO_HIT, { count: hit });
+      else    this.bus.emit(EVENTS.COMBO_BREAK);
       this.pending.splice(i, 1);
     }
   }
 
   _resolve(damage) {
     const ppos = this.player.position;
-    let hitSomething = false;
+    let hitCount = 0;
     let hitBoss = false;
     // Enemies
     for (const e of this.enemySystem.enemies) {
@@ -47,7 +51,7 @@ export class CombatSystem {
         e.kb.subVectors(e.position, ppos).setY(0).normalize().multiplyScalar(6);
         this.particles.burst(e.position, '#ffffff', 8);
         if (dead) this.enemySystem.kill(e);
-        hitSomething = true;
+        hitCount++;
       }
     }
     // Boss
@@ -58,12 +62,14 @@ export class CombatSystem {
         playSfx('hit');
         this.particles.burst(this.bossSystem.boss.position, '#d06fd6', 10);
         hitBoss = true;
+        hitCount++;
       }
     }
     // Feedback (Phase 1)
     if (this.feedback) {
-      if (hitBoss)      { this.feedback.hitstopBig();   this.feedback.shakeMedium(); }
-      else if (hitSomething) { this.feedback.hitstopSmall(); this.feedback.shakeSmall(); }
+      if (hitBoss)           { this.feedback.hitstopBig();   this.feedback.shakeMedium(); }
+      else if (hitCount > 0) { this.feedback.hitstopSmall(); this.feedback.shakeSmall(); }
     }
+    return hitCount;
   }
 }

@@ -43,11 +43,7 @@ export class EnemySystem {
       if (e.dead) continue;
       e.update(dt, player, (from, dir) => this.projectiles.fire(from, dir));
       if (e.position.distanceTo(player.position) < 1.3) {
-        // Touch damage
-        const took = player.takeDamage(1);
-        if (took) {
-          // tiny knockback
-        }
+        player.takeDamage(1, e.position);
       }
     }
   }

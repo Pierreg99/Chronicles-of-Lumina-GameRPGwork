@@ -175,4 +175,22 @@ export const CONFIG = {
     flashDamage:  { color: '#ff5555', duration: 0.15 },
     slowmoSlam:   { factor: 0.35, duration: 0.30 },
   },
+
+  // ── Phase 4: combo + adaptive music + damage direction ──
+  combo: {
+    maxSteps:     3,
+    windowSec:    0.45,  // hits within this window chain the combo
+    decayPerStep: 0.35,  // visual decay per missed window
+  },
+
+  damageDirection: {
+    duration: 1.2,
+    edgeMargin: 60,      // px from viewport edge
+  },
+
+  music: {
+    ambientGain: 0.18,
+    combatGain:  0.10,
+    crossfadeSec: 0.6,
+  },
 };

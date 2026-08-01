@@ -51,7 +51,7 @@ export class ProjectileSystem {
       s.m.position.addScaledVector(s.vel, dt);
       s.life -= dt;
       if (s.m.position.distanceTo(player.position) < 0.8) {
-        onPlayerHit && onPlayerHit();
+        onPlayerHit && onPlayerHit(s.m.position);
         this.scene.remove(s.m);
         this.shots.splice(i, 1);
         continue;

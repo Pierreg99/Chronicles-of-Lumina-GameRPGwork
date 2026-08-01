@@ -66,6 +66,13 @@ export const EVENTS = Object.freeze({
   SLOWMO:  'feedback:slowmo',
   CAMERA_KICK: 'feedback:camera-kick',
 
+  // Phase 4+ events
+  COMBO_HIT:    'combat:combo-hit',
+  COMBO_BREAK:  'combat:combo-break',
+  DAMAGE_TAKEN: 'player:damage-taken', // payload: { source: Vector3 }
+  COMBAT_ENTER: 'combat:enter',
+  COMBAT_EXIT:  'combat:exit',
+
   // Phase 5+ UX events
   TUTORIAL_STEP: 'tutorial:step',
   TUTORIAL_DISMISS: 'tutorial:dismiss',

@@ -38,9 +38,8 @@ export class BossSystem {
     if (result && result.slam) {
       this.projectiles.spawnSlamRing(this.boss.position);
       this.particles.burst(this.boss.position, '#b06fd6', 20);
-      // damage if close
       if (this.boss.position.distanceTo(player.position) < 4) {
-        player.takeDamage(1);
+        player.takeDamage(1, this.boss.position);
       }
       // Phase 1 feedback: bigger shake, slowmo, hit-stop
       if (this.feedback) {
@@ -58,7 +57,7 @@ export class BossSystem {
       }
     }
     if (result && result.melee) {
-      player.takeDamage(1);
+      player.takeDamage(1, this.boss.position);
       this.feedback && this.feedback.shakeMedium();
     }
   }

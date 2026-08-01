@@ -3,13 +3,15 @@
 
 import * as THREE from 'three';
 import { state } from '../core/state.js';
+import { EVENTS } from '../core/constants.js';
 import { PlayerAnimation } from './player-animation.js';
 import { PlayerCombat } from './player-combat.js';
 
 export class Player {
-  constructor(scene, materials) {
+  constructor(scene, materials, bus) {
     this.scene = scene;
     this.materials = materials;
+    this.bus = bus;
     this.group = new THREE.Group();
     this._build();
     scene.add(this.group);
@@ -78,9 +80,16 @@ export class Player {
     this.rolling = 0.4;
   }
 
-  takeDamage(dmg = 1) {
+  takeDamage(dmg = 1, source = null) {
     const taken = this.combat.takeDamage(dmg);
-    if (taken) state.damageTaken = (state.damageTaken || 0) + dmg;
+    if (taken) {
+      state.damageTaken = (state.damageTaken || 0) + dmg;
+      if (this.bus) {
+        this.bus.emit(EVENTS.PLAYER_DAMAGE);
+        this.bus.emit(EVENTS.DAMAGE_TAKEN, { source });
+        this.bus.emit(EVENTS.COMBO_BREAK);
+      }
+    }
     return taken;
   }
 

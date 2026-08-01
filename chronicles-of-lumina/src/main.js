@@ -46,7 +46,10 @@ import { BossBar } from './ui/boss-bar.js';
 import { InventoryPanel } from './ui/inventory-panel.js';
 import { MobileControls } from './ui/mobile-controls.js';
 import { InteractionHint } from './ui/interaction-hint.js';
+import { ComboIndicator } from './ui/combo-indicator.js';
+import { DamageDirection } from './ui/damage-direction.js';
 import { transition, SCREEN } from './core/screen-state.js';
+import { playLayer, stopLayer, updateAudio } from './engine/audio.js';
 
 // ── Bootstrap ──────────────────────────────────────────────
 const canvas = document.getElementById('game');
@@ -62,7 +65,7 @@ const minimap = new Minimap();
 
 const world = buildWorld({ scene, materials });
 const elder = new NpcElder(scene, materials, new THREE.Vector3(2, 0, 0));
-const player = new Player(scene, materials);
+const player = new Player(scene, materials, bus);
 
 const projectiles = new ProjectileSystem(scene);
 const loot = new LootSystem(scene, materials);
@@ -77,7 +80,7 @@ const dialogueSystem = new DialogueSystem(bus);
 const interactionSystem = new InteractionSystem({
   bus, player, shrine: world.shrine, elder, dialogueSystem, questSystem,
 });
-const combatSystem = new CombatSystem({ player, enemySystem, bossSystem, particleSystem: particles, audio: null, feedback });
+const combatSystem = new CombatSystem({ player, enemySystem, bossSystem, particleSystem: particles, audio: null, feedback, bus });
 
 // UI panels
 new HUD(bus, player);
@@ -89,6 +92,11 @@ new BossBar(bus);
 new InventoryPanel(bus, inventorySystem);
 new MobileControls();
 new InteractionHint(bus, { player, interactionSystem });
+new ComboIndicator(bus);
+new DamageDirection(bus, { camera: cameraRig, player });
+
+// Adaptive music: ambient always, combat when enemies near
+playLayer('ambient');
 
 // ── Global event wiring ───────────────────────────────────
 bus.on(EVENTS.PLAYER_DAMAGE, () => bus.emit(EVENTS.UI_REFRESH));
@@ -279,7 +287,7 @@ function loop(t) {
     player.update(dt, t, input);
     enemySystem.update(dt, player);
     bossSystem.update(dt, player);
-    projectiles.update(dt, player, () => player.takeDamage(1));
+    projectiles.update(dt, player, (shotPos) => player.takeDamage(1, shotPos));
     loot.update(dt, player,
       () => bus.emit(EVENTS.LOOT_PICKUP_CRYSTAL),
       () => bus.emit(EVENTS.LOOT_PICKUP_BERRY)
@@ -288,6 +296,16 @@ function loop(t) {
     combatSystem.update(dt);
     dialogueSystem.update();
     feedback.update(rawDt);
+    updateAudio(rawDt);
+
+    // Adaptive music: combat layer fades in when an enemy is within 10 units.
+    let enemiesNear = false;
+    for (const e of enemySystem.enemies) {
+      if (e.dead) continue;
+      if (e.position.distanceTo(player.position) < 10) { enemiesNear = true; break; }
+    }
+    if (bossSystem.boss && bossSystem.boss.active && !bossSystem.boss.dead) enemiesNear = true;
+    if (enemiesNear) playLayer('combat'); else stopLayer('combat');
   }
 
   cameraRig.update(dt, player.position, player.velocity);
