@@ -1,0 +1,176 @@
+{
+  "atlas_size": [
+    512,
+    512
+  ],
+  "grid": [
+    4,
+    4
+  ],
+  "cell_size": [
+    128,
+    128
+  ],
+  "layout": [
+    {
+      "index": 0,
+      "filename": "grass_tile.png",
+      "grid_x": 0,
+      "grid_y": 0,
+      "pixel_x": 0,
+      "pixel_y": 0,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 1,
+      "filename": "path_tile.png",
+      "grid_x": 1,
+      "grid_y": 0,
+      "pixel_x": 128,
+      "pixel_y": 0,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 2,
+      "filename": "water_tile.png",
+      "grid_x": 2,
+      "grid_y": 0,
+      "pixel_x": 256,
+      "pixel_y": 0,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 3,
+      "filename": "rock.png",
+      "grid_x": 3,
+      "grid_y": 0,
+      "pixel_x": 384,
+      "pixel_y": 0,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 4,
+      "filename": "tree.png",
+      "grid_x": 0,
+      "grid_y": 1,
+      "pixel_x": 0,
+      "pixel_y": 128,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 5,
+      "filename": "house.png",
+      "grid_x": 1,
+      "grid_y": 1,
+      "pixel_x": 128,
+      "pixel_y": 128,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 6,
+      "filename": "shrine.png",
+      "grid_x": 2,
+      "grid_y": 1,
+      "pixel_x": 256,
+      "pixel_y": 128,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 7,
+      "filename": "minimap.png",
+      "grid_x": 3,
+      "grid_y": 1,
+      "pixel_x": 384,
+      "pixel_y": 128,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 8,
+      "filename": "heart_full.png",
+      "grid_x": 0,
+      "grid_y": 2,
+      "pixel_x": 0,
+      "pixel_y": 256,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 9,
+      "filename": "heart_empty.png",
+      "grid_x": 1,
+      "grid_y": 2,
+      "pixel_x": 128,
+      "pixel_y": 256,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 10,
+      "filename": "crystal.png",
+      "grid_x": 2,
+      "grid_y": 2,
+      "pixel_x": 256,
+      "pixel_y": 256,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 11,
+      "filename": "berry.png",
+      "grid_x": 3,
+      "grid_y": 2,
+      "pixel_x": 384,
+      "pixel_y": 256,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 12,
+      "filename": "slime_blue_icon.png",
+      "grid_x": 0,
+      "grid_y": 3,
+      "pixel_x": 0,
+      "pixel_y": 384,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 13,
+      "filename": "slime_green_icon.png",
+      "grid_x": 1,
+      "grid_y": 3,
+      "pixel_x": 128,
+      "pixel_y": 384,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 14,
+      "filename": "slime_purple_icon.png",
+      "grid_x": 2,
+      "grid_y": 3,
+      "pixel_x": 256,
+      "pixel_y": 384,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "index": 15,
+      "filename": "slime_blue_portrait.png",
+      "grid_x": 3,
+      "grid_y": 3,
+      "pixel_x": 384,
+      "pixel_y": 384,
+      "width": 128,
+      "height": 128
+    }
+  ]
+}
