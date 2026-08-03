@@ -423,6 +423,8 @@ export class Game {
 
     if (this.input.consumeAttack())    this.combatSystem.tryAttack();
     if (this.input.consumeDodge())     this.player.startDodge();
+    // Era-portal: check first (independent of zone portals)
+    tickEraInteraction(this.eraPortal, this.input, this.bus);
     if (this.input.consumeInteract())  this.interactionSystem.interact();
     if (this.input.consumePause())     { transition(SCREEN.PAUSED); }
     if (this.input.consumeInventory()) { this.bus.emit('inventory:toggle'); }
