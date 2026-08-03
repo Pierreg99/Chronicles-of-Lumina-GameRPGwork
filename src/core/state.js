@@ -56,6 +56,7 @@ export const state = {
   currentZone: 'verdant',
   visitedZones: new Set(['verdant']),
   mapCode: null,
+  era: 1, // Evoland-style era: 1=8-bit, 2=16-bit, 3=3D
 };
 
 /** @returns {boolean} */
