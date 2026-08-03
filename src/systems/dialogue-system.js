@@ -3,6 +3,7 @@
 
 import { EVENTS } from '../core/constants.js';
 import { CONFIG } from '../core/config.js';
+import { currentEra, ERAS } from '../core/era.js';
 import { t } from '../core/i18n.js';
 
 /**
@@ -36,10 +37,12 @@ export class DialogueSystem {
   }
 
   startIntro() {
-    // Pull from config if non-empty, otherwise the localized string.
+    // Era-aware: each era has its own intro flavor
+    const era = currentEra();
+    const eraKey = `dialog.elder_intro_era${era}`;
     const text = (CONFIG.quest.elderIntro?.length)
       ? CONFIG.quest.elderIntro.join(' ')
-      : t('dialog.elder_intro');
+      : (t(eraKey) || t('dialog.elder_intro'));
     this.say(t('dialog.speakers.elder'), text);
   }
 
