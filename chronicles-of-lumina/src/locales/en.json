@@ -46,14 +46,38 @@
     "hintInteract": "[E] {action}"
   },
   "codex": {
-    "slime_blue":   { "name": "Meadow Slime",   "desc": "Slow blue slime from the meadows. 2 HP." },
-    "slime_green":  { "name": "Leaf Slime",    "desc": "Leaps aggressively. 3 HP." },
-    "slime_purple": { "name": "Mist Slime",    "desc": "Fires purple projectiles from afar. 3 HP." },
-    "boss_nebelkoloss": { "name": "Mist Colossus", "desc": "Ancient guardian of the shrine. 25 HP, 2 attacks." },
-    "crystal":      { "name": "Light Crystal", "desc": "Purifies the shrine. 10 required." },
-    "berry":        { "name": "Healing Berry", "desc": "Restores 2 HP. Drops from slimes." },
-    "shrine":       { "name": "Emerald Forest Shrine", "desc": "A decayed shrine at the end of the forest." },
-    "village":      { "name": "Village of Sunhallow", "desc": "The hero's home village." }
+    "slime_blue": {
+      "name": "Meadow Slime",
+      "desc": "Slow blue slime from the meadows. 2 HP."
+    },
+    "slime_green": {
+      "name": "Leaf Slime",
+      "desc": "Leaps aggressively. 3 HP."
+    },
+    "slime_purple": {
+      "name": "Mist Slime",
+      "desc": "Fires purple projectiles from afar. 3 HP."
+    },
+    "boss_nebelkoloss": {
+      "name": "Mist Colossus",
+      "desc": "Ancient guardian of the shrine. 25 HP, 2 attacks."
+    },
+    "crystal": {
+      "name": "Light Crystal",
+      "desc": "Purifies the shrine. 10 required."
+    },
+    "berry": {
+      "name": "Healing Berry",
+      "desc": "Restores 2 HP. Drops from slimes."
+    },
+    "shrine": {
+      "name": "Emerald Forest Shrine",
+      "desc": "A decayed shrine at the end of the forest."
+    },
+    "village": {
+      "name": "Village of Sunhallow",
+      "desc": "The hero's home village."
+    }
   },
   "dialog": {
     "speakers": {
@@ -66,6 +90,10 @@
     "boss_defeated": "The guardian is defeated! The shrine lies open before you.",
     "victory": "You've done it, my child! The shrine blazes — the crystals have returned the light. Sunhallow celebrates your name.",
     "shrine_locked_crystals": "The shrine is still corrupted. It needs {remaining} more light crystals.",
-    "shrine_locked_boss": "The Mist Colossus blocks the shrine! Defeat him first."
+    "shrine_locked_boss": "The Mist Colossus blocks the shrine! Defeat him first.",
+    "elder_intro_era1": "Eight-bit era. NES time. Aren, you can only move in 4 directions - use ARROW KEYS. Defeat the BLOCK SLIMES and bring 10 CRYSTALS to the shrine.",
+    "elder_intro_era2": "Sixteen-bit era. SNES time. You can now move in 8 directions - WASD. The PIXEL SLIMES are stronger. Use SPACE to cast magic.",
+    "elder_intro_era3": "Three-D era. Finally REAL. Free camera, precise MAGIC SLIMES with special abilities. Show them what you can do.",
+    "era_advance": "You feel the WORLD shifting..."
   }
 }
