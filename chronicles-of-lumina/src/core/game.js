@@ -22,6 +22,7 @@ import { Input }           from '../engine/input.js';
 import { playSfx, playLayer, stopLayer, updateAudio, toggleMute as toggleSfxMute } from '../engine/audio.js';
 import { music } from '../engine/music.js';
 import { playBark } from '../engine/voice.js';
+import { SkySystem } from '../engine/sky.js';
 
 import { buildWorld }     from '../world/world-builder.js';
 import { ZONES, getZone, decodeMapCode } from '../world/zones/index.js';
@@ -117,6 +118,10 @@ export class Game {
 
     // World + entities
     this.world = buildWorld({ scene: this.scene, materials: this.materials, zoneId: state.currentZone });
+
+    // Phase 25+: day/night + weather. Owned by the game so it can
+    // persist across zone changes and tick from the main loop.
+    this.sky = new SkySystem(this.scene, state.currentZone);
     this.elder = new NpcElder(this.scene, this.materials, new THREE.Vector3(2, 0, 0));
     this.player = new Player(this.scene, this.materials, this.bus);
     this.projectiles = new ProjectileSystem(this.scene);
@@ -312,6 +317,8 @@ export class Game {
     // Phase 20+: crossfade ambient music to the new biome. The flash
     // hides both the world rebuild and the audio swap.
     this.bus.emit(EVENTS.MUSIC_SET, { zoneId, fadeSec: 2.5 });
+    // Phase 25+: switch the weather system to the new zone's default
+    if (this.sky) this.sky.setZone(zoneId);
 
     setTimeout(() => {
       // Tear down current world
@@ -481,6 +488,12 @@ export class Game {
     // Phase 21+: adaptive combat music. Tension layer ramps based on
     // enemy proximity, combat layer triggers on hit / damage events.
     this._updateMusicLayers();
+
+    // Phase 25+: tick the sky system. This drives time-of-day and
+    // applies scene.background / fog / ambient light each frame.
+    this.sky.update(dt);
+    const currentZone = this.world?.zone || ZONES[state.currentZone];
+    if (currentZone) this.sky.applySky(currentZone);
 
     this.player.update(gameDt, state.time, this.input);
     this.enemySystem.update(gameDt, this.player);
