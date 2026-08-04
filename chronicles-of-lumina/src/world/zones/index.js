@@ -133,6 +133,132 @@ export const ZONES = {
       spire:    { x: -25, z:  25 },
     },
   },
+  // ── Phase 23: 5 new biomes ────────────────────────────────
+  crystal: {
+    id: 'crystal',
+    name: 'Kristallhöhlen',
+    description: 'Unterirdische Kavernen voller leuchtender Kristalle. Schimmernde Echos.',
+    accent: '#7DD3FC',
+    sky:        0x1A1530,      // deep cave purple
+    fog:        0x2A2050,
+    fogNear:    8,
+    fogFar:     55,
+    ambient:    0x3A2D6B,
+    sun:        0x9DD4FF,      // crystal blue glow
+    ground:     0x2A2545,
+    path:       0x4A4575,
+    trees:     ['crystal_cluster', 'glow_mushroom'],
+    rocks:      10,
+    enemyPool: ['crystal_slime', 'echo_wraith', 'gem_golem'],
+    bossPool:  ['crystal_king'],
+    music:     'crystal',
+    difficulty: 1.5,
+    spawns: {
+      hub:      { x:  0,  z:  0 },
+      deep:     { x: 25, z: -25 },
+      altar:    { x: -25, z:  25 },
+    },
+  },
+  sky: {
+    id: 'sky',
+    name: 'Himmeltempel',
+    description: 'Schwebende Inseln über den Wolken. Ätherische Stille und Windgesang.',
+    accent: '#FCD34D',
+    sky:        0xA8C5E8,      // bright daylight
+    fog:        0xD6E2EE,      // cloud white
+    fogNear:    25,
+    fogFar:     100,
+    ambient:    0xE8EEF4,
+    sun:        0xFFF8DC,
+    ground:     0xF5EDD8,      // pale temple stone
+    path:       0xE8DDB8,
+    trees:     ['cloud_bush', 'floating_shrine'],
+    rocks:      3,
+    enemyPool: ['sky_lantern', 'wind_wraith', 'temple_guardian'],
+    bossPool:  ['sky_sovereign'],
+    music:     'sky',
+    difficulty: 1.7,
+    spawns: {
+      plaza:    { x:  0,  z:  0 },
+      bridge:   { x: 22, z: -22 },
+      spire:    { x: -22, z:  22 },
+    },
+  },
+  reef: {
+    id: 'reef',
+    name: 'Gezeitenriff',
+    description: 'Korallenriff unter der Wasseroberfläche. Kaustisches Licht, schaukelnde Seegräser.',
+    accent: '#34D399',
+    sky:        0x2A6E8F,      // underwater blue
+    fog:        0x3A8EAF,
+    fogNear:    12,
+    fogFar:     60,
+    ambient:    0x4A9EBF,
+    sun:        0xA8DDEE,      // caustic blue
+    ground:     0xE8C896,      // sand
+    path:       0xC8A876,
+    trees:     ['coral', 'kelp', 'sea_anemone'],
+    rocks:      7,
+    enemyPool: ['crab', 'jellyfish', 'eel'],
+    bossPool:  ['kraken'],
+    music:     'reef',
+    difficulty: 1.4,
+    spawns: {
+      lagoon:   { x:  0,  z:  0 },
+      trench:   { x: 25, z: -25 },
+      garden:   { x: -25, z:  25 },
+    },
+  },
+  haunted: {
+    id: 'haunted',
+    name: 'Geisterruinen',
+    description: 'Verfallene Tempel, durchdrungen von violetten Nebeln. Ewiger Wind und ferne Schreie.',
+    accent: '#A78BFA',
+    sky:        0x2A1A3A,      // eerie purple
+    fog:        0x4A3A6A,
+    fogNear:    10,
+    fogFar:     55,
+    ambient:    0x3A2A5A,
+    sun:        0xC5B0E8,      // ghostly pale
+    ground:     0x3A2A4A,
+    path:       0x5A4A6A,
+    trees:     ['dead_tree', 'haunted_bush'],
+    rocks:      8,
+    enemyPool: ['ghost_slime', 'wraith', 'haunted_armor'],
+    bossPool:  ['phantom_lord'],
+    music:     'haunted',
+    difficulty: 1.6,
+    spawns: {
+      gate:     { x:  0,  z:  0 },
+      courtyard:{ x: 22, z: -22 },
+      throne:   { x: -22, z:  22 },
+    },
+  },
+  void: {
+    id: 'void',
+    name: 'Leerenspalt',
+    description: 'Riss im Gefüge der Realität. Sternenfeld, schwebende Fragmente, instabile Portale.',
+    accent: '#1E1B4B',
+    sky:        0x050315,      // near-black
+    fog:        0x1A0F3A,
+    fogNear:    6,
+    fogFar:     45,
+    ambient:    0x2A1F5A,
+    sun:        0x9090FF,      // cosmic violet
+    ground:     0x10081F,
+    path:       0x2A1F4A,
+    trees:     ['void_shard', 'rift_obelisk'],
+    rocks:      12,
+    enemyPool: ['void_slime', 'phase_stalker', 'rift_lord'],
+    bossPool:  ['the_architect'],
+    music:     'void',
+    difficulty: 2.2,
+    spawns: {
+      edge:     { x:  0,  z:  0 },
+      core:     { x: 22, z: -22 },
+      abyss:    { x: -22, z:  22 },
+    },
+  },
 };
 
 // Default zone (player starts here)

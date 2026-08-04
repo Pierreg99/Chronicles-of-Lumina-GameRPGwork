@@ -4,9 +4,12 @@ import { ZONES, getZone, listZones, encodeMapCode, decodeMapCode } from '../src/
 import { test, group, assert } from './_runner.mjs';
 
 group('zones registry', () => {
-  test('contains the 5 documented biomes', () => {
+  test('contains the 10 documented biomes', () => {
     const ids = listZones().map((z) => z.id);
-    assert.deepEqual(ids.sort(), ['dunes', 'ember', 'mire', 'peaks', 'verdant']);
+    assert.deepEqual(ids.sort(), [
+      'crystal', 'dunes', 'ember', 'haunted', 'mire',
+      'peaks', 'reef', 'sky', 'verdant', 'void',
+    ]);
   });
 
   test('every zone has the required fields', () => {
@@ -30,12 +33,21 @@ group('zones registry', () => {
       assert.truthy(z.difficulty >= 0.5 && z.difficulty <= 3.0,
         `${z.id} difficulty ${z.difficulty} out of range`);
     }
-    // Ember is always the hardest zone
-    const ember = getZone('ember');
-    for (const z of listZones()) {
-      if (z.id === 'ember') continue;
-      assert.truthy(ember.difficulty >= z.difficulty,
-        `ember (${ember.difficulty}) should be the hardest, but ${z.id} is ${z.difficulty}`);
+  });
+
+  test('void is the hardest zone, verdant the easiest', () => {
+    const all = listZones();
+    const voidZone = getZone('void');
+    const verdant = getZone('verdant');
+    for (const z of all) {
+      if (z.id === 'void') continue;
+      assert.truthy(voidZone.difficulty >= z.difficulty,
+        `void (${voidZone.difficulty}) should be the hardest, but ${z.id} is ${z.difficulty}`);
+    }
+    for (const z of all) {
+      if (z.id === 'verdant') continue;
+      assert.truthy(verdant.difficulty <= z.difficulty,
+        `verdant (${verdant.difficulty}) should be the easiest, but ${z.id} is ${z.difficulty}`);
     }
   });
 });
