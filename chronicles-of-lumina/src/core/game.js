@@ -21,6 +21,7 @@ import { MaterialFactory } from '../engine/materials.js';
 import { Input }           from '../engine/input.js';
 import { playSfx, playLayer, stopLayer, updateAudio, toggleMute as toggleSfxMute } from '../engine/audio.js';
 import { music } from '../engine/music.js';
+import { playBark } from '../engine/voice.js';
 
 import { buildWorld }     from '../world/world-builder.js';
 import { ZONES, getZone, decodeMapCode } from '../world/zones/index.js';
@@ -203,10 +204,18 @@ export class Game {
 
   // 3. Global event wiring for player lifecycle + scene beats.
   _wireGlobalEvents() {
-    this.bus.on(EVENTS.PLAYER_DAMAGE, () => { this.bus.emit(EVENTS.UI_REFRESH); music.pulseCombat(true); });
+    this.bus.on(EVENTS.PLAYER_DAMAGE, ({ amount } = {}) => {
+      this.bus.emit(EVENTS.UI_REFRESH);
+      music.pulseCombat(true);
+      // Phase 22+: vocal bark for hits. Critical = barked harder.
+      const isCrit = amount != null && amount >= 2;
+      playBark(isCrit ? 'hit_critical' : 'hit');
+      // Low-HP warning bark
+      if (this.player && this.player.hp <= this.player.maxHp * 0.3) playBark('lowhp');
+    });
     this.bus.on(EVENTS.PLAYER_HEAL,   () => this.bus.emit(EVENTS.UI_REFRESH));
-    this.bus.on(EVENTS.PLAYER_ATTACK, () => music.pulseCombat(true));
-    this.bus.on(EVENTS.ENEMY_HIT,     () => music.pulseCombat(true));
+    this.bus.on(EVENTS.ENEMY_HIT,     () => { music.pulseCombat(true); playBark('hit'); });
+    this.bus.on(EVENTS.PLAYER_DIED,   () => playBark('death'));
     this.bus.on(EVENTS.PLAYER_DIED, () => {
       this.player.respawn(this.world.village.respawn);
       this.dialogueSystem.say('System', 'Du wurdest am Brunnen wiederbelebt.');
@@ -218,11 +227,13 @@ export class Game {
       this.inventorySystem.add('crystal');
       this.bus.emit(EVENTS.UI_REFRESH);
       playSfx('pickup');
+      playBark('pickup');
       this.particles.burst(this.player.position, '#5ad1ff', 8);
     });
     this.bus.on(EVENTS.LOOT_PICKUP_BERRY, () => {
       this.inventorySystem.add('berry');
       playSfx('pickup');
+      playBark('pickup');
       this.particles.burst(this.player.position, '#d94f4f', 8);
     });
 
@@ -260,13 +271,15 @@ export class Game {
       setTimeout(() => this._endGame(true), 1500);
     });
 
-    this.bus.on(EVENTS.BOSS_SPAWN, () => this.dialogueSystem.bossWarning());
+    this.bus.on(EVENTS.BOSS_SPAWN, () => { this.dialogueSystem.bossWarning(); playBark('boss'); });
+    this.bus.on(EVENTS.XP_LEVELUP, () => playBark('levelup'));
+    this.bus.on(EVENTS.ZONE_CHANGE, (payload) => {
+      this._handleZoneChange(payload);
+      playBark('portal');
+    });
 
-    // Phase 19+: zone transitions. When the player steps through a
-    // portal (or the URL/map-code loads a custom map), tear down the
-    // current world and rebuild for the new zone. A short camera flash
-    // hides the swap.
-    this.bus.on(EVENTS.ZONE_CHANGE, (payload) => this._handleZoneChange(payload));
+    // Phase 19+: zone transitions. (ZONE_CHANGE listener is now consolidated
+    // above — see Phase 22: combined with portal bark.)
 
     // Phase 20+: ambient music events. MUSIC_SET switches the current
     // biome's track with a smooth crossfade; MUSIC_STOP ends it.
