@@ -203,8 +203,10 @@ export class Game {
 
   // 3. Global event wiring for player lifecycle + scene beats.
   _wireGlobalEvents() {
-    this.bus.on(EVENTS.PLAYER_DAMAGE, () => this.bus.emit(EVENTS.UI_REFRESH));
+    this.bus.on(EVENTS.PLAYER_DAMAGE, () => { this.bus.emit(EVENTS.UI_REFRESH); music.pulseCombat(true); });
     this.bus.on(EVENTS.PLAYER_HEAL,   () => this.bus.emit(EVENTS.UI_REFRESH));
+    this.bus.on(EVENTS.PLAYER_ATTACK, () => music.pulseCombat(true));
+    this.bus.on(EVENTS.ENEMY_HIT,     () => music.pulseCombat(true));
     this.bus.on(EVENTS.PLAYER_DIED, () => {
       this.player.respawn(this.world.village.respawn);
       this.dialogueSystem.say('System', 'Du wurdest am Brunnen wiederbelebt.');
@@ -325,6 +327,31 @@ export class Game {
     }, 220);
   }
 
+  /**
+   * Phase 21+: drive the adaptive music layers. Tension is based on
+   * how close the nearest live enemy is to the player; combat decays
+   * on its own after the last hit.
+   */
+  _updateMusicLayers() {
+    if (!this.player || !this.enemySystem) return;
+    const pp = this.player.position;
+    let nearest = Infinity;
+    for (const e of this.enemySystem.enemies) {
+      if (!e || e.dead || !e.group) continue;
+      const dx = e.group.position.x - pp.x;
+      const dz = e.group.position.z - pp.z;
+      const d = Math.hypot(dx, dz);
+      if (d < nearest) nearest = d;
+    }
+    // Tension ramps 0→1 as nearest enemy goes from 15m → 4m
+    let tension = 0;
+    if (nearest < 15) {
+      tension = Math.max(0, Math.min(1, (15 - nearest) / 11));
+    }
+    music.setTensionLevel(tension);
+    if (this.ctx) music.tickCombatDecay(this.ctx.currentTime || 0, 4);
+  }
+
   _disposeWorld() {
     // Whitelist of types to preserve across zone transitions. Everything
     // else (village, forest, shrine, props, portals) is removed so the
@@ -437,6 +464,10 @@ export class Game {
     if (this.input.consumeCodex())     { this.bus.emit('codex:toggle'); }
 
     if (this.player.hp <= 0) this.bus.emit(EVENTS.PLAYER_DIED);
+
+    // Phase 21+: adaptive combat music. Tension layer ramps based on
+    // enemy proximity, combat layer triggers on hit / damage events.
+    this._updateMusicLayers();
 
     this.player.update(gameDt, state.time, this.input);
     this.enemySystem.update(gameDt, this.player);

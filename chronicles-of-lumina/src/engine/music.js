@@ -70,10 +70,14 @@ export class MusicEngine {
     /** @type {GainNode|null} */
     this.masterGain = null;
     this.currentZone = null;
-    /** @type {{ pad: any[], arp: any[], texture: any[], gain: GainNode, intervalId: number, stop: () => void } | null} */
+    /** @type {any} */
     this.activeTrack = null;
     this.muted = false;
     this.started = false;
+    // Phase 21+: adaptive combat layer state
+    this.tensionLevel = 0;     // 0-1, ramps based on enemy proximity
+    this.combatLevel = 0;      // 0-1, ramps based on recent combat
+    this.lastCombatAt = -Infinity;
   }
 
   /**
@@ -129,6 +133,61 @@ export class MusicEngine {
     track.gain.gain.linearRampToValueAtTime(this.muted ? 0 : 1, now + fadeSec);
     this.activeTrack = track;
     this.started = true;
+    this.tensionLevel = 0;
+    this.combatLevel = 0;
+  }
+
+  /**
+   * Phase 21+: ramp the tension layer (0-1) based on enemy proximity.
+   * Called every frame by the game's update loop.
+   * @param {number} level 0-1
+   */
+  setTensionLevel(level) {
+    const target = Math.max(0, Math.min(1, level));
+    this.tensionLevel = target;
+    this._applyAdaptiveLayers();
+  }
+
+  /**
+   * Phase 21+: ramp the combat layer (0-1) based on recent combat.
+   * Decays naturally over `combatDecaySec` after the last hit.
+   * @param {boolean} inCombat
+   */
+  pulseCombat(inCombat = true) {
+    if (inCombat) {
+      this.lastCombatAt = this.ctx ? this.ctx.currentTime : 0;
+      this.combatLevel = 1;
+    }
+    this._applyAdaptiveLayers();
+  }
+
+  /**
+   * Phase 21+: called every frame by the game loop. Decays combat
+   * level over time when no fresh combat happens.
+   * @param {number} now
+   * @param {number} decaySec
+   */
+  tickCombatDecay(now, decaySec = 4) {
+    if (this.combatLevel > 0 && now - this.lastCombatAt > decaySec) {
+      this.combatLevel = 0;
+      this._applyAdaptiveLayers();
+    }
+  }
+
+  /** @private */
+  _applyAdaptiveLayers() {
+    if (!this.activeTrack || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const t = this.activeTrack.tensionGain;
+    const c = this.activeTrack.combatGain;
+    if (t) {
+      t.gain.cancelScheduledValues(now);
+      t.gain.linearRampToValueAtTime(this.tensionLevel * 0.4, now + 0.8);
+    }
+    if (c) {
+      c.gain.cancelScheduledValues(now);
+      c.gain.linearRampToValueAtTime(this.combatLevel * 0.7, now + 0.3);
+    }
   }
 
   stop() {
@@ -138,6 +197,8 @@ export class MusicEngine {
     }
     this.started = false;
     this.currentZone = null;
+    this.tensionLevel = 0;
+    this.combatLevel = 0;
   }
 
   /**
@@ -232,14 +293,89 @@ export class MusicEngine {
     noiseGain.connect(gain);
     noise.start();
 
+    // ── Layer 4: Tension (Phase 21+) ──
+    // Low-pass-filtered drone on a perfect fifth below the root.
+    // Fades in when tensionLevel rises (enemies nearby).
+    const tensionGain = this.ctx.createGain();
+    tensionGain.gain.value = 0;
+    tensionGain.connect(gain);
+    const tensionOsc1 = this.ctx.createOscillator();
+    const tensionOsc2 = this.ctx.createOscillator();
+    const tensionFilter = this.ctx.createBiquadFilter();
+    tensionOsc1.type = 'sawtooth';
+    tensionOsc2.type = 'sawtooth';
+    tensionOsc1.frequency.value = scale[0] * 0.5;     // root, octave down
+    tensionOsc2.frequency.value = scale[0] * 0.75;    // fifth below
+    tensionOsc1.detune.value = -8;
+    tensionOsc2.detune.value =  8;
+    tensionFilter.type = 'lowpass';
+    tensionFilter.frequency.value = 400;
+    tensionFilter.Q.value = 2.5;
+    tensionOsc1.connect(tensionFilter);
+    tensionOsc2.connect(tensionFilter);
+    tensionFilter.connect(tensionGain);
+    tensionOsc1.start();
+    tensionOsc2.start();
+
+    // ── Layer 5: Combat (Phase 21+) ──
+    // Filtered noise burst every 0.2s, simulating percussion. Fades
+    // in when combatLevel is high.
+    const combatGain = this.ctx.createGain();
+    combatGain.gain.value = 0;
+    combatGain.connect(gain);
+    const combatInterval = setInterval(() => {
+      if (!this.ctx || this.ctx.state === 'closed') return;
+      if (this.combatLevel < 0.1) return;
+      const now = this.ctx.currentTime;
+      const noiseBurst = this.ctx.createBufferSource();
+      noiseBurst.buffer = this._createNoiseBuffer(0.1);
+      const burstFilter = this.ctx.createBiquadFilter();
+      burstFilter.type = 'bandpass';
+      burstFilter.frequency.value = 80 + Math.random() * 200;
+      burstFilter.Q.value = 3;
+      const burstGain = this.ctx.createGain();
+      burstGain.gain.setValueAtTime(0, now);
+      burstGain.gain.linearRampToValueAtTime(0.4, now + 0.01);
+      burstGain.gain.linearRampToValueAtTime(0, now + 0.08);
+      noiseBurst.connect(burstFilter);
+      burstFilter.connect(burstGain);
+      burstGain.connect(combatGain);
+      noiseBurst.start(now);
+      noiseBurst.stop(now + 0.1);
+    }, 200);
+
+    // ── Layer 6: Combat melody (Phase 21+) ──
+    // Higher arpeggio with shorter notes when in combat.
+    const combatMelodyInterval = setInterval(() => {
+      if (!this.ctx || this.ctx.state === 'closed') return;
+      if (this.combatLevel < 0.5) return;
+      const now = this.ctx.currentTime;
+      const note = scale[Math.floor(Math.random() * scale.length)] * 2;
+      const osc = this.ctx.createOscillator();
+      const oscGain = this.ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = note;
+      oscGain.gain.setValueAtTime(0, now);
+      oscGain.gain.linearRampToValueAtTime(0.04, now + 0.02);
+      oscGain.gain.linearRampToValueAtTime(0, now + 0.15);
+      osc.connect(oscGain);
+      oscGain.connect(combatGain);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    }, 220);
+
     const stop = () => {
       clearInterval(arpInterval);
+      clearInterval(combatInterval);
+      clearInterval(combatMelodyInterval);
       try { noise.stop(); } catch (_) {}
+      try { tensionOsc1.stop(); } catch (_) {}
+      try { tensionOsc2.stop(); } catch (_) {}
       padVoices.forEach((v) => { try { v.osc.stop(); } catch (_) {} });
       try { gain.disconnect(); } catch (_) {}
     };
 
-    return { gain, stop, padVoices };
+    return { gain, stop, padVoices, tensionGain, combatGain };
   }
 
   /**
