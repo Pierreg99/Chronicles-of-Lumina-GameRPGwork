@@ -1,6 +1,6 @@
 # Chronicles of Lumina
 
-![Version](https://img.shields.io/badge/version-0.10.3-blue) ![Phases](https://img.shields.io/badge/phases-19%2F19-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R7-success) ![Tests](https://img.shields.io/badge/tests-99%2F99-success) ![Assets](https://img.shields.io/badge/assets-procedural-success) ![Bot](https://img.shields.io/badge/bot-discord.js_v14-7B2FBE) ![Pages](https://img.shields.io/badge/pages-live-success)
+![Version](https://img.shields.io/badge/version-0.10.3-blue) ![Phases](https://img.shields.io/badge/phases-27%2F27-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R7-success) ![Tests](https://img.shields.io/badge/tests-145%2F145-success) ![Assets](https://img.shields.io/badge/assets-procedural-success) ![Bot](https://img.shields.io/badge/bot-discord.js_v14-7B2FBE) ![Pages](https://img.shields.io/badge/pages-live-success)
 
 <p align="center">
   <img src="docs/showcase.svg" alt="Chronicles of Lumina" width="100%">
@@ -15,7 +15,7 @@
 
 3D-Browser-Action-Adventure im farbenfrohen JRPG-Fantasy-Stil. Vanilla JS + Three.js, ES-Module, kein Build-Step.
 
-> Vertikale Slice Demo: Sammle 10 Lichtkristalle, besiege den Nebel-Koloss, reinige den Schrein. Erkunde **5 Biome** über **Portale**, baue dir **Custom-Maps** mit geteilbaren URLs, und spiele täglich das **Daily Run** für die Highscore.
+> Vertikale Slice Demo: Sammle 10 Lichtkristalle, besiege den Nebel-Koloss, reinige den Schrein. Erkunde **10 Biome** über **Portale**, baue dir **Custom-Maps** mit geteilbaren URLs, höre **per-Biom synthetisierte Musik**, generiere **prozedurale Dungeons**, finde **10 versteckte Mini-Bosse**, mach **Photo Mode Screenshots** und spiel das **10-Sekunden-Replay** ab.
 
 ## Quickstart
 
@@ -55,12 +55,32 @@ Mobile: virtueller Joystick + Aktions-Buttons (E / Rollen / Angriff).
 ## Features
 
 ### Open World (Phase 19+)
-- **5 thematische Biome** — Smaragdwald (Wald, Starter) · Golddünen (Wüste, mittel) · Sturmgipfel (Berge, schwer) · Nebelmarsch (Sumpf, mittel-schwer) · Glutkessel (Vulkan, Endgame)
+- **10 thematische Biome** — Smaragdwald (Wald, Starter) · Golddünen (Wüste) · Sturmgipfel (Berge) · Nebelmarsch (Sumpf) · Glutkessel (Vulkan) · **Kristallhöhlen** (unterirdisch) · **Himmeltempel** (schwebend) · **Gezeitenriff** (Korallen) · **Geisterruinen** (Nebel) · **Leerenspalt** (kosmisch, Endgame)
 - **Sichtbare Portale** — leuchtende Ringe auf der Karte, drücke E um das Biom zu wechseln
 - **Biom-spezifische Atmosphäre** — eigener Himmel, Fog, Boden-Farbe pro Zone
 - **URL-shared Custom Maps** — `?map=zoneId:seed` lädt eine geteilte Karte direkt
 - **In-World Zone-Indicator** — kleines Badge oben mitten, zeigt aktuelles Biom
 - **Schwierigkeits-Pips** auf den Biome-Cards signalisieren, was einen erwartet
+
+### Audio (Phase 20-22)
+- **Per-Biom Ambient Music** — 10 einzigartige 3-Layer-Tracks (Pad + Arpeggio + Texture), prozedural via Web Audio API. Crossfade bei Zonenwechsel.
+- **Adaptive Combat Music** — Tension-Layer faded basierend auf Gegner-Nähe ein, Combat-Layer bei Hits/Schaden mit Percussion + Melodie. Decay nach 4s.
+- **12 Voice Barks** — prozedurale Vocal-SFX via Formant-Synthese für hit/critical/miss/levelup/lowhp/death/pickup/portal/boss/parry/combo/ultimate.
+- **Prozedural Dungeon Music** — crypt/mine/tower Typen mit eigenem Klangcharakter.
+
+### Procedural (Phase 24)
+- **Dungeon-Generator** — 3 Dungeon-Typen (Crypt, Mine, Tower) mit deterministischem Layout pro Seed. 8-12 Räume, L-förmige Korridore, Entrance + Boss + Exit garantiert.
+
+### Atmosphäre (Phase 25)
+- **Tag/Nacht-Zyklus** — 10 Min Echtzeit = voller 24h-Zyklus. Himmel verschiebt sich (Nacht→Morgenröte→Tag→Abenddämmerung), Fog-Dichte variiert, Sonnen-Position treibt Directional-Light.
+- **Pro-Biom-Wetter** — verdant (Regen/Nebel), dunes (Sandsturm), peaks (Schnee/Nebel), mire (Nebel/Niesel), ember (Asche/Glutregen), crystal (Glühen/Funken), reef (Niesel/Strömung), haunted (Nebel), void (Leerenspalt/Riss).
+
+### Versteckte Inhalte (Phase 26)
+- **10 Secret Areas** — eine pro Biom mit einzigartigem Mini-Boss, Loot-Drops, Codex-Unlocks. Uralter Baumgeist, Sandkönig, Frostlord, Miremutter, Titan-Schmied, Kristallwächter, Himmelseraph, Krakenlord, Schatten-Selbst (spiegelt Spieler), Der Architekt (HP 50, Endgegner).
+
+### UX (Phase 27)
+- **Photo Mode** — `takePhoto(canvas)` als PNG-Download via Canvas-API
+- **10s Replay Buffer** — 600-Frame Ringbuffer (60fps), Highlights-Sampling, End-Screen-Zusammenfassung (Zonen besucht, max Distanz, Dauer)
 
 ### UI (Phase 9+)
 - **Mystical-Violet-Theme** — durchgehende Farbpalette: Violet (Akzent), Cyan (XP/Magie), Rose (Boss/Damage), Emerald (HP)

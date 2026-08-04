@@ -81,7 +81,7 @@ Bottom-up Abhängigkeiten, eine Source of Truth für Balancing (`core/config.js`
 
 ## Roadmap
 
-19 Phasen done (siehe [`chronicles-of-lumina/ROADMAP.md`](./chronicles-of-lumina/ROADMAP.md) für Details):
+27 Phasen done (siehe [`chronicles-of-lumina/ROADMAP.md`](./chronicles-of-lumina/ROADMAP.md) für Details):
 
 | # | Phase | Status |
 |---|-------|--------|
@@ -96,7 +96,15 @@ Bottom-up Abhängigkeiten, eine Source of Truth für Balancing (`core/config.js`
 | 16 | Test-Coverage (53 → 74 Assertions) | ✅ |
 | 17 | i18n (t() + DE/EN Locales) | ✅ |
 | 18 | Quality + Performance (Audio-Sprite, Object-Pool) | ✅ |
-| 19 | **Open World: 5 Biome + Portale + URL Map-Codes** | ✅ |
+| 19 | Open World: 5 Biome + Portale + URL Map-Codes | ✅ |
+| 20 | Audio: Per-Biome Ambient Music (Web Audio synth) | ✅ |
+| 21 | Audio: Adaptive Combat Music (tension + combat layers) | ✅ |
+| 22 | Audio: Voice Barks (12 formant-synth effects) | ✅ |
+| 23 | Maps: 5 new biomes (crystal, sky, reef, haunted, void) | ✅ |
+| 24 | Maps: Procedural Dungeon Generation | ✅ |
+| 25 | Atmosphere: Day/Night Cycle + Weather | ✅ |
+| 26 | Maps: Secret Areas + Hidden Mini-Bosses | ✅ |
+| 27 | UX: Photo Mode + 10s Replay Buffer | ✅ |
 
 ## Lizenz
 

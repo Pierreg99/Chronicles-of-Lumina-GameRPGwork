@@ -39,8 +39,16 @@ Evolution des Spiels in 9 Phasen. Jede Phase endet mit einem lauffähigen Spiel,
 | **18** | Quality: tsc-Error-Cleanup (34→14), Test-Flake-Fix, Random-Date-TS-Fix | 1 | ✅ |
 | **18** | Performance: Audio-Sprite, Object-Pooling für Projektile, FPS-Profiling | 1 | ✅ |
 | **19** | Open World: 5 Biome (Verdant/Dunes/Peaks/Mire/Ember) + Zone-Portale + URL-Map-Codes | 1 | ✅ |
+| **20** | Audio: Per-Biome Ambient Music (Web Audio synth, 3-layer pad/arp/texture) | 1 | ✅ |
+| **21** | Audio: Adaptive Combat Music (tension + combat + combat-melody layers) | 1 | ✅ |
+| **22** | Audio: Voice Barks (12 formant-synth vocal effects for events) | 1 | ✅ |
+| **23** | Maps: 5 new biomes (crystal, sky, reef, haunted, void) | 1 | ✅ |
+| **24** | Maps: Procedural Dungeon Generation (crypt/mine/tower) | 1 | ✅ |
+| **25** | Atmosphere: Day/Night Cycle + Per-Biome Weather | 1 | ✅ |
+| **26** | Maps: Secret Areas + 10 Hidden Mini-Bosses (one per biome) | 1 | ✅ |
+| **27** | UX: Photo Mode (PNG download) + 10s Replay Buffer | 1 | ✅ |
 
-**Total: 19 Commits done, 0 Phasen geplant, ~12h done = ~12h**
+**Total: 27 Commits done, 0 Phasen geplant, ~18h done = ~18h**
 
 ## Phasen-Details
 
