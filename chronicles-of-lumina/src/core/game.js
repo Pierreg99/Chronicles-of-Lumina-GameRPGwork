@@ -19,7 +19,8 @@ import { createCamera }    from '../engine/camera.js';
 import { createLighting }  from '../engine/lighting.js';
 import { MaterialFactory } from '../engine/materials.js';
 import { Input }           from '../engine/input.js';
-import { playSfx, playLayer, stopLayer, updateAudio } from '../engine/audio.js';
+import { playSfx, playLayer, stopLayer, updateAudio, toggleMute as toggleSfxMute } from '../engine/audio.js';
+import { music } from '../engine/music.js';
 
 import { buildWorld }     from '../world/world-builder.js';
 import { ZONES, getZone, decodeMapCode } from '../world/zones/index.js';
@@ -264,6 +265,15 @@ export class Game {
     // current world and rebuild for the new zone. A short camera flash
     // hides the swap.
     this.bus.on(EVENTS.ZONE_CHANGE, (payload) => this._handleZoneChange(payload));
+
+    // Phase 20+: ambient music events. MUSIC_SET switches the current
+    // biome's track with a smooth crossfade; MUSIC_STOP ends it.
+    this.bus.on(EVENTS.MUSIC_SET, ({ zoneId, fadeSec }) => {
+      music.setZone(zoneId, fadeSec);
+    });
+    this.bus.on(EVENTS.MUSIC_STOP, () => {
+      music.stop();
+    });
   }
 
   /**
@@ -283,6 +293,10 @@ export class Game {
     // the world re-build pop.
     this.bus.emit(EVENTS.FLASH, { color: 0xffffff, duration: 0.5 });
     this.bus.emit(EVENTS.HITSTOP, { frames: 6 });
+
+    // Phase 20+: crossfade ambient music to the new biome. The flash
+    // hides both the world rebuild and the audio swap.
+    this.bus.emit(EVENTS.MUSIC_SET, { zoneId, fadeSec: 2.5 });
 
     setTimeout(() => {
       // Tear down current world
@@ -463,6 +477,9 @@ export class Game {
     this.enemySystem.spawnInitial();
     this.bus.emit(EVENTS.UI_REFRESH);
     this.dialogueSystem.startIntro();
+    // Phase 20+: kick off ambient music for the current zone
+    music.ensureContext();
+    music.setZone(state.currentZone);
   }
 
   _endGame(win) {
