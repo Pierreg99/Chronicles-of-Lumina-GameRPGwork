@@ -14,12 +14,36 @@ import { CONFIG } from '../core/config.js';
 const SAMPLE_RATE_FALLBACK = 44100;
 const SPRITE_PADDING_SEC    = 0.05; // small gap between slices to avoid overlap artefacts
 
+import { ERAS, currentEra } from '../core/era.js';
+
+// Each era has its own SFX palette. Era 1 = chiptune (square wave, low pitch).
+// Era 2 = richer 16-bit (sawtooth + small vibrato). Era 3 = modern orchestral
+// (sine + longer attack). Same logical names, different sound.
 const SFX_PRESETS = {
-  swing:    [220,  90, 0.12, 'sawtooth'],
-  hit:      [180,  60, 0.15, 'square'],
-  pickup:   [660, 990, 0.20, 'sine'],
-  interact: [440, 550, 0.15, 'sine'],
-  shrine:   [330, 880, 1.20, 'sine'],
+  [ERAS.EIGHT_BIT]: {
+    swing:    [220,   90, 0.10, 'square'],
+    hit:      [180,   60, 0.12, 'square'],
+    pickup:   [660,  990, 0.15, 'square'],
+    interact: [440,  550, 0.12, 'square'],
+    shrine:   [330,  880, 0.90, 'square'],
+    era_advance: [440, 220, 0.50, 'square'],   // 8-bit warp
+  },
+  [ERAS.SIXTEEN_BIT]: {
+    swing:    [220,   90, 0.12, 'sawtooth'],
+    hit:      [180,   60, 0.15, 'square'],
+    pickup:   [660,  990, 0.20, 'sine'],
+    interact: [440,  550, 0.15, 'sine'],
+    shrine:   [330,  880, 1.20, 'sine'],
+    era_advance: [330, 880, 0.80, 'sawtooth'], // 16-bit warp
+  },
+  [ERAS.THREE_D]: {
+    swing:    [330,  110, 0.15, 'sawtooth'],
+    hit:      [220,   80, 0.18, 'square'],
+    pickup:   [880, 1320, 0.25, 'sine'],
+    interact: [550,  660, 0.18, 'sine'],
+    shrine:   [440, 1100, 1.50, 'sine'],
+    era_advance: [110, 880, 1.20, 'sine'],     // 3D warp (sweep)
+  },
 };
 
 let _ctx = null;
@@ -79,13 +103,19 @@ function _renderPreset(p1, p2, dur, type, sampleRate) {
 
 /** Builds the combined SFX buffer; safe to call multiple times. */
 function _buildSfxSprite() {
-  if (!_ctx || _sprite) return;
+  if (!_ctx) return;
+  // Re-build on every era change (the sprite is era-specific)
+  _sprite = null;
+  _spriteIndex = {};
   const sr = _ctx.sampleRate || SAMPLE_RATE_FALLBACK;
+  // Use the CURRENT era's SFX presets (so era 1, 2, 3 each get their own sprite)
+  const era = currentEra();
+  const eraPresets = SFX_PRESETS[era] || {};
   // First pass: compute durations to know the total length
   let total = 0;
   /** @type {Array<{name: string, dur: number, p1: number, p2: number, type: string}>} */
   const meta = [];
-  for (const [name, cfg] of Object.entries(SFX_PRESETS)) {
+  for (const [name, cfg] of Object.entries(eraPresets)) {
     const p1 = /** @type {number} */ (cfg[0]);
     const p2 = /** @type {number} */ (cfg[1]);
     const dur = /** @type {number} */ (cfg[2]);
@@ -117,6 +147,11 @@ export function playSfx(name) {
     _playSfxLegacy(name, ctx);
     return;
   }
+  // Lazy-rebuild sprite on era change (era 1 -> 2 -> 3 -> 1, etc.)
+  if (!_sprite || (_lastBuiltEra !== undefined && _lastBuiltEra !== currentEra())) {
+    _buildSfxSprite();
+    _lastBuiltEra = currentEra();
+  }
   const slot = _spriteIndex[name];
   if (!slot) return;
   const [offset, dur] = slot;
@@ -131,7 +166,7 @@ export function playSfx(name) {
 /** Fallback path for browsers without reliable AudioBuffer rendering. */
 function _playSfxLegacy(name, ctx) {
   if (!ctx) return;
-  const cfg = SFX_PRESETS[name] || [440, 440, 0.10, 'sine'];
+  const cfg = (SFX_PRESETS[currentEra()] || {})[name] || [440, 440, 0.10, 'sine'];
   const o = ctx.createOscillator();
   const g = ctx.createGain();
   o.connect(g); g.connect(_sfxGain);
@@ -150,7 +185,10 @@ export function isMuted() { return _muted; }
 export function toggleMute() { _muted = !_muted; return _muted; }
 
 /** Number of SFX presets baked into the sprite. Exposed for diagnostics. */
-export function sfxSpriteSize() { return Object.keys(SFX_PRESETS).length; }
+export function sfxSpriteSize() {
+  const eraPresets = SFX_PRESETS[currentEra()] || {};
+  return Object.keys(eraPresets).length;
+}
 
 // ── Layered music (Phase 4) ───────────────────────────────
 //

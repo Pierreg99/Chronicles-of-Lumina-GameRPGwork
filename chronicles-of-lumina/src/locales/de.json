@@ -46,14 +46,38 @@
     "hintInteract": "[E] {action}"
   },
   "codex": {
-    "slime_blue":   { "name": "Wiesen-Schleim",   "desc": "Langsamer, blauer Schleim aus den Wiesen. 2 HP." },
-    "slime_green":  { "name": "Blatt-Schleim",    "desc": "Springt aggressiv an. 3 HP." },
-    "slime_purple": { "name": "Nebel-Schleim",    "desc": "Schießt lila Projektile aus der Ferne. 3 HP." },
-    "boss_nebelkoloss": { "name": "Nebel-Koloss", "desc": "Uralter Wächter des Schreins. 25 HP, 2 Angriffe." },
-    "crystal":      { "name": "Lichtkristall",   "desc": "Reinigt den Schrein. 10 Stück erforderlich." },
-    "berry":        { "name": "Heilbeere",       "desc": "Stellt 2 HP wieder her. Droppt von Schleimen." },
-    "shrine":       { "name": "Smaragdwald-Schrein", "desc": "Ein verfallener Schrein am Ende des Waldes." },
-    "village":      { "name": "Dorf Sonnenhain", "desc": "Heimatdorf des Helden." }
+    "slime_blue": {
+      "name": "Wiesen-Schleim",
+      "desc": "Langsamer, blauer Schleim aus den Wiesen. 2 HP."
+    },
+    "slime_green": {
+      "name": "Blatt-Schleim",
+      "desc": "Springt aggressiv an. 3 HP."
+    },
+    "slime_purple": {
+      "name": "Nebel-Schleim",
+      "desc": "Schießt lila Projektile aus der Ferne. 3 HP."
+    },
+    "boss_nebelkoloss": {
+      "name": "Nebel-Koloss",
+      "desc": "Uralter Wächter des Schreins. 25 HP, 2 Angriffe."
+    },
+    "crystal": {
+      "name": "Lichtkristall",
+      "desc": "Reinigt den Schrein. 10 Stück erforderlich."
+    },
+    "berry": {
+      "name": "Heilbeere",
+      "desc": "Stellt 2 HP wieder her. Droppt von Schleimen."
+    },
+    "shrine": {
+      "name": "Smaragdwald-Schrein",
+      "desc": "Ein verfallener Schrein am Ende des Waldes."
+    },
+    "village": {
+      "name": "Dorf Sonnenhain",
+      "desc": "Heimatdorf des Helden."
+    }
   },
   "dialog": {
     "speakers": {
@@ -66,6 +90,10 @@
     "boss_defeated": "Der Wächter ist besiegt! Der Schrein liegt vor dir.",
     "victory": "Du hast es geschafft, mein Kind! Der Schrein erstrahlt — die Kristalle haben das Licht zurückgebracht. Sonnenhain feiert deinen Namen.",
     "shrine_locked_crystals": "Der Schrein ist noch verdorben. Ihm fehlen {remaining} Lichtkristalle.",
-    "shrine_locked_boss": "Der Nebel-Koloss blockiert den Schrein! Besiege ihn zuerst."
+    "shrine_locked_boss": "Der Nebel-Koloss blockiert den Schrein! Besiege ihn zuerst.",
+    "elder_intro_era1": "Acht-Bit-Ära. NES-Zeit. Aren, du kannst nur in 4 Richtungen laufen — drücke PFEILTASTEN. Besiege die BLOCK-SCHLEIME und bring 10 KRISTALLE zum Schrein.",
+    "elder_intro_era2": "Sechzehn-Bit-Ära. SNES-Zeit. Du kannst jetzt in 8 Richtungen laufen — WASD. Die PIXEL-SCHLEIME sind stärker. Mit LEERTASTE wirfst du Magie.",
+    "elder_intro_era3": "Drei-D-Ära. Endlich ECHT. Freie Kamera, präzise MAGIE-SCHLEIME mit Spezialfähigkeiten. Zeig ihnen, was du kannst.",
+    "era_advance": "Du spürst wie die WELT sich verschiebt..."
   }
 }

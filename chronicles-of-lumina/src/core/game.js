@@ -62,6 +62,10 @@ import { CodexPanel }      from '../ui/codex-panel.js';
 import { SettingsPanel }   from '../ui/settings-panel.js';
 import { ZonePicker }      from '../ui/zone-picker.js';
 import { createPerfOverlay, wantsPerfOverlay } from '../ui/perf-overlay.js';
+import { applyEraPostProcess, currentEra, ERAS, advanceEra } from './era.js';
+import { EraPortal } from '../entities/era-portal.js';
+import { EraIndicator } from '../ui/era-indicator.js';
+import { tickEraInteraction } from '../utils/era-interaction.js';
 
 /**
  * @typedef {import('../systems/feedback-system.js').FeedbackSystem} TFeedbackSystem
@@ -126,6 +130,8 @@ export class Game {
     this.player = new Player(this.scene, this.materials, this.bus);
     this.projectiles = new ProjectileSystem(this.scene);
     this.loot = new LootSystem(this.scene, this.materials);
+    this.eraPortal = new EraPortal(this.scene, { x: -10, z: 10 });
+    this.eraIndicator = new EraIndicator(this.bus);
 
     // Settings singleton (used by FeedbackSystem for reduceMotion DI)
     this.settings = settings;
@@ -478,6 +484,8 @@ export class Game {
 
     if (this.input.consumeAttack())    this.combatSystem.tryAttack();
     if (this.input.consumeDodge())     this.player.startDodge();
+    // Era-portal: check first (independent of zone portals)
+    tickEraInteraction(this.eraPortal, this.input, this.bus);
     if (this.input.consumeInteract())  this.interactionSystem.interact();
     if (this.input.consumePause())     { transition(SCREEN.PAUSED); }
     if (this.input.consumeInventory()) { this.bus.emit('inventory:toggle'); }
@@ -525,6 +533,12 @@ export class Game {
 
   _render() {
     this.renderer.render(this.scene, this.cameraRig.camera);
+    if (this.eraCanvas) {
+      applyEraPostProcess(this.canvas, this.eraCanvas);
+      // Show the era canvas only when not in 3D era (which passes through directly)
+      const showEra = currentEra() !== ERAS.THREE_D;
+      this.eraCanvas.style.display = showEra ? 'block' : 'none';
+    }
   }
 
   // ── Game actions ─────────────────────────────────────────
