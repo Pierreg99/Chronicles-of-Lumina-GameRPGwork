@@ -19,7 +19,10 @@ import { createCamera }    from '../engine/camera.js';
 import { createLighting }  from '../engine/lighting.js';
 import { MaterialFactory } from '../engine/materials.js';
 import { Input }           from '../engine/input.js';
-import { playSfx, playLayer, stopLayer, updateAudio } from '../engine/audio.js';
+import { playSfx, playLayer, stopLayer, updateAudio, toggleMute as toggleSfxMute } from '../engine/audio.js';
+import { music } from '../engine/music.js';
+import { playBark } from '../engine/voice.js';
+import { SkySystem } from '../engine/sky.js';
 
 import { buildWorld }     from '../world/world-builder.js';
 import { ZONES, getZone, decodeMapCode } from '../world/zones/index.js';
@@ -119,6 +122,10 @@ export class Game {
 
     // World + entities
     this.world = buildWorld({ scene: this.scene, materials: this.materials, zoneId: state.currentZone });
+
+    // Phase 25+: day/night + weather. Owned by the game so it can
+    // persist across zone changes and tick from the main loop.
+    this.sky = new SkySystem(this.scene, state.currentZone);
     this.elder = new NpcElder(this.scene, this.materials, new THREE.Vector3(2, 0, 0));
     this.player = new Player(this.scene, this.materials, this.bus);
     this.projectiles = new ProjectileSystem(this.scene);
@@ -208,8 +215,18 @@ export class Game {
 
   // 3. Global event wiring for player lifecycle + scene beats.
   _wireGlobalEvents() {
-    this.bus.on(EVENTS.PLAYER_DAMAGE, () => this.bus.emit(EVENTS.UI_REFRESH));
+    this.bus.on(EVENTS.PLAYER_DAMAGE, ({ amount } = {}) => {
+      this.bus.emit(EVENTS.UI_REFRESH);
+      music.pulseCombat(true);
+      // Phase 22+: vocal bark for hits. Critical = barked harder.
+      const isCrit = amount != null && amount >= 2;
+      playBark(isCrit ? 'hit_critical' : 'hit');
+      // Low-HP warning bark
+      if (this.player && this.player.hp <= this.player.maxHp * 0.3) playBark('lowhp');
+    });
     this.bus.on(EVENTS.PLAYER_HEAL,   () => this.bus.emit(EVENTS.UI_REFRESH));
+    this.bus.on(EVENTS.ENEMY_HIT,     () => { music.pulseCombat(true); playBark('hit'); });
+    this.bus.on(EVENTS.PLAYER_DIED,   () => playBark('death'));
     this.bus.on(EVENTS.PLAYER_DIED, () => {
       this.player.respawn(this.world.village.respawn);
       this.dialogueSystem.say('System', 'Du wurdest am Brunnen wiederbelebt.');
@@ -221,11 +238,13 @@ export class Game {
       this.inventorySystem.add('crystal');
       this.bus.emit(EVENTS.UI_REFRESH);
       playSfx('pickup');
+      playBark('pickup');
       this.particles.burst(this.player.position, '#5ad1ff', 8);
     });
     this.bus.on(EVENTS.LOOT_PICKUP_BERRY, () => {
       this.inventorySystem.add('berry');
       playSfx('pickup');
+      playBark('pickup');
       this.particles.burst(this.player.position, '#d94f4f', 8);
     });
 
@@ -263,13 +282,24 @@ export class Game {
       setTimeout(() => this._endGame(true), 1500);
     });
 
-    this.bus.on(EVENTS.BOSS_SPAWN, () => this.dialogueSystem.bossWarning());
+    this.bus.on(EVENTS.BOSS_SPAWN, () => { this.dialogueSystem.bossWarning(); playBark('boss'); });
+    this.bus.on(EVENTS.XP_LEVELUP, () => playBark('levelup'));
+    this.bus.on(EVENTS.ZONE_CHANGE, (payload) => {
+      this._handleZoneChange(payload);
+      playBark('portal');
+    });
 
-    // Phase 19+: zone transitions. When the player steps through a
-    // portal (or the URL/map-code loads a custom map), tear down the
-    // current world and rebuild for the new zone. A short camera flash
-    // hides the swap.
-    this.bus.on(EVENTS.ZONE_CHANGE, (payload) => this._handleZoneChange(payload));
+    // Phase 19+: zone transitions. (ZONE_CHANGE listener is now consolidated
+    // above — see Phase 22: combined with portal bark.)
+
+    // Phase 20+: ambient music events. MUSIC_SET switches the current
+    // biome's track with a smooth crossfade; MUSIC_STOP ends it.
+    this.bus.on(EVENTS.MUSIC_SET, ({ zoneId, fadeSec }) => {
+      music.setZone(zoneId, fadeSec);
+    });
+    this.bus.on(EVENTS.MUSIC_STOP, () => {
+      music.stop();
+    });
   }
 
   /**
@@ -289,6 +319,12 @@ export class Game {
     // the world re-build pop.
     this.bus.emit(EVENTS.FLASH, { color: 0xffffff, duration: 0.5 });
     this.bus.emit(EVENTS.HITSTOP, { frames: 6 });
+
+    // Phase 20+: crossfade ambient music to the new biome. The flash
+    // hides both the world rebuild and the audio swap.
+    this.bus.emit(EVENTS.MUSIC_SET, { zoneId, fadeSec: 2.5 });
+    // Phase 25+: switch the weather system to the new zone's default
+    if (this.sky) this.sky.setZone(zoneId);
 
     setTimeout(() => {
       // Tear down current world
@@ -315,6 +351,31 @@ export class Game {
       }
       this.bus.emit(EVENTS.UI_REFRESH);
     }, 220);
+  }
+
+  /**
+   * Phase 21+: drive the adaptive music layers. Tension is based on
+   * how close the nearest live enemy is to the player; combat decays
+   * on its own after the last hit.
+   */
+  _updateMusicLayers() {
+    if (!this.player || !this.enemySystem) return;
+    const pp = this.player.position;
+    let nearest = Infinity;
+    for (const e of this.enemySystem.enemies) {
+      if (!e || e.dead || !e.group) continue;
+      const dx = e.group.position.x - pp.x;
+      const dz = e.group.position.z - pp.z;
+      const d = Math.hypot(dx, dz);
+      if (d < nearest) nearest = d;
+    }
+    // Tension ramps 0→1 as nearest enemy goes from 15m → 4m
+    let tension = 0;
+    if (nearest < 15) {
+      tension = Math.max(0, Math.min(1, (15 - nearest) / 11));
+    }
+    music.setTensionLevel(tension);
+    if (this.ctx) music.tickCombatDecay(this.ctx.currentTime || 0, 4);
   }
 
   _disposeWorld() {
@@ -432,6 +493,16 @@ export class Game {
 
     if (this.player.hp <= 0) this.bus.emit(EVENTS.PLAYER_DIED);
 
+    // Phase 21+: adaptive combat music. Tension layer ramps based on
+    // enemy proximity, combat layer triggers on hit / damage events.
+    this._updateMusicLayers();
+
+    // Phase 25+: tick the sky system. This drives time-of-day and
+    // applies scene.background / fog / ambient light each frame.
+    this.sky.update(dt);
+    const currentZone = this.world?.zone || ZONES[state.currentZone];
+    if (currentZone) this.sky.applySky(currentZone);
+
     this.player.update(gameDt, state.time, this.input);
     this.enemySystem.update(gameDt, this.player);
     this.bossSystem.update(gameDt, this.player);
@@ -477,6 +548,9 @@ export class Game {
     this.enemySystem.spawnInitial();
     this.bus.emit(EVENTS.UI_REFRESH);
     this.dialogueSystem.startIntro();
+    // Phase 20+: kick off ambient music for the current zone
+    music.ensureContext();
+    music.setZone(state.currentZone);
   }
 
   _endGame(win) {

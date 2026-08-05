@@ -64,6 +64,8 @@ export class Menus {
         const label = document.getElementById('mute-label');
         if (label) label.textContent = muted ? 'Stumm: AN' : 'Stumm: AUS';
         if (window.__updateMuteIcon) window.__updateMuteIcon(muted);
+        // Phase 20+: also mute/unmute the ambient music engine
+        import('../engine/music.js').then((mod) => mod.music.setMuted(muted));
       });
     };
 
