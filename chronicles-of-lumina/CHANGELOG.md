@@ -2,6 +2,67 @@
 
 Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [Unreleased] — Lane C vertical-depth sprint
+
+### Added (Phase 28-34)
+
+#### Equipment & Magic (Phase 28-29)
+- **Equipment system** (`src/systems/equipment.js`): 6 slots (head/chest/legs/boots/weapon/trinket),
+  5 rarities (common → legendary), 24 templates, stat bonuses (str/dex/int/vit/wis),
+  set bonuses when matching pieces are worn. Equipped items appear in
+  `src/ui/equipment-panel.js` (toggle `U`).
+- **Magic system** (`src/systems/magic.js`): 3 schools (fire/ice/arcane), 12 spells
+  (4 per school), MP + regen, school mastery multipliers.
+  Spell bar (`src/ui/spell-bar.js`) shows cooldowns.
+- **Player stats block** in `src/core/state.js` — `baseStats` and
+  `getAllStatBonuses(equipped)` aggregate item + skill bonuses.
+
+#### Crafting (Phase 30)
+- **Crafting system** (`src/systems/crafting.js`): 4 stations (forge, alchemy, enchanting,
+  cooking), 30+ recipes, 17 materials, recipe discovery on first craft.
+- Material drops from gathering, monster loot, secret-area rewards.
+
+#### Progression (Phase 31-32)
+- **Skill tree** (`src/systems/skill-tree.js`): 3 branches (Krieger/Magier/Schurke),
+  24 nodes (8 per branch, 2 capstones each), `J` to open. Points
+  from level-ups (1 per level + 2 every 5 levels). Prereq-gated.
+  `allocateNode` / `deallocateNode` / `getAllocatedBonuses`.
+- **Achievement system** (`src/systems/achievement.js`): 55 achievements
+  across 5 categories (combat, exploration, crafting, progression,
+  secret). `checkAchievements` predicate-based, `achievementProgress`
+  for numeric ones.
+
+#### Variety (Phase 33)
+- **Per-biome trees** (`src/world/zones/biome-trees.js`): 23 tree variants,
+  each biome has its own pool (verdant oak/birch/bush, dunes palm/cactus,
+  peaks pine, mire willow, ember obsidian, crystal crystal_cluster,
+  sky cloud_bush, reef coral, haunted ghost_tree, void void_shard).
+- **Per-biome enemies** (`src/world/zones/biome-enemies.js`): 36 enemy
+  types, 3-4 per biome. Difficulty scales: verdant slime (2 HP) →
+  void rift_lord (24 HP). 9 body shapes (slime, bug, worm, bird,
+  wisp, beast, wraith, golem, column).
+
+#### Endgame (Phase 34)
+- **10 challenge modes** (`src/systems/endgame.js`): endless, hardcore,
+  speedrun (10 min), glass_cannon (1 HP / 10x dmg), no_spells,
+  endless_boss, ironman (hardcore + no save + 30 min), pacifist
+  (0 kills), nightmare (+50% HP/dmg), random.
+- **Endless waves** scale: enemyHpMul, enemyDmgMul, enemyCount
+  (capped 50), xpMul.
+- **Leaderboard** (localStorage `lumina-leaderboard-v1`):
+  load/save/add/clear, top scores by mode, weighted score formula.
+
+### Tests
+- 7 new test files: `equipment.test.mjs`, `magic.test.mjs`,
+  `crafting.test.mjs`, `skill-tree.test.mjs`, `achievement.test.mjs`,
+  `biome-variety.test.mjs`, `endgame.test.mjs`
+- Total: 213 → **276 assertions** across 32 test files, all green
+
+### Verified
+- `npm test`: 276/276 grün
+- All new modules pass `node --check`
+- 7 commits on `main` (Phases 28-34)
+
 ## [Unreleased] — Lane B audio + map sprint
 
 ### Added (Phase 20-27)

@@ -47,6 +47,13 @@ Evolution des Spiels in 9 Phasen. Jede Phase endet mit einem lauffähigen Spiel,
 | **25** | Atmosphere: Day/Night Cycle + Per-Biome Weather | 1 | ✅ |
 | **26** | Maps: Secret Areas + 10 Hidden Mini-Bosses (one per biome) | 1 | ✅ |
 | **27** | UX: Photo Mode (PNG download) + 10s Replay Buffer | 1 | ✅ |
+| **28** | Systems: Equipment (6 slots, 5 rarities, 24 templates, stat bonuses) | 1 | ✅ |
+| **29** | Systems: Magic (3 schools, 12 spells, MP + regen, mastery) | 1 | ✅ |
+| **30** | Systems: Crafting (4 stations, 30+ recipes, 17 materials) | 1 | ✅ |
+| **31** | Progression: Skill Tree (3 branches, 24 nodes, 2 capstones each) | 1 | ✅ |
+| **32** | Progression: Achievement System (55 across 5 categories) | 1 | ✅ |
+| **33** | Variety: Per-Biome Trees (23 variants) + Per-Biome Enemies (36 types) | 1 | ✅ |
+| **34** | Endgame: 10 Challenge Modes + localStorage Leaderboard | 1 | ✅ |
 
 **Total: 27 Commits done, 0 Phasen geplant, ~18h done = ~18h**
 
