@@ -2,9 +2,75 @@
 
 Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
-## [Unreleased] — Phase 19+ in Planung
+## [Unreleased] — Lane B audio + map sprint
 
-Siehe [`ROADMAP.md`](./ROADMAP.md) für die offene Roadmap.
+### Added (Phase 20-27)
+
+#### Audio
+- **Per-biome ambient music** (`src/engine/music.js`): 10 unique 3-layer
+  tracks (pad + arpeggio + texture) synthesized via Web Audio API.
+  Crossfade on zone change.
+- **Adaptive combat music** (Phase 21): tension layer fades in
+  based on enemy proximity, combat layer triggers on hit/damage
+  with percussion + melody. Decays after 4s of no combat.
+- **Voice barks** (Phase 22): 12 procedural vocal-style SFX via
+  formant synthesis (hit, hit_critical, miss, levelup, lowhp,
+  death, pickup, portal, boss, parry, combo, ultimate).
+  Triggered by game events (damage, attack, level-up, pickup,
+  zone change, boss spawn, death).
+- Per-biome music scales: verdant A-minor pentatonic, dunes
+  G-minor, peaks C-major, mire F-dorian, ember D-minor, plus
+  crystal/sky/reef/haunted/void phrygian/lydian/mixolydian
+
+#### Maps
+- **5 new biomes** (Phase 23): Kristallhöhlen (underground, glowing
+  crystals), Himmeltempel (floating islands, pastel clouds),
+  Gezeitenriff (underwater coral), Geisterruinen (purple mist),
+  Leerenspalt (cosmic void, NEW hardest zone at 2.2 difficulty)
+- **Procedural dungeon generation** (Phase 24): 3 dungeon types
+  (crypt, mine, tower) with deterministic layout per seed.
+  Constrained random walk with 8-12 rooms, L-shaped corridors,
+  entrance + boss + exit guarantee. Validates in-bounds.
+- **Day/night cycle** (Phase 25): 10-min real-time = full 24h
+  cycle. Sky color shifts (night→dawn→day→dusk), fog density
+  varies, sun position drives directional light, ambient
+  intensity follows time-of-day curve.
+- **Per-biome weather** (Phase 25): verdant rain/fog, dunes
+  sandstorm, peaks snow/fog, mire fog/drizzle, ember ash/
+  ember-rain, crystal glow/sparkle, reef drizzle/current,
+  haunted mist, void void-storm/rift. State persists across
+  zone visits.
+- **10 secret areas** (Phase 26): one hidden mini-boss per
+  biome. Verdant Treant, Sand King, Frost Lord, Miremother,
+  Titan Forger, Crystal Warden, Sky Seraph, Kraken Lord,
+  Shadow Self (mirrors player), The Architect (final boss,
+  HP 50). Each has unique loot drops + codex unlocks.
+
+#### UX
+- **Photo mode** (Phase 27): `takePhoto(canvas)` captures the
+  game canvas as PNG and triggers a browser download via
+  temp anchor. iOS Safari fallback to window.open.
+- **Replay buffer** (Phase 27): 10s @ 60fps = 600-frame
+  circular buffer. Records player position + camera yaw +
+  current zone. `getHighlights()` for 20-frame scrub UI,
+  `summarizeReplay()` for end-screen stats (zones visited,
+  max distance, duration, frame count).
+
+### Tests
+- 8 new test files: `music.test.mjs`, `voice.test.mjs`,
+  `zones.test.mjs` (updated), `dungeon-gen.test.mjs`,
+  `sky.test.mjs`, `secret-areas.test.mjs`, `photo-replay.test.mjs`
+- Total: 99 → **145 assertions**, all green
+- 16 new files, ~3500 LOC added
+
+### Verified
+- `npm test`: 145/145 grün
+- All new modules pass `node --check`
+- Lane B is complete: every phase (20-27) committed + pushed
+
+## [0.10.8] – 2026-08-01
+
+### Added (Phase 19 — Open World)
 
 ## [0.10.8] – 2026-08-01
 
