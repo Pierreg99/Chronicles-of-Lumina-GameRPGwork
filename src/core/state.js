@@ -57,6 +57,13 @@ export const state = {
   visitedZones: new Set(['verdant']),
   mapCode: null,
   era: 1, // Evoland-style era: 1=8-bit, 2=16-bit, 3=3D
+  // Phase 28+: equipment + magic
+  equipment: {},    // { helm, chest, legs, boots, gloves, ring, weapon } → item
+  baseStats: { maxHp: 6, maxMana: 20, attackDamage: 1, attackSpeed: 0.18, critChance: 0.05, manaRegen: 1.0 },
+  mana: 20,
+  skillPoints: 0,
+  // Phase 31+: skill tree — branches unlocked + per-node level
+  skillTree: { krieger: [], magier: [], schurke: [] },
 };
 
 /** @returns {boolean} */
