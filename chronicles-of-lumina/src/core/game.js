@@ -61,6 +61,7 @@ import { Tutorial }        from '../ui/tutorial.js';
 import { CodexPanel }      from '../ui/codex-panel.js';
 import { SettingsPanel }   from '../ui/settings-panel.js';
 import { ZonePicker }      from '../ui/zone-picker.js';
+import { EquipmentPanel }  from '../ui/equipment-panel.js';
 import { createPerfOverlay, wantsPerfOverlay } from '../ui/perf-overlay.js';
 import { applyEraPostProcess, currentEra, ERAS, advanceEra } from './era.js';
 import { EraPortal } from '../entities/era-portal.js';
@@ -189,6 +190,7 @@ export class Game {
     this.codexPanel = new CodexPanel(this.bus, this.codex);
     this.settingsPanel = new SettingsPanel();
     this.zonePicker = new ZonePicker(this.bus);
+    this.equipmentPanel = new EquipmentPanel();
 
     const tutorial = new Tutorial(this.bus);
     tutorial.register('move',     (s) => s.time > 1  && s.time < 2,  'Bewege Aren mit WASD oder den Pfeiltasten.');
