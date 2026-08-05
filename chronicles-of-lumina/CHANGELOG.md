@@ -2,9 +2,65 @@
 
 Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
-## [Unreleased] — Lane C vertical-depth sprint
+## [Unreleased] — Lane D story & content depth sprint
 
-### Added (Phase 28-34)
+### Added (Phase 35-40)
+
+#### NPCs & Dialog (Phase 35)
+- **NPC system** (`src/systems/npc.js`): 12 roles, 13 named NPCs
+  across 7 biomes, 21 dialog trees with branching choices,
+  conditional unlocks (level/gold/items) and actions
+  (giveItem, takeItem, giveGold, startQuest, completeQuest,
+  giveXp, giveSkillPoint, openShop, rest).
+- 4 shop inventories linked to vendors (Mira, Iron, Yarrow, Lyra).
+- 3 class trainers (Ascheklinge Krieger / Lyric Magier / Schatten Schurke).
+
+#### Quests (Phase 36)
+- **Quest system** (`src/systems/quest.js`): 25 quests across 5 types
+  (5 main, 15 side, 3 daily, 2 hidden), objective tracking for
+  collect/kill/craft/visit/travel/interact/discover, prereq chains,
+  reward distribution (xp/gold/items/skillPoints).
+- Main chain: `q_collect_crystals` -> `q_purify_shrine` -> `q_defeat_architect`.
+
+#### Story (Phase 37)
+- **5-chapter story arc** (`src/systems/story.js`): ch_intro -> ch_call ->
+  ch_shrine -> ch_void -> ch_end. Unlock conditions check crystals,
+  quest completion, boss defeats.
+- 12 cutscene types (fade, dialog, camera, music, ritual, cinematic, teleport, boss_intro, credits, NG+ offer).
+- `CutscenePlayer` class — state machine that advances through scenes.
+
+#### Boss Dialog (Phase 38)
+- **15 boss voice lines** (`src/systems/boss-dialog.js`): 5 story bosses
+  + 10 secret mini-bosses, each with intro / 2-4 taunts / death /
+  victory text. Stats: hp, damage, range, aggro.
+- `bossTier` difficulty classifier (easy/medium/hard/story) and
+  `bossesByDifficulty` sorting.
+
+#### Daily Challenge (Phase 39)
+- **10 daily challenges** (`src/systems/daily-challenge.js`): rotating
+  deterministically by date. Same day = same challenge for everyone.
+- FNV-1a hash for daily seed (map generation).
+- `applyDailyBonus` rewards xpMul/goldMul on completion.
+- `dailyStreak` tracks consecutive days (localStorage).
+
+#### New Game+ (Phase 40)
+- **6 NG+ tiers** (`src/systems/new-game-plus.js`): 0 (base), NG+1..NG+5 Hölle.
+- Difficulty scales: enemyHpMul 1.0-4.0, enemyDmgMul 1.0-3.0, xpMul 1.0-4.0, goldMul 1.0-3.0.
+- Carry over: equipment (rarity bumped +1), skill tree, achievements.
+- Partial carry: 50% inventory, 30% gold.
+- Reset: hp/mana/xp/level, quests, bosses, visited zones.
+
+### Tests
+- 6 new test files: `npc.test.mjs`, `quest.test.mjs`, `story.test.mjs`,
+  `boss-dialog.test.mjs`, `daily-challenge.test.mjs`, `new-game-plus.test.mjs`
+- Total: 276 → **397 assertions** across 38 test files, all green
+
+### Verified
+- `npm test`: 397/397 grün
+- All new modules pass `node --check`
+- 7 commits on `main` (Phases 35-40 + doc-update)
+
+## [Unreleased] — Lane C vertical-depth sprint
 
 #### Equipment & Magic (Phase 28-29)
 - **Equipment system** (`src/systems/equipment.js`): 6 slots (head/chest/legs/boots/weapon/trinket),

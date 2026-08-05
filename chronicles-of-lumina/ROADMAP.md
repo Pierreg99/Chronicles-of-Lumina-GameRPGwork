@@ -54,6 +54,12 @@ Evolution des Spiels in 9 Phasen. Jede Phase endet mit einem lauffähigen Spiel,
 | **32** | Progression: Achievement System (55 across 5 categories) | 1 | ✅ |
 | **33** | Variety: Per-Biome Trees (23 variants) + Per-Biome Enemies (36 types) | 1 | ✅ |
 | **34** | Endgame: 10 Challenge Modes + localStorage Leaderboard | 1 | ✅ |
+| **35** | NPCs: 13 named characters, 21 dialog trees, 4 shop inventories | 1 | ✅ |
+| **36** | Quests: 25 quests (5 main / 15 side / 3 daily / 2 hidden), prereq chains | 1 | ✅ |
+| **37** | Story: 5-chapter arc with 12 cutscene types, CutscenePlayer state machine | 1 | ✅ |
+| **38** | Boss Voice: 15 bosses with intro / taunts / death / victory lines | 1 | ✅ |
+| **39** | Daily Challenge: 10 challenges, rotating seed, streak tracking | 1 | ✅ |
+| **40** | New Game+: 6 tiers (NG+1..5 Hölle), carry-over + rarity bump | 1 | ✅ |
 
 **Total: 27 Commits done, 0 Phasen geplant, ~18h done = ~18h**
 

@@ -1,6 +1,6 @@
 # Chronicles of Lumina
 
-![Version](https://img.shields.io/badge/version-0.11.0-blue) ![Phases](https://img.shields.io/badge/phases-34%2F34-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R7-success) ![Tests](https://img.shields.io/badge/tests-276%2F276-success) ![Assets](https://img.shields.io/badge/assets-procedural-success) ![Bot](https://img.shields.io/badge/bot-discord.js_v14-7B2FBE) ![Pages](https://img.shields.io/badge/pages-live-success)
+![Version](https://img.shields.io/badge/version-0.12.0-blue) ![Phases](https://img.shields.io/badge/phases-40%2F40-success) ![Refactor](https://img.shields.io/badge/refactor-R1--R7-success) ![Tests](https://img.shields.io/badge/tests-397%2F397-success) ![Assets](https://img.shields.io/badge/assets-procedural-success) ![Bot](https://img.shields.io/badge/bot-discord.js_v14-7B2FBE) ![Pages](https://img.shields.io/badge/pages-live-success)
 
 <p align="center">
   <img src="docs/showcase.svg" alt="Chronicles of Lumina" width="100%">
@@ -15,7 +15,7 @@
 
 3D-Browser-Action-Adventure im farbenfrohen JRPG-Fantasy-Stil. Vanilla JS + Three.js, ES-Module, kein Build-Step.
 
-> Vertikale Slice Demo: Sammle 10 Lichtkristalle, besiege den Nebel-Koloss, reinige den Schrein. Erkunde **10 Biome** über **Portale**, höre **per-Biom synthetisierte Musik**, generiere **prozedurale Dungeons**, finde **10 versteckte Mini-Bosse**, **rüste dich aus** mit 6 Slot-Equipment und 5 Seltenheitsstufen, **wirf Magie** aus 3 Schulen mit 12 Zaubern, **braue Tränke** an 4 Stationen, **steige auf** durch ein 3-Klassen-Skillbaum mit 24 Knoten, **sammle 55 Erfolge**, und fordere dich selbst mit **10 Endgame-Modi** plus **Highscore-Bestenliste** heraus.
+> Vertikale Slice Demo: Sammle 10 Lichtkristalle, besiege den Nebel-Koloss, reinige den Schrein. **Erkunde 10 Biome** mit eigener Musik und Wetter, **sprich mit 13 NPCs** in 21 Dialogbäumen, **nimm 25 Quests** an, **erlebe eine 5-Kapitel-Story** mit Cutscenes, **höre 15 Bosse** mit eigenen Intros und Taunts, **spiele 10 tägliche Challenges** mit Streak, und fordere dich selbst mit **6 NG+ Schwierigkeitsstufen** plus 10 Endgame-Modi und Highscore-Bestenliste.
 
 ## Quickstart
 
