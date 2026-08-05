@@ -873,6 +873,66 @@ html[data-show-fps="1"]::after {
 }
 
 /* ============================================================
+   Phase 29+ — Spell Bar
+   ============================================================ */
+#spell-bar {
+  display: flex;
+}
+.spell-mana {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--xp);
+  font-weight: 500;
+  font-size: 0.85rem;
+  padding: 0 8px;
+}
+.spell-mana .icon { color: var(--xp); }
+.spell-divider {
+  width: 1px;
+  background: var(--border);
+  height: 28px;
+  margin: 0 4px;
+}
+.spell-slot {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-sm);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: border-color 0.15s, transform 0.1s;
+  cursor: pointer;
+  overflow: hidden;
+}
+.spell-slot:hover { border-color: var(--accent); transform: translateY(-2px); }
+.spell-slot.spell-disabled { opacity: 0.4; }
+.spell-slot.spell-empty { opacity: 0.3; }
+.spell-key {
+  position: absolute;
+  top: 2px; left: 4px;
+  font-size: 0.7rem;
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+.spell-cost {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.spell-cd {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 3px;
+  background: var(--xp);
+  box-shadow: 0 0 4px var(--xp-glow);
+}
+
+/* ============================================================
    Phase 28+ — Equipment + Stats panel
    ============================================================ */
 #equipment-panel .title {
