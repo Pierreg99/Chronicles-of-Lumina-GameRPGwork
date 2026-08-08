@@ -2,7 +2,7 @@
 
 3D-Browser-Action-Adventure, modular aufgebaut mit Vanilla JS + Three.js.
 
-> Hauptprojekt: **[Chronicles of Lumina](./chronicles-of-lumina/)** — eine eigenständige Fantasy-Welt im JRPG-Stil mit 5 thematischen Biomen, Portal-Navigation und URL-shared Custom-Maps.
+> Hauptprojekt: **[Chronicles of Lumina](./chronicles-of-lumina/)** — eine eigenständige Fantasy-Welt im JRPG-Stil mit **10 thematischen Biomen**, Portal-Navigation, URL-shared Custom-Maps, vollständiger Story, Quests, NPCs, Equipment, Magic, Crafting, Skill-Tree, Achievements und New Game+.
 
 ## Schnellstart
 
@@ -27,10 +27,10 @@ npx serve .
 
 | Bereich | Pfad | Inhalt |
 |---------|------|--------|
-| Spiel | [`chronicles-of-lumina/`](./chronicles-of-lumina/) | Vollständige ES-Modul-Architektur, 75+ JS-Dateien, prozedurale Assets |
+| Spiel | [`chronicles-of-lumina/`](./chronicles-of-lumina/) | Vollständige ES-Modul-Architektur, 100+ JS-Dateien, prozedurale Assets |
 | Doku | [`chronicles-of-lumina/README.md`](./chronicles-of-lumina/README.md) | Modul-Architektur, Steuerung, Erweiterungs-Patterns |
-| Plan | [`chronicles-of-lumina/ROADMAP.md`](./chronicles-of-lumina/ROADMAP.md) | 19 Phasen done, alle Quality-Achsen abgehakt |
-| Tests | `npm test` (in `chronicles-of-lumina/`) | 99 Assertions in 8 Test-Files, alle grün |
+| Plan | [`chronicles-of-lumina/ROADMAP.md`](./chronicles-of-lumina/ROADMAP.md) | 40 Phasen done |
+| Tests | `npm test` (in `chronicles-of-lumina/`) | **397 Assertions** in 38 Test-Files, alle grün |
 | Discord-Bot | [`chronicles-of-lumina/bot/`](./chronicles-of-lumina/bot/) | LuminaBot (discord.js v14, 8 Commands, 4 Events) |
 | Desktop | [`chronicles-of-lumina/desktop/`](./chronicles-of-lumina/desktop/) | Electron-Wrapper |
 
@@ -44,36 +44,41 @@ npx serve .
 | Shift | Ausweichrolle |
 | E | Interaktion (Schrein, Elder) **oder Portal** |
 | Esc / P | Pause |
+| I | Inventar |
+| C | Codex |
+| U | Equipment |
+| J | Skill-Tree |
 
 Mobile: virtueller Joystick + Aktions-Buttons.
 
 ## Tech-Stack
 
 - **JavaScript (ES-Module)** — kein Build-Step, keine Bundler
-- **Three.js 0.160** via Importmap (CDN)
-- **Web Audio API** — synthetisierte SFX, keine Audio-Assets
+- **Three.js** via Importmap (CDN)
+- **Web Audio API** — synthetisierte SFX + prozedurale Musik, keine Audio-Assets
 - **WebGL** für 3D, mit Fallback-Hinweis bei fehlender Unterstützung
-- **LocalStorage** für Settings, Codex, Map-Codes
+- **LocalStorage** für Settings, Codex, Map-Codes, Progress
 
 ## Highlights
 
-- **5 thematische Biome** — Smaragdwald / Golddünen / Sturmgipfel / Nebelmarsch / Glutkessel
+- **10 thematische Biome** — Smaragdwald / Golddünen / Sturmgipfel / Nebelmarsch / Glutkessel + Kristallhöhlen / Himmeltempel / Gezeitenriff / Geisterruinen / Leerenspalt
 - **URL-shared Custom Maps** — `?map=verdant:20473104` lädt geteilte Karten
-- **99 Tests, alle grün** — 8 Test-Files, 0 Frameworks
+- **397 Tests, alle grün** — custom Runner, 0 Frameworks
 - **Zero-Build** — pure ES-Module, läuft aus jedem statischen Host
 - **Multi-Platform** — Web, Android (PWA), Desktop (Electron)
+- **Vollständige Progression** — Equipment, Magic (3 Schools), Crafting, Skill-Tree, Achievements, NG+, Daily Challenges, Endgame-Modi
 
 ## Architektur
 
 ```
 chronicles-of-lumina/src/
 ├── main.js           # 5-Zeilen-Bootstrap
-├── core/             # Game, Loop, Config, Constants, State, EventBus, Settings, HitStop, Screen-State
-├── engine/           # Three.js, Audio, Input, Camera (Shake/Kick), Lighting, Materials
-├── world/            # World-Builder, Terrain, Village, Forest, Shrine, Environment, Props, Particles, Minimap, Zones, Zone-Portals
+├── core/             # Game, Loop, Config, Constants, State, EventBus, Settings, HitStop, Screen-State, i18n
+├── engine/           # Three.js, Audio, Music, Voice, Input, Camera, Lighting, Materials
+├── world/            # World-Builder, Terrain, Village, Forest, Shrine, Environment, Props, Particles, Minimap, Zones, Zone-Portals, Dungeons, Secret Areas
 ├── entities/         # Player, Enemies, Boss, Projectile, Loot, NPCs
-├── systems/          # Combat, Quest, XP, Inventory, Dialogue, Interaction, Feedback, Codex, Spawn
-├── ui/               # HUD, Menus, Panels, Icons, Zone-Picker, Settings, Mobile-Controls
+├── systems/          # Combat, Quest, XP, Inventory, Dialogue, Interaction, Feedback, Codex, Spawn, Equipment, Magic, Crafting, Skill-Tree, Achievement, Story, NPC, Boss-Dialog, Daily-Challenge, New-Game-Plus, Endgame
+├── ui/               # HUD, Menus, Panels, Icons, Zone-Picker, Settings, Mobile-Controls, Spell-Bar, Equipment-Panel
 └── utils/            # Math, Random, Pool, Tween, DOM, Time, UV, AssetGen
 ```
 
@@ -81,31 +86,8 @@ Bottom-up Abhängigkeiten, eine Source of Truth für Balancing (`core/config.js`
 
 ## Roadmap
 
-27 Phasen done (siehe [`chronicles-of-lumina/ROADMAP.md`](./chronicles-of-lumina/ROADMAP.md) für Details):
-
-| # | Phase | Status |
-|---|-------|--------|
-| 0–9 | Plumbing → Polish → Doku | ✅ |
-| R1–R7 | Refactor (Systems auf `game`-Param, Monkey-Patches weg, etc.) | ✅ |
-| 10 | Prozedurale Asset-Generierung | ✅ |
-| 11 | LuminaBot Discord-Bot | ✅ |
-| 12 | Hygiene (Dead-Code, CI-Workflows) | ✅ |
-| 13 | JSDoc Type-Safety | ✅ |
-| 14 | GitHub-Pages + Release v0.10.3 | ✅ |
-| 15 | Security (SECURITY.md, Dependabot, npm-audit) | ✅ |
-| 16 | Test-Coverage (53 → 74 Assertions) | ✅ |
-| 17 | i18n (t() + DE/EN Locales) | ✅ |
-| 18 | Quality + Performance (Audio-Sprite, Object-Pool) | ✅ |
-| 19 | Open World: 5 Biome + Portale + URL Map-Codes | ✅ |
-| 20 | Audio: Per-Biome Ambient Music (Web Audio synth) | ✅ |
-| 21 | Audio: Adaptive Combat Music (tension + combat layers) | ✅ |
-| 22 | Audio: Voice Barks (12 formant-synth effects) | ✅ |
-| 23 | Maps: 5 new biomes (crystal, sky, reef, haunted, void) | ✅ |
-| 24 | Maps: Procedural Dungeon Generation | ✅ |
-| 25 | Atmosphere: Day/Night Cycle + Weather | ✅ |
-| 26 | Maps: Secret Areas + Hidden Mini-Bosses | ✅ |
-| 27 | UX: Photo Mode + 10s Replay Buffer | ✅ |
+40 Phasen done (siehe [`chronicles-of-lumina/ROADMAP.md`](./chronicles-of-lumina/ROADMAP.md) und [`CHANGELOG.md`](./chronicles-of-lumina/CHANGELOG.md) für Details).
 
 ## Lizenz
 
-MIT — siehe [`LICENSE`](./LICENSE) (TODO: hinzufügen, falls öffentlich).
+MIT — siehe [`LICENSE`](./LICENSE).
