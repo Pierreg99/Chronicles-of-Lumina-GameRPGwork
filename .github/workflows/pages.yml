@@ -1,27 +1,30 @@
-# pages.yml — build game and push static output to gh-pages branch on every push.
-# Uses peaceiris/actions-gh-pages with explicit exclude_assets to keep
-# gh-pages lean (no bot/, desktop/, tests/, docs/, etc.)
-name: Build and Deploy to GitHub Pages
+# pages.yml — modern GitHub Pages deploy via actions/deploy-pages
+# After first successful run, set Settings → Pages → Source to "GitHub Actions".
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+      - name: Setup Node
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: '20'
 
@@ -33,24 +36,41 @@ jobs:
         working-directory: chronicles-of-lumina
         run: npm run build-pages
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@4c82c7262fae7c69e985454e2c815482877cc12a # v3.9.3, SHA-pinned
+      - name: Prepare publish directory
+        run: |
+          mkdir -p _site
+          # Copy game assets, skip non-web folders
+          rsync -a \
+            --exclude 'node_modules' \
+            --exclude 'bot' \
+            --exclude 'desktop' \
+            --exclude 'tests' \
+            --exclude 'docs' \
+            --exclude '*.md' \
+            --exclude 'package*.json' \
+            --exclude 'jsconfig.json' \
+            --exclude 'build-pages.mjs' \
+            --exclude '.gitignore' \
+            chronicles-of-lumina/ _site/
+          # Keep PWA manifest
+          if [ -f chronicles-of-lumina/manifest.webmanifest ]; then
+            cp chronicles-of-lumina/manifest.webmanifest _site/
+          fi
+          # Ensure .nojekyll so underscore paths are served
+          touch _site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d16ff0b8d1c5cde0a9767c8 # v3.0.1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./chronicles-of-lumina
-          destination_dir: ''
-          allow_empty_commit: true
-          exclude_assets: |
-            node_modules/**
-            bot/**
-            desktop/**
-            tests/**
-            docs/**
-            *.md
-            *.json
-            !manifest.webmanifest
-            jsconfig.json
-            package*.json
-            build-pages.mjs
-            .gitignore
-            .nojekyll
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ec41091b5d8c6a9fcfcc669a0f91 # v4.0.5
