@@ -1,6 +1,7 @@
 // tests/era.test.mjs — verifies the Evoland-style era state machine.
 import { test } from './_runner.mjs';
 import { ERAS, ERA_INFO, currentEra, advanceEra, setEra, allEras, currentEraInfo } from '../src/core/era.js';
+import { applyEraPostProcess } from '../src/engine/era-renderer.js';
 import { state } from '../src/core/state.js';
 
 // Reset state before each test
@@ -66,4 +67,8 @@ test('era: pixelSize decreases as we progress', () => {
   if (ERA_INFO[1].pixelSize !== 4) throw new Error('era 1 should be 4');
   if (ERA_INFO[2].pixelSize !== 2) throw new Error('era 2 should be 2');
   if (ERA_INFO[3].pixelSize !== 1) throw new Error('era 3 should be 1');
+});
+
+test('era-renderer: exports applyEraPostProcess function', () => {
+  if (typeof applyEraPostProcess !== 'function') throw new Error('expected applyEraPostProcess to be a function');
 });
