@@ -1,5 +1,4 @@
-# pages.yml — modern GitHub Pages deploy via actions/deploy-pages
-# After first successful run, set Settings → Pages → Source to "GitHub Actions".
+# pages.yml — modern GitHub Pages deploy via actions/deploy-pages & gh-pages branch fallback
 name: Deploy to GitHub Pages
 
 on:
@@ -8,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -59,6 +58,12 @@ jobs:
           # Ensure .nojekyll so underscore paths are served
           touch _site/.nojekyll
 
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d16ff0b8d1c5cde0a9767c8 # v3.0.1
         with:
@@ -73,4 +78,5 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
+        continue-on-error: true
         uses: actions/deploy-pages@d6db90164ac5ec41091b5d8c6a9fcfcc669a0f91 # v4.0.5

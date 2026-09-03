@@ -5,6 +5,7 @@
 // and what controls are available. Gameplay is identical across eras.
 
 import { state } from './state.js';
+export { applyEraPostProcess } from '../engine/era-renderer.js';
 
 /** @typedef {1|2|3} EraId */
 
