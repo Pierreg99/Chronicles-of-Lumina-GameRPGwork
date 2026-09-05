@@ -13,7 +13,7 @@ on GitHub receives security updates. Older commits and tags are not patched.
 ## Reporting a Vulnerability
 
 **Preferred:** Open a private security advisory via GitHub:
-https://github.com/Pierreg99/Lumina-Game/security/advisories/new
+https://github.com/Pierreg99/Chronicles-of-Lumina-GameRPGwork/security/advisories/new
 
 **Alternative:** Email the maintainer (Cryofreee / Pierreg99) — see
 `.well-known/security.txt` for the current address.

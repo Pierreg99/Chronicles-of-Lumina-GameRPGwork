@@ -1,5 +1,5 @@
-// engine/input.js — keyboard + mouse drag + touch + virtual joystick.
-// Reads from a single DOM element (#joy + 3 .actbtn) on mobile.
+// engine/input.js — keyboard + mouse drag + touch + virtual joystick + lookpad.
+// Reads from #joy, #lookpad, and action buttons on mobile.
 
 export class Input {
   constructor(canvas) {
@@ -14,6 +14,7 @@ export class Input {
     this.pauseEdge = false;
     this.inventoryEdge = false;
     this.codexEdge = false;
+    this.cameraYawDelta = 0;
     this._install();
   }
 
@@ -44,19 +45,22 @@ export class Input {
       }
     });
 
-    // Virtual joystick
+    // Virtual joystick — radius derived from element size (not hard-coded 60)
     const joyEl = document.getElementById('joy');
     const knob = joyEl && joyEl.querySelector('.knob');
     const move = (t) => {
       if (!joyEl) return;
       const r = joyEl.getBoundingClientRect();
-      let dx = t.clientX - (r.left + 60);
-      let dy = t.clientY - (r.top + 60);
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const maxR = Math.max(24, Math.min(r.width, r.height) * 0.37);
+      let dx = t.clientX - cx;
+      let dy = t.clientY - cy;
       const len = Math.hypot(dx, dy);
-      if (len > 44) { dx = dx / len * 44; dy = dy / len * 44; }
+      if (len > maxR) { dx = dx / len * maxR; dy = dy / len * maxR; }
       if (knob) knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-      this.joy.x = dx / 44;
-      this.joy.y = dy / 44;
+      this.joy.x = dx / maxR;
+      this.joy.y = dy / maxR;
       this.joy.active = true;
     };
     if (joyEl) {
@@ -66,15 +70,39 @@ export class Input {
         this.joy = { x: 0, y: 0, active: false };
         if (knob) knob.style.transform = 'translate(-50%,-50%)';
       });
+      joyEl.addEventListener('touchcancel', () => {
+        this.joy = { x: 0, y: 0, active: false };
+        if (knob) knob.style.transform = 'translate(-50%,-50%)';
+      });
+    }
+
+    // Lookpad — right-side drag for camera yaw on mobile
+    const look = document.getElementById('lookpad');
+    if (look) {
+      let lookLastX = 0;
+      look.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        lookLastX = e.touches[0].clientX;
+      }, { passive: false });
+      look.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const x = e.touches[0].clientX;
+        this.cameraYawDelta += (x - lookLastX) * 0.006;
+        lookLastX = x;
+      }, { passive: false });
     }
 
     const bind = (id, fn) => {
       const el = document.getElementById(id);
-      if (el) el.addEventListener('touchstart', (e) => { e.preventDefault(); fn(); }, { passive: false });
+      if (!el) return;
+      el.addEventListener('touchstart', (e) => { e.preventDefault(); fn(); }, { passive: false });
+      // Desktop / pointer fallback for testing with mouse
+      el.addEventListener('mousedown', (e) => { e.preventDefault(); fn(); });
     };
     bind('btn-atk', () => { this.attackEdge = true; });
     bind('btn-int', () => { this.interactEdge = true; });
     bind('btn-roll', () => { this.dodgeEdge = true; });
+    bind('btn-pause', () => { this.pauseEdge = true; });
   }
 
   // ── polled values used each frame ────────────────────────
@@ -94,5 +122,5 @@ export class Input {
   consumePause()     { const v = this.pauseEdge;  this.pauseEdge  = false; return v; }
   consumeInventory() { const v = this.inventoryEdge; this.inventoryEdge = false; return v; }
   consumeCodex()     { const v = this.codexEdge;     this.codexEdge     = false; return v; }
-  consumeCameraYaw() { const v = this.cameraYawDelta || 0; this.cameraYawDelta = 0; return -v; } // sign flipped
+  consumeCameraYaw() { const v = this.cameraYawDelta || 0; this.cameraYawDelta = 0; return -v; }
 }

@@ -33,7 +33,7 @@ python3 -m http.server 8080
 **Lieferumfang:** `index.html`, `src/`, `assets/`, `manifest.webmanifest`, `sw.js`, `tests/`
 
 **URLs:**
-- Production: `https://<user>.github.io/Lumina-Game/`
+- Production: `https://pierreg99.github.io/Chronicles-of-Lumina-GameRPGwork/`
 - Eigener Host: `https://lumina.example.com/`
 
 **Voraussetzungen:** keinerlei — Vanilla JS, Three.js via CDN-Import.

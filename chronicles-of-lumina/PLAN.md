@@ -93,7 +93,7 @@ grep -rn "@v[0-9]" .github/workflows/            # sollte 0 Treffer (nur @<sha>)
   - Title: "v0.10.0 — LuminaBot + Asset-Gen"
   - Body: auto-generated via `/patch`-Befehl (siehe Phase 11)
   - Attachments: keine (alles prozedural)
-- [ ] Demo-Link in README: `https://pierreg99.github.io/Lumina-Game/`
+- [ ] Demo-Link in README: `https://pierreg99.github.io/Chronicles-of-Lumina-GameRPGwork/`
 - [ ] Social-Card / Open-Graph-Image: `docs/og-image.png` (1200×630, generiert via AssetGen.pwaIcon(512) + Title)
 
 ### Verifikation
@@ -134,7 +134,7 @@ grep -rn "@v[0-9]" .github/workflows/            # sollte 0 Treffer (nur @<sha>)
   Contact: mailto:cryofreee@example.com
   Expires: 2027-01-01T00:00:00.000Z
   Preferred-Languages: de, en
-  Canonical: https://github.com/Pierreg99/Lumina-Game/.well-known/security.txt
+  Canonical: https://github.com/Pierreg99/Chronicles-of-Lumina-GameRPGwork/.well-known/security.txt
   ```
 - [ ] CodeQL-Workflow (optional): `.github/workflows/codeql.yml` — analysiert JS/ESM
 - [ ] PR-Template: `.github/PULL_REQUEST_TEMPLATE.md` (kurz, checklist)

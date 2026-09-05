@@ -1,13 +1,13 @@
 {
   "name": "Chronicles of Lumina",
   "short_name": "Lumina",
-  "description": "A vanilla-JS + Three.js JRPG-browser-game.",
+  "description": "A vanilla-JS + Three.js JRPG-style 3D browser adventure.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "landscape",
-  "background_color": "#0c1118",
-  "theme_color": "#1d4d8a",
+  "orientation": "any",
+  "background_color": "#0F0F1A",
+  "theme_color": "#7C3AED",
   "lang": "de",
   "icons": [
     { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },

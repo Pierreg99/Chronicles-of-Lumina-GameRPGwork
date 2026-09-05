@@ -2,6 +2,30 @@
 
 Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [0.13.0] – 2026-09-06 — Immersive UX / Pages / polish
+
+### Added
+- **Boot loader** — mystical orb + progress bar while Three.js / modules boot; dismisses after `Game` constructs.
+- **Mobile lookpad** — invisible right-side drag zone for camera yaw (complements joystick).
+- **Mobile pause button** — quick Esc/P equivalent for touch.
+- **Clipboard util** (`src/utils/clipboard.js`) — Clipboard API → `execCommand` → prompt fallback for Seed-teilen.
+- **Tab auto-pause** — `visibilitychange` pauses when the document is hidden (battery / safety).
+- **Safe-area insets** — HUD / joystick / buttons respect `env(safe-area-inset-*)` on notched phones.
+- Unit tests for clipboard helper (+3 assertions).
+
+### Changed
+- Adaptive **pixel ratio** cap (1.5 on coarse pointer, 2 on desktop) to cut mobile fillrate.
+- Joystick radius derived from element size (no hard-coded 60px center).
+- HUD low-HP warning uses CSS class `hp-low` (animated pulse, reduce-motion aware).
+- PWA manifest theme/background aligned to Mystical Violet; SW cache → `lumina-v0.13.0`.
+- Docs / release / security links point at **this** repo’s Pages URL:
+  `https://pierreg99.github.io/Chronicles-of-Lumina-GameRPGwork/`
+- CI workflow renamed/clarified (`ci.yml`); Pages deploy unchanged (Actions → `_site`).
+
+### Verified
+- `npm test`: 401/401 green
+- Zero-build ES-module architecture preserved
+
 ## [0.12.0] – 2026-08-08 — Lane D story & content depth sprint
 
 ### Added (Phase 35-40)
