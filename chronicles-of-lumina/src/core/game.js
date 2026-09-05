@@ -3,6 +3,9 @@
 
 import * as THREE from 'three';
 
+// SkySystem mutates fog/background via globalThis.THREE (keeps sky.js Node-testable).
+globalThis.THREE = THREE;
+
 import { CONFIG }  from './config.js';
 import { EVENTS }  from './constants.js';
 import { EventBus } from './event-bus.js';

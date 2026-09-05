@@ -142,15 +142,37 @@ export class SkySystem {
 
     // Sky: blend curve color with zone's natural sky (30% zone, 70% curve)
     const skyColor = blendHex(skySample.color, baseZone.sky, 0.3);
-    this.scene.background = { r: (skyColor >> 16) & 0xff, g: (skyColor >> 8) & 0xff, b: skyColor & 0xff, hex: skyColor };
-
-    // Fog: use base zone fog color, expand far plane at night
-    if (!this.scene.fog) {
-      this.scene.fog = { color: { hex: baseZone.fog }, near: baseZone.fogNear || 20, far: baseZone.fogFar || 80 };
-    }
-    this.scene.fog.color = { hex: baseZone.fog };
+    const fogHex = baseZone.fog;
+    const baseNear = baseZone.fogNear || 20;
     const baseFar = baseZone.fogFar || 80;
-    this.scene.fog.far = baseFar * (0.7 + 0.3 * (1 - fogSample.mul));
+    const fogFar = baseFar * (0.7 + 0.3 * (1 - fogSample.mul));
+    const THREE = globalThis.THREE;
+
+    // Prefer real THREE.Color / Fog APIs (browser). Fake plain objects only for Node tests.
+    if (this.scene.background && typeof this.scene.background.setHex === 'function') {
+      this.scene.background.setHex(skyColor);
+    } else if (THREE?.Color) {
+      this.scene.background = new THREE.Color(skyColor);
+    } else {
+      this.scene.background = {
+        r: (skyColor >> 16) & 0xff,
+        g: (skyColor >> 8) & 0xff,
+        b: skyColor & 0xff,
+        hex: skyColor,
+      };
+    }
+
+    const fogColorApi = this.scene.fog && this.scene.fog.color;
+    if (fogColorApi && typeof fogColorApi.setHex === 'function') {
+      fogColorApi.setHex(fogHex);
+      if ('near' in this.scene.fog) this.scene.fog.near = baseNear;
+      this.scene.fog.far = fogFar;
+    } else if (THREE?.Fog) {
+      // Recreate if a prior buggy assign wiped the THREE.Color (getRGB crash).
+      this.scene.fog = new THREE.Fog(fogHex, baseNear, fogFar);
+    } else {
+      this.scene.fog = { color: { hex: fogHex }, near: baseNear, far: fogFar };
+    }
 
     // Update ambient + directional lights if they exist (real three.js)
     for (const child of this.scene.children || []) {

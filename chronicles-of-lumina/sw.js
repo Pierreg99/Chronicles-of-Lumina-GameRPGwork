@@ -2,7 +2,7 @@
 // Network-first for HTML and JS (so updates go live immediately).
 // Cache-first for images/assets (perf).
 
-const CACHE = 'lumina-v0.13.2';
+const CACHE = 'lumina-v0.13.3';
 const ASSETS = [
   './',
   './index.html',
