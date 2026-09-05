@@ -1,9 +1,8 @@
 // ui/hud.js — heart display + HP bar.
 //
 // Phase 9 visual refresh: hearts are now inline SVG icons (filled / outline).
-// The HP bar is driven by the player's actual hp/maxHp — previously it was
-// incorrectly rendering the crystal count, which is already shown in the
-// quest panel.
+// v0.13: low-HP warning uses a CSS class (hp-low) for pulse animation instead
+// of inline styles, so reduce-motion / theme tokens stay consistent.
 //
 // Subscribes to UI_REFRESH + SCREEN change. Renders declaratively from
 // render(player). main.js no longer needs to poke any DOM in the hearts path.
@@ -49,14 +48,7 @@ export class HUD {
     if (this.hpBarEl && p.maxHp > 0) {
       const pct = Math.max(0, Math.min(100, (p.hp / p.maxHp) * 100));
       this.hpBarEl.style.width = pct + '%';
-      // Switch bar color to warning when low HP
-      if (pct <= 30) {
-        this.hpBarEl.style.background = 'linear-gradient(90deg, #B45309, #F59E0B)';
-        this.hpBarEl.style.boxShadow = '0 0 8px rgba(245, 158, 11, 0.5)';
-      } else {
-        this.hpBarEl.style.background = '';
-        this.hpBarEl.style.boxShadow = '';
-      }
+      this.hpBarEl.classList.toggle('hp-low', pct <= 30);
     }
   }
 }

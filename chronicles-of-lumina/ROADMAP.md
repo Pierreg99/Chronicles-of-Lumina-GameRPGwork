@@ -1,6 +1,14 @@
-# Lumina-Game Roadmap
+# Chronicles of Lumina Roadmap
 
 Evolution des Spiels in 9 Phasen. Jede Phase endet mit einem lauffähigen Spiel, eigenem Commit und Push auf `main`.
+
+
+## v0.13.0 — Immersive polish (2026-09-06)
+
+- Boot loader, mobile lookpad + pause, safe-area HUD
+- Adaptive DPR, tab auto-pause, clipboard share fallbacks
+- Canonical GitHub Pages: https://pierreg99.github.io/Chronicles-of-Lumina-GameRPGwork/
+- Tests: 397 → 401
 
 ## Qualitätsachsen
 

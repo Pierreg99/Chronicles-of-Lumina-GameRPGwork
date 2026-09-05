@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>Chronicles of Lumina</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0F0F1A">
@@ -16,6 +16,16 @@
   </script>
 </head>
 <body>
+  <!-- Boot loader — dismissed once Game boots -->
+  <div id="boot-loader" role="status" aria-live="polite" aria-busy="true">
+    <div class="boot-inner">
+      <div class="boot-orb" aria-hidden="true"></div>
+      <div class="boot-title">Chronicles of Lumina</div>
+      <div class="boot-sub">Welt wird gewebt…</div>
+      <div class="boot-bar" aria-hidden="true"><div class="boot-bar-fill"></div></div>
+    </div>
+  </div>
+
   <canvas id="game"></canvas>
   <canvas id="era-canvas" style="position:fixed;inset:0;width:100vw;height:100vh;display:none;pointer-events:none;z-index:1"></canvas>
   <div id="flash-overlay"></div>
@@ -95,18 +105,25 @@
   </div>
 
   <!-- Mobile controls -->
-  <div id="mobile-ui">
-    <div class="joystick" id="joy"><div class="knob"></div></div>
+  <div id="mobile-ui" aria-hidden="true">
+    <button type="button" class="actbtn mobile-pause" id="btn-pause" aria-label="Pause">
+      <span class="icon icon-md" data-icon="pause"></span>
+      <span>Pause</span>
+    </button>
+    <div class="lookpad" id="lookpad" aria-label="Kamera drehen"></div>
+    <div class="joystick" id="joy" role="application" aria-label="Bewegung">
+      <div class="knob"></div>
+    </div>
     <div class="actbtns">
-      <div class="actbtn" id="btn-int">
+      <div class="actbtn" id="btn-int" role="button" aria-label="Interaktion">
         <span class="icon icon-md" data-icon="crosshair"></span>
         <span>E</span>
       </div>
-      <div class="actbtn" id="btn-roll">
+      <div class="actbtn" id="btn-roll" role="button" aria-label="Ausweichrolle">
         <span class="icon icon-md" data-icon="shield"></span>
         <span>Rollen</span>
       </div>
-      <div class="actbtn" id="btn-atk">
+      <div class="actbtn" id="btn-atk" role="button" aria-label="Angriff">
         <span class="icon icon-lg" data-icon="sword"></span>
         <span>ATK</span>
       </div>
@@ -152,6 +169,7 @@
       <span class="icon" data-icon="play"></span>
       Abenteuer beginnen
     </button>
+    <div class="boot-version" id="start-version">v0.13.0 · Zero-Build ES Modules</div>
   </div>
 
   <!-- Pause -->

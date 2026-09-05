@@ -440,6 +440,13 @@ export class Game {
 
   // 6. Pause wiring — Esc/Pause button flips screen state.
   _buildPauseWiring() {
+    // v0.13: auto-pause when the tab is hidden — saves battery / GPU and
+    // prevents the player walking into hazards while alt-tabbed.
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && state.screen === 'playing') {
+        transition(SCREEN.PAUSED);
+      }
+    });
     window.addEventListener('resize', () => {
       this.renderer.resize();
       this.cameraRig.setAspect(window.innerWidth / window.innerHeight);

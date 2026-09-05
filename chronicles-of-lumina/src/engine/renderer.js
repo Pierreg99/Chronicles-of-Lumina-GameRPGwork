@@ -1,21 +1,35 @@
 // engine/renderer.js — Three.js WebGL renderer + resize handling + WebGL fallback.
+// v0.13: caps DPR lower on coarse-pointer (mobile) devices; pauses shadow
+// quality work isn't needed — just avoid burning fillrate on high-DPI phones.
 
 import * as THREE from 'three';
+
+function pickPixelRatio() {
+  const dpr = window.devicePixelRatio || 1;
+  const coarse = window.matchMedia('(pointer: coarse)').matches;
+  // Mobile: hard-cap at 1.5 to keep fillrate sane; desktop: 2
+  return Math.min(dpr, coarse ? 1.5 : 2);
+}
 
 export class Renderer {
   constructor(canvas) {
     this.canvas = canvas;
     try {
-      this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
     } catch (err) {
       showFallback(err);
       throw err;
     }
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(pickPixelRatio());
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     window.addEventListener('resize', () => this.resize());
+    // Re-evaluate DPR if the pointer profile changes (rare, but cheap)
+    window.matchMedia('(pointer: coarse)').addEventListener?.('change', () => {
+      this.renderer.setPixelRatio(pickPixelRatio());
+      this.resize();
+    });
   }
 
   resize() {

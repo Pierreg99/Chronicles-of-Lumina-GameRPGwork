@@ -99,7 +99,7 @@ export function bugReportEmbed({ id, user, description, createdAt }) {
       { name: 'Gemeldet von', value: `<@${user.id}>`,  inline: true },
       { name: 'Beschreibung', value: description,      inline: false },
     )
-    .setFooter(FOOTER('Auch im GitHub-Issue-Tracker melden: github.com/Pierreg99/Lumina-Game/issues'));
+    .setFooter(FOOTER('Auch im GitHub-Issue-Tracker melden: github.com/Pierreg99/Chronicles-of-Lumina-GameRPGwork/issues'));
 }
 
 /** /suggestion — creative confirmation (gold) */

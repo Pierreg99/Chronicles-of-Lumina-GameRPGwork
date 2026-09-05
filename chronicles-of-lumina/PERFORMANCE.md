@@ -1,6 +1,6 @@
 # Performance Budget
 
-Last updated: 2026-08-01 (Phase 18 complete)
+Last updated: 2026-09-06 (v0.13 immersive polish)
 
 ## Targets
 

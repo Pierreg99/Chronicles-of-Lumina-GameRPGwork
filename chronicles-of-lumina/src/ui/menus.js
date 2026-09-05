@@ -1,16 +1,18 @@
 // ui/menus.js — start / pause / end screens. Listens to screen-state
 // changes and shows/hides overlays declaratively. The DOM is no longer
 // poked from main.js for these panels.
+// v0.13: clipboard share uses async Clipboard API with prompt() fallback.
 
-import { EVENTS } from '../core/constants.js';
-import { screenBus, SCREEN, transition } from '../core/screen-state.js';
+import { screenBus, SCREEN } from '../core/screen-state.js';
 import { state } from '../core/state.js';
+import { copyText } from '../utils/clipboard.js';
 
 const PANELS = {
   [SCREEN.START]:     'start-screen',
   [SCREEN.PAUSED]:    'pause-screen',
   [SCREEN.ENDSCREEN]: 'end-screen',
 };
+
 
 export class Menus {
   constructor(bus, callbacks = {}) {
@@ -41,21 +43,28 @@ export class Menus {
     bind(document.getElementById('end-restart-btn'), () => this.cb.onRestart && this.cb.onRestart());
 
     const share = document.getElementById('end-share-btn');
-    if (share) share.onclick = () => {
-      const url = new URL(location.href);
-      const seedEl = document.getElementById('end-seed');
-      const s = seedEl ? seedEl.textContent : '';
-      // Phase 19+: prefer the new map code (zone:seed) when set, fall
-      // back to legacy ?seed= for back-compat.
-      if (state.mapCode) {
-        url.searchParams.set('map', state.mapCode);
-      } else if (s && s !== '—') {
-        url.searchParams.set('seed', s);
-      }
-      navigator.clipboard?.writeText(url.toString());
-      share.textContent = 'Kopiert!';
-      setTimeout(() => { share.textContent = 'Seed teilen'; }, 1500);
-    };
+    if (share) {
+      const shareHandler = async (e) => {
+        e.preventDefault();
+        const url = new URL(location.href);
+        const seedEl = document.getElementById('end-seed');
+        const s = seedEl ? seedEl.textContent : '';
+        // Phase 19+: prefer the new map code (zone:seed) when set, fall
+        // back to legacy ?seed= for back-compat.
+        if (state.mapCode) {
+          url.searchParams.set('map', state.mapCode);
+        } else if (s && s !== '—') {
+          url.searchParams.set('seed', s);
+        }
+        const ok = await copyText(url.toString());
+        const label = share.querySelector('.share-label') || share;
+        const prev = label.textContent;
+        label.textContent = ok ? 'Kopiert!' : 'URL gezeigt';
+        setTimeout(() => { label.textContent = prev.includes('teilen') || prev.includes('Seed') ? 'Seed teilen' : 'Seed teilen'; }, 1600);
+      };
+      share.addEventListener('click', shareHandler);
+      share.addEventListener('touchend', shareHandler, { passive: false });
+    }
 
     const mute = document.getElementById('mute-btn');
     if (mute) mute.onclick = () => {
@@ -85,7 +94,14 @@ export class Menus {
     const showId = PANELS[screen];
     if (showId) {
       const el = document.getElementById(showId);
-      if (el) el.style.display = 'flex';
+      if (el) {
+        el.style.display = 'flex';
+        // Focus primary action for keyboard / screen-reader users
+        const primary = el.querySelector('.btn.primary');
+        if (primary) {
+          try { primary.focus({ preventScroll: true }); } catch { /* ignore */ }
+        }
+      }
     }
   }
 

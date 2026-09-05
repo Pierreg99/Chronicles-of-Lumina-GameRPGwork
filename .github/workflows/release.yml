@@ -64,8 +64,8 @@ jobs:
             ${{ steps.changelog.outputs.body }}
 
             ---
-            **Live Demo:** https://pierreg99.github.io/Lumina-Game/
-            **Changelog:** https://github.com/Pierreg99/Lumina-Game/blob/main/chronicles-of-lumina/CHANGELOG.md
+            **Live Demo:** https://pierreg99.github.io/Chronicles-of-Lumina-GameRPGwork/
+            **Changelog:** https://github.com/Pierreg99/Chronicles-of-Lumina-GameRPGwork/blob/main/chronicles-of-lumina/CHANGELOG.md
           draft: false
           prerelease: ${{ contains(steps.version.outputs.tag, '-') }}
           generate_release_notes: false

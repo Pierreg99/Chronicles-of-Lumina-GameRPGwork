@@ -69,7 +69,7 @@ bot/
 2. In `.env` setzen:
    ```
    GITHUB_TOKEN=ghp_xxx
-   GITHUB_REPO=Pierreg99/Lumina-Game
+   GITHUB_REPO=Pierreg99/Chronicles-of-Lumina-GameRPGwork
    ```
 3. `npm run deploy` + `npm start`
 
