@@ -1,6 +1,6 @@
 {
   "name": "chronicles-of-lumina",
-  "version": "0.13.3",
+  "version": "0.13.4",
   "private": true,
   "type": "module",
   "description": "3D browser action-adventure \u2014 vanilla JS + Three.js. 40 phases complete (0\u201340), 401 tests, 10 biomes, immersive UX polish (v0.13).",

@@ -57,6 +57,7 @@ let _layers = new Map();   // name → { nodes: [], gain: GainNode, currentGain:
 // _sprite = AudioBuffer with all presets concatenated; _spriteIndex = name → [offset, duration]
 let _sprite = /** @type {AudioBuffer | null} */ (null);
 let _spriteIndex = /** @type {Record<string, [number, number]>} */ ({});
+let _lastBuiltEra = /** @type {string | undefined} */ (undefined);
 
 function ensure() {
   if (_ctx) return _ctx;
@@ -136,6 +137,7 @@ function _buildSfxSprite() {
     cursor += m.dur + SPRITE_PADDING_SEC;
   }
   _sprite = buf;
+  _lastBuiltEra = currentEra();
 }
 
 // ── SFX (Phase 18: from sprite) ───────────────────────────
@@ -148,9 +150,8 @@ export function playSfx(name) {
     return;
   }
   // Lazy-rebuild sprite on era change (era 1 -> 2 -> 3 -> 1, etc.)
-  if (!_sprite || (_lastBuiltEra !== undefined && _lastBuiltEra !== currentEra())) {
+  if (!_sprite || _lastBuiltEra !== currentEra()) {
     _buildSfxSprite();
-    _lastBuiltEra = currentEra();
   }
   const slot = _spriteIndex[name];
   if (!slot) return;
