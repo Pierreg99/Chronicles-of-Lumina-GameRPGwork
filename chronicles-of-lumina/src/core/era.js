@@ -68,3 +68,6 @@ export function setEra(e) {
 
 /** @returns {object} the metadata for the current era */
 export function currentEraInfo() { return ERA_INFO[currentEra()]; }
+
+// Re-export for modules that historically imported post-process from era.js
+export { applyEraPostProcess } from '../engine/era-renderer.js';

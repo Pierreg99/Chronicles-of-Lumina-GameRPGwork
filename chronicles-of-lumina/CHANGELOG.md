@@ -1,3 +1,7 @@
+## 0.13.1 — 2026-09-05
+
+- Fix era post-process import: re-export `applyEraPostProcess` from `era.js` + SW cache bust `lumina-v0.13.1`.
+
 # Changelog
 
 Alle nennenswerten Änderungen an Chronicles of Lumina. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
