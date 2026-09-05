@@ -38,8 +38,8 @@ jobs:
 
       - name: Prepare publish directory
         run: |
-          mkdir -p _site
-          # Copy game assets, skip non-web folders
+          mkdir -p _site/chronicles-of-lumina
+          # Nested game entry (build-pages copied game.html → index.html)
           rsync -a \
             --exclude 'node_modules' \
             --exclude 'bot' \
@@ -51,13 +51,15 @@ jobs:
             --exclude 'jsconfig.json' \
             --exclude 'build-pages.mjs' \
             --exclude '.gitignore' \
-            chronicles-of-lumina/ _site/
-          # Keep PWA manifest
-          if [ -f chronicles-of-lumina/manifest.webmanifest ]; then
-            cp chronicles-of-lumina/manifest.webmanifest _site/
+            chronicles-of-lumina/ _site/chronicles-of-lumina/
+          # Root redirect → chronicles-of-lumina/game.html (preserves query/hash)
+          cp index.html _site/index.html
+          if [ -f .well-known/security.txt ]; then
+            mkdir -p _site/.well-known
+            cp .well-known/security.txt _site/.well-known/
           fi
-          # Ensure .nojekyll so underscore paths are served
           touch _site/.nojekyll
+
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0

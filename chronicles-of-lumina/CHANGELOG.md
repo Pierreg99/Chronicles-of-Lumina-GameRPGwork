@@ -1,6 +1,14 @@
-## 0.13.1 — 2026-09-05
+## 0.13.2 — 2026-09-06
+
+- Ship-complete: repo-root `index.html` redirects to `chronicles-of-lumina/game.html` (preserves query/hash).
+- GitHub Pages publishes nested game under `/chronicles-of-lumina/` with root redirect (SW cache `lumina-v0.13.2`).
+- Package version **0.13.2**.
+
+## 0.13.1 — 2026-09-06
 
 - Fix era post-process import: re-export `applyEraPostProcess` from `era.js` + SW cache bust `lumina-v0.13.1`.
+- Package version synced to **0.13.1**.
+- Repo-root `index.html` redirects to `chronicles-of-lumina/game.html` (preserves query/hash) for local/root serving.
 
 # Changelog
 

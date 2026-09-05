@@ -6,7 +6,14 @@
 
 ## Schnellstart
 
+Repo-root `index.html` redirects to `chronicles-of-lumina/game.html` (preserves `?query` and `#hash`).
+
 ```bash
+# From repo root (redirect → game):
+python3 -m http.server 8080
+# Browser: http://localhost:8080/   or   .../chronicles-of-lumina/game.html
+
+# Or serve the game folder directly:
 cd chronicles-of-lumina
 python3 -m http.server 8080
 # Browser: http://localhost:8080/game.html

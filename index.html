@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chronicles of Lumina — redirect</title>
+  <meta name="robots" content="noindex" />
+  <script>
+    (function () {
+      var target = 'chronicles-of-lumina/game.html';
+      var dest = target + location.search + location.hash;
+      location.replace(dest);
+    })();
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=chronicles-of-lumina/game.html" />
+  </noscript>
+</head>
+<body>
+  <p>Opening <a id="go" href="chronicles-of-lumina/game.html">Chronicles of Lumina</a>…</p>
+  <script>
+    document.getElementById('go').href =
+      'chronicles-of-lumina/game.html' + location.search + location.hash;
+  </script>
+</body>
+</html>
